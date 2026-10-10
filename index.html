@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>면역 디펜스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+<style>
+/* Layout: game screen. Membrane-framed arena (blood vessel left, tissue field, wound right), top status bar, bottom dock = glucose bar + tabbed card hand + round action buttons. Deep body-interior world, single theme. */
+:root{
+  --bg:#2a0b14; --bg2:#3d1221; --flesh:#fbdadd; --flesh2:#f3b8c1; --skin:#fff4f5;
+  --membrane:#c0465f; --membrane-d:#7d2238; --ink:#4a1626; --muted:#8c4a5c; --light:#ffe9ec;
+  --gold:#e8920c; --goldbg:#ffcf4d; --golddk:#a8690a; --danger:#e8334f; --ok:#2f9e5c; --blue:#3d8fd1;
+  --display:"Jua","Gowun Dodum",system-ui,sans-serif;
+  --body:"Gowun Dodum",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--light);font-family:var(--body);font-size:15px;padding-inline:16px;padding-block:14px;box-sizing:border-box;
+  background-image:radial-gradient(circle at 20% 0,#4a1527 0,transparent 45%),radial-gradient(circle at 90% 100%,#3a0f1e 0,transparent 50%)}
+*{box-sizing:border-box}
+.game{position:relative;max-width:1000px;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;background:var(--membrane-d);border:3px solid var(--membrane);border-bottom:0;border-radius:24px 24px 0 0;padding:8px 12px}
+.brand{font-family:var(--display);font-size:19px;color:var(--flesh)}
+.stagepill{display:flex;align-items:center;gap:8px;background:var(--bg2);border-radius:999px;padding:3px 14px 3px 3px;font-family:var(--display);font-size:15px;color:var(--flesh)}
+.stagepill .lv{width:26px;height:26px;border-radius:50%;background:var(--goldbg);color:#6b3d05;display:grid;place-items:center;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto;min-width:0}
+.chip{font-family:var(--display);font-size:12.5px;padding:2px 9px;border-radius:999px;background:var(--skin);color:var(--muted);border:2px solid transparent}
+.chip.on{color:var(--blue)}
+.chip.warn{color:var(--danger)}
+.thermo{display:flex;align-items:center;gap:6px;background:var(--bg2);border-radius:999px;padding:3px 10px 3px 6px;font-family:var(--display);color:var(--flesh);font-size:13px}
+.thermo .tube{width:70px;height:10px;border-radius:5px;background:#5c1c2e;overflow:hidden}
+.thermo .tube i{display:block;height:100%;width:0;background:#7cc0f0;transition:width .3s,background .3s}
+.thermo b{font-weight:400;font-size:15px;font-variant-numeric:tabular-nums;min-width:3.6em}
+.thermo.hot .tube i{background:#ffb02e}.thermo.hot{color:#ffd27a}
+.thermo.burn .tube i{background:#ff3b3b}.thermo.burn{color:#fff;background:#b3122c;animation:throb .6s ease-in-out infinite}
+@keyframes throb{50%{transform:scale(1.07)}}
+.game.hot .arena{box-shadow:0 0 0 3px #ff8a3d,0 0 26px rgba(255,110,40,.55)}
+.game.burn .arena{box-shadow:0 0 0 4px #ff2a2a,0 0 40px rgba(255,30,30,.75);animation:burnglow .5s ease-in-out infinite}
+.game.burn .topbar{background:#a3122a}
+@keyframes burnglow{50%{box-shadow:0 0 0 4px #ff6a3d,0 0 60px rgba(255,60,30,.9)}}
+.hpbox{display:flex;align-items:center;gap:6px}
+.hearts{display:flex;gap:1px}
+.hearts svg{width:15px;height:15px;display:block}
+.hearts .empty path{fill:#5c1c2e}
+.hpnum{font-family:var(--display);font-size:17px;color:var(--flesh);font-variant-numeric:tabular-nums;min-width:1.4em}
+.arena{position:relative;border-inline:3px solid var(--membrane);background:#120409;overflow:hidden}
+canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:pointer}
+.toast{position:absolute;left:50%;top:10px;transform:translateX(-50%);max-width:min(560px,92%);background:rgba(255,244,245,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);border:2px solid rgba(255,207,77,.75);border-radius:18px;padding:9px 15px;font-size:14px;line-height:1.55;pointer-events:none;transition:opacity .3s;color:var(--ink);text-shadow:0 0 6px rgba(255,255,255,.9)}
+.toast b{font-family:var(--display);font-weight:400;color:var(--gold);font-size:17px;display:block;margin-bottom:2px}
+.dock{background:var(--flesh);border:3px solid var(--membrane);border-radius:0 0 24px 24px;padding:10px 12px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;color:var(--ink)}
+.glurow{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.hexa{width:50px;height:44px;flex:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--golddk);display:grid;place-items:center}
+.hexa span{width:44px;height:38px;clip-path:inherit;background:var(--goldbg);display:grid;place-items:center;font-family:var(--display);font-size:18px;color:#6b3d05;font-variant-numeric:tabular-nums}
+.glubar{flex:1;min-width:0;height:18px;border-radius:999px;background:#e8a3ae;border:3px solid var(--membrane);overflow:hidden;position:relative}
+.glubar i{display:block;height:100%;background:var(--goldbg);transition:width .25s}
+.glubar .tk{position:absolute;top:0;bottom:0;width:2px;background:rgba(125,34,56,.28)}
+.glulbl{font-family:var(--display);font-size:14px;color:var(--muted);white-space:nowrap}
+.handarea{min-width:0;display:flex;flex-direction:column}
+.tabs{display:flex;gap:4px;padding-left:10px}
+.tab{font-family:var(--display);font-size:14px;padding:5px 14px 4px;border-radius:12px 12px 0 0;background:var(--flesh2);color:var(--muted);border:3px solid var(--membrane);border-bottom:0;cursor:pointer;margin-bottom:-3px;position:relative}
+.tab[aria-selected="true"]{background:var(--skin);color:var(--ink);z-index:1}
+.tab:focus-visible,.unit:focus-visible,.round:focus-visible,.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.handwrap{background:var(--skin);border:3px solid var(--membrane);border-radius:16px;padding:0 8px 8px;min-width:0}
+.hand{display:flex;gap:12px;overflow-x:auto;padding:24px 10px 10px;scrollbar-width:thin}
+.unit{position:relative;flex:none;width:94px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 6px 8px;background:var(--light);border:3px solid var(--membrane);border-radius:16px;cursor:pointer;color:var(--ink);font-family:var(--display);box-shadow:0 5px 0 var(--membrane-d);transition:transform .28s cubic-bezier(.3,1.7,.5,1),box-shadow .2s,border-color .2s}
+.unit canvas{width:60px;height:60px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 2px var(--flesh2)}
+.unit .txt{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%}
+.unit .t{font-size:13px;line-height:1.15;text-align:center;word-break:keep-all}
+.unit .lk{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.25;word-break:keep-all}
+.unit .cost{position:absolute;top:-12px;left:-12px;width:32px;height:28px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--goldbg);color:#6b3d05;font-size:15px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.unit.poor .cost{background:#e3c3c9;color:var(--muted)}
+.unit.poor canvas,.unit.off canvas{opacity:.55}
+.unit:hover{transform:translateY(-4px)}
+.unit.sel{transform:translateY(-16px) scale(1.14);border-color:var(--goldbg);box-shadow:0 0 0 5px rgba(255,207,77,.55),0 9px 0 var(--membrane-d);z-index:2}
+.unit.fire{animation:fire .5s cubic-bezier(.3,1.7,.5,1)}
+.unit.nope{animation:nope .35s}
+@keyframes fire{0%{transform:scale(1)}30%{transform:translateY(-18px) scale(1.2);border-color:var(--goldbg)}100%{transform:none}}
+@keyframes nope{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.unit.locked{background:#efe4e7;border-style:dashed;border-color:#c79aa6;box-shadow:none}
+.unit.locked canvas{filter:grayscale(1);opacity:.4}
+.unit.locked .t{color:#a58a93}
+.rowlbl{font-family:var(--display);font-size:12.5px;color:var(--muted);padding:2px 10px 0;border-top:2px dashed var(--flesh2);margin:0 6px}
+.hand.mem{padding-top:20px}
+.unit.auto{cursor:help;background:#fff;border-color:#d79aa8;box-shadow:0 5px 0 #c58494}
+.unit .cnt{position:absolute;top:-10px;right:-10px;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--membrane);color:#fff;font-size:13px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.unit .cnt.zero{background:#d9b3bc}
+.prog{height:5px;width:80%;border-radius:3px;background:#e2cfd4;overflow:hidden}.prog i{display:block;height:100%;background:#c79aa6}
+.info{font-size:13.5px;color:var(--muted);line-height:1.5;padding:2px 6px 0;min-height:2.6em}
+.actions{display:flex;align-items:flex-end;gap:10px}
+.smalls{display:grid;grid-template-columns:repeat(2,54px);gap:8px}
+.round{width:54px;height:54px;border-radius:50%;border:3px solid var(--membrane);background:var(--skin);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:var(--display);font-size:11.5px;color:var(--ink);box-shadow:0 4px 0 var(--membrane-d);cursor:pointer;padding:0;transition:transform .1s,box-shadow .1s}
+.round svg{width:20px;height:20px}
+.round:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--membrane-d)}
+.round:disabled{opacity:.45;cursor:default}
+.round.sel{background:var(--danger);color:#fff;border-color:var(--membrane-d)}
+.round.go{width:96px;height:96px;background:var(--goldbg);border-color:var(--golddk);box-shadow:0 6px 0 var(--golddk);font-size:17px;color:#6b3d05}
+.round.go svg{width:34px;height:34px}
+.round.go:not(:disabled){animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.06)}}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(42,11,20,.78);padding:16px;z-index:5;border-radius:24px}
+.card{background:var(--flesh);border:3px solid var(--membrane);border-radius:24px;padding:22px 24px;max-width:500px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 0 var(--membrane-d);color:var(--ink)}
+.card h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0;text-wrap:balance;color:var(--membrane-d)}
+.card .eyebrow{font-family:var(--display);font-size:14px;color:var(--gold)}
+.card p{margin:0;line-height:1.65;color:var(--muted)}
+.card ul{margin:0;padding-left:18px;line-height:1.7;color:var(--muted);font-size:14px}
+.btn{align-self:flex-start;font-family:var(--display);font-size:18px;background:var(--goldbg);color:#6b3d05;border:0;border-radius:999px;padding:10px 22px;cursor:pointer;box-shadow:0 4px 0 var(--golddk)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--golddk)}
+.bookcard{max-width:900px;height:100%}
+.booktabs{display:flex;gap:4px;border-bottom:3px solid var(--membrane);padding-left:6px}
+.booktabs .tab{margin-bottom:-3px}
+.bookpage{display:flex;flex-direction:column;gap:14px;overflow:auto;min-height:0;flex:1;padding-right:4px}
+.bookrow{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding-top:12px;border-top:2px dashed var(--flesh2)}
+.bookrow:first-child{border-top:0;padding-top:4px}
+.rowhead b{display:block;font-family:var(--display);font-weight:400;font-size:18px;color:var(--membrane-d)}
+.rowhead span{font-size:12.5px;color:var(--muted);line-height:1.45;display:block;margin-top:2px}
+.rowcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 2px}
+.tag{font-family:var(--display);font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--flesh);color:var(--membrane-d)}
+.tag.how{background:#fff3d6;color:#8a5a06}
+.found{font-style:normal;font-size:11px;background:var(--ok);color:#fff;border-radius:999px;padding:1px 7px;vertical-align:2px}
+.entry dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:12px;line-height:1.45}
+.entry dt{font-family:var(--display);color:var(--gold)}
+.entry dd{margin:0;color:var(--ink)}
+@media (max-width:680px){.bookrow{grid-template-columns:minmax(0,1fr)}}
+.entry{display:flex;gap:10px;align-items:flex-start;background:var(--skin);border:2px solid var(--flesh2);border-radius:14px;padding:8px}
+.entry canvas{width:56px;height:56px;flex:none;background:#fff;border-radius:50%}
+.entry b{font-family:var(--display);font-weight:400;font-size:15px;display:block}
+.entry .how{font-size:12px;color:var(--gold);font-family:var(--display)}
+.entry p{font-size:12.5px;line-height:1.5;margin:2px 0 0}
+@media (max-width:680px){
+  .dock{grid-template-columns:minmax(0,1fr)}
+  .actions{order:-1;grid-column:1/-1;justify-content:flex-end}
+  .smalls{grid-template-columns:repeat(4,54px)}
+  .thermo .tube{width:44px}#tempState{display:none}
+  .round.go{width:64px;height:64px;font-size:13px}.round.go svg{width:24px;height:24px}
+  .brand{display:none}.chips{order:3;margin-left:0;width:100%}
+  .hpbox{margin-left:auto}.hearts svg{width:12px;height:12px}
+  .unit{width:84px}.unit canvas{width:52px;height:52px}
+}
+@media (max-width:680px){.toast{font-size:12.5px;padding:7px 11px;top:6px}.toast b{font-size:15px}}
+@media (prefers-reduced-motion:reduce){.unit,.round{transition:none}.unit.fire,.unit.nope,.round.go:not(:disabled){animation:none}}
+</style>
+</head>
+<body>
+<div class="game" id="game">
+  <div class="topbar">
+    <span class="brand">면역 디펜스</span>
+    <div class="stagepill"><span class="lv" id="stageNo">1</span><span id="stageName">피부 상처</span></div>
+    <div class="thermo" id="thermo" title="체온"><div class="tube"><i id="thermoFill"></i></div><b id="tempNum">36.8℃</b><span id="tempState">정상</span></div>
+    <div class="chips" id="chips"></div>
+    <div class="hpbox" aria-label="몸 체력"><div class="hearts" id="hearts"></div><b class="hpnum" id="hp">10</b></div>
+  </div>
+
+  <div class="arena">
+    <canvas id="cv" width="960" height="500" aria-label="게임 판"></canvas>
+    <div class="toast" id="toast" style="opacity:0"></div>
+  </div>
+
+  <div class="dock">
+    <div class="glurow">
+      <div class="hexa"><span id="glu">0</span></div>
+      <div class="glubar" id="glubar"><i id="gluFill"></i></div>
+      <span class="glulbl">포도당</span>
+    </div>
+    <div class="handarea">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="barrier" id="tab-barrier">1차 방어선</button>
+        <button class="tab" role="tab" data-tab="unit" id="tab-unit">면역세포</button>
+        <button class="tab" role="tab" data-tab="auto" id="tab-auto">자동 출동</button>
+      </div>
+      <div class="handwrap">
+        <div class="hand" id="barrierRow"></div>
+        <div id="unitRow" hidden>
+          <div class="hand" id="unitHand"></div>
+          <div class="rowlbl">기억세포 · 같은 유형을 10번 물리치면 열린다</div>
+          <div class="hand mem" id="memHand"></div>
+        </div>
+        <div class="hand" id="autoRow" hidden></div>
+        <div class="info" id="info">면역세포 카드를 누르면 혈관에서 바로 출동한다.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="smalls">
+        <button class="round" id="antiBtn" title="항생제 (1회)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.2 7.9l5.6 8.2"/></svg>항생제</button>
+        <button class="round" id="pyBtn" title="해열제 (피버 타임에 1회)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 4a2 2 0 014 0v9.3a4 4 0 11-4 0z"/><path d="M12 9v6"/><path d="M17.5 5.5h4M17.5 8.5h3"/></svg>해열제</button>
+        <button class="round" id="removeBtn" title="제거 모드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>제거</button>
+        <button class="round" id="bookBtn" title="면역 도감"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5C9.5 18 6.5 18 4 19z"/><path d="M12 6v13.5"/></svg>도감</button>
+      </div>
+      <button class="round go" id="startBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="startLbl">시작</span></button>
+    </div>
+  </div>
+  <div class="overlay" id="overlay"></div>
+</div>
+
+<script>
+const COLS=9, ROWS=5, CELL=100, LEFT=60, W=960, H=500;
+const cv=document.getElementById('cv');let ctx=cv.getContext('2d');
+const dpr=Math.min(2,window.devicePixelRatio||1);
+cv.width=W*dpr; cv.height=H*dpr; ctx.scale(dpr,dpr);
+
+// ---------- biology data ----------
+const STRAINS={
+  A:{name:'세균 A형',color:'#e5484d',shape:'circle',divide:1,dodge:1,
+    trait:'편모로 헤엄쳐 다가오는 식세포를 요리조리 피하고, 이분법으로 계속 수를 늘린다. 항체가 붙으면 편모가 묶여 더는 못 피한다.'},
+  B:{name:'세균 B형',color:'#3d8fd1',shape:'tri',capsule:1,divide:1,intracell:1,
+    trait:'두꺼운 협막(캡슐)에 싸여 미끄러워서 식세포가 잘 못 잡는다. 먹혀도 일부는 소화되지 않고 대식세포 안에서 살아남아 대식세포를 감염시킨다(세포 내 기생). 항체가 붙어 있으면(옵소닌화) 제대로 먹히고 소화된다.'},
+  C:{name:'독소 세균 C형',color:'#2f9e5c',shape:'square',
+    trait:'독소를 뿜어 주변 면역세포를 해친다. 항체가 독소에 붙어 중화한다.'},
+  D:{name:'바이러스 D형',color:'#e39a0c',shape:'star',virus:1,spd:1.35,hide:5,
+    trait:'전파가 빠른 바이러스. 빠르게 움직이고 5초 만에 세포 속으로 숨는다.'},
+  E:{name:'바이러스 E형',color:'#0f9f9f',shape:'diamond',virus:1,hide:6,mhc:1,
+    trait:'감염시킨 세포 표면의 MHC를 숨겨서 세포독성 T림프구가 알아보지 못한다. 대신 MHC가 사라진 세포를 알아보는 NK세포가 2배로 강하다.'},
+  F:{name:'변이 바이러스 F형',color:'#c03fa8',shape:'cross',virus:1,hide:6,
+    trait:'항원이 바뀐 새 바이러스다. 예전 기억이 통하지 않아 처음부터 다시 정체를 밝혀야 한다.'},
+  P:{name:'꽃가루',color:'#d9a400',shape:'flower',harmless:1,
+    trait:'병원체가 아니라 해롭지 않은 꽃가루다. 아무것도 공격하지 않는다. 그런데 면역계가 이걸 적으로 착각하면 알레르기가 생긴다.'}
+};
+const UNITS={
+  macro:{name:'대식세포(백혈구)',cost:50,hp:280,sp:.75,rate:1.1,dmg:14,
+    desc:'느리고 튼튼한 식세포. 멀리 있는 병원체는 못 알아채고 돌아다니다 바로 옆에 오면 먹는다. 먹은 병원체의 조각을 표면에 올려 그 유형의 정체를 드러낸다(항원 제시)'},
+  mast:{name:'비만세포',cost:40,hp:90,sp:.5,
+    desc:'조직에 머무는 경보 담당. 세균이 다가오면 소리치며 히스타민을 뿜는다. 혈관이 넓어져 혈장이 새어 나오고 호중구가 몰려온다(염증 반응)'},
+  neut:{name:'호중구(백혈구)',cost:0,hp:60,sp:1.6,rate:.5,dmg:9,life:40,summon:1,
+    desc:'비만세포가 부를 때만 혈관을 빠져나와 달려온다. 비만세포가 경보를 울린 세균만 빠르게 먹고, 다 처리하면 5초 뒤 사라진다(죽은 호중구가 고름이 된다)'},
+  helper:{name:'보조 T림프구',cost:60,hp:90,sp:.8,
+    desc:'사이토카인으로 B림프구와 세포독성 T림프구를 활성화하는 지휘관. 정체가 드러난 항원이 있어야 출동한다'},
+  bcell:{name:'B림프구',cost:70,hp:80,sp:.9,
+    desc:'드러난 항원 하나에 딱 맞는 클론이 출동한다(클론 선택). 보조 T 신호를 받으면 뒤에서 분열하며 형질세포를 만들어 낸다'},
+  plasma:{name:'형질세포',cost:0,hp:70,sp:.9,rate:3.2,dmg:10,life:40,summon:1,
+    desc:'B림프구가 분화해서만 생긴다. 맡은 항원이 있는 곳으로 가서 항체를 뿌리고 다른 곳으로 옮겨 간다. 맡은 병원체가 다 사라지면 4초 뒤 사라진다'},
+  nk:{name:'NK세포',cost:50,hp:110,sp:1.2,rate:1,dmg:20,
+    desc:'항원을 몰라도 감염세포를 알아보고 공격하는 선천 면역 세포. 바로 싸우지만 힘은 약하다'},
+  tc:{name:'세포독성 T림프구',cost:85,hp:110,sp:1.1,rate:1,dmg:32,
+    desc:'드러난 바이러스 항원 하나를 맡는다. 보조 T 신호를 받으면 그 항원을 단 감염세포만 찾아가 퍼포린으로 파괴한다'},
+  memory:{name:'기억세포',cost:60,hp:160,sp:1.2,
+    desc:'예전에 싸운 항원을 기억하는 B림프구. 보조 T를 기다리지 않고 곧바로 형질세포를 빠르게 많이 만들고, 항체도 더 잘 붙는다(2차 면역반응)'}
+};
+const BARRIERS={
+  skin:{name:'피부',cost:30,hp:240,block:1,desc:'통과할 수 없는 벽. 계속 맞으면 뚫린다'},
+  mucus:{name:'점막',cost:20,desc:'점액이 붙잡아 지나가는 병원체를 50% 느리게 한다'},
+  lyso:{name:'분비물',cost:25,desc:'라이소자임이 세균 벽을 녹인다. 바이러스에는 효과 없음'},
+  cilia:{name:'섬모',cost:30,desc:'섬모 운동으로 3초마다 병원체를 뒤로 밀어낸다'}
+};
+const ENEMIES={
+  bact:{name:'세균',hp:40,speed:.36,dps:8,r:22},
+  toxin:{name:'독소 세균',hp:75,speed:.28,dps:6,r:24},
+  virus:{name:'바이러스',hp:28,speed:.75,dps:4,r:18},
+  infected:{name:'감염세포',hp:100,speed:0,dps:0,r:30},
+  mutant:{name:'변이 바이러스',hp:900,speed:.18,dps:14,r:42},
+  pollen:{name:'꽃가루',hp:30,speed:.3,dps:0,r:19}
+};
+const EXTRA={bact:1,toxin:1,virus:1,mutant:1,pollen:1};
+const NOTES={
+  leave:['임무 완료','할 일을 마친 면역세포는 잠시 뒤 물러난다. 실제로도 감염이 끝나면 대부분의 면역세포는 스스로 죽거나(세포자살) 사라지고, 기억세포만 남아 다음 감염에 대비한다.'],
+  bite:['세균의 반격','세균도 가만히 있지 않는다. 독소와 효소를 뿜어 가까이 온 면역세포를 공격한다. 체력이 다 닳은 면역세포는 죽는다.'],
+  macroInf:['대식세포 감염','B형 세균이 소화되지 않고 대식세포 안에서 살아남았다(세포 내 기생). 감염된 대식세포는 싸우지 못하고 점점 약해지다가, 터지면서 세균을 다시 쏟아낸다. 보조 T림프구가 가까이 가서 신호를 주면 대식세포가 활성화되어 안의 세균을 죽인다.'],
+  macroCure:['대식세포 활성화','보조 T림프구의 사이토카인(인터페론 감마)을 받은 대식세포가 활성화되어 안에 숨은 세균을 죽였다. 활성화된 대식세포는 더 세게 싸운다.'],
+  macroBurst:['감염된 대식세포가 터졌다','안에서 불어난 세균이 쏟아져 나왔다. 세포 내 기생 세균은 이렇게 면역세포를 숙주 삼아 퍼진다.'],
+  sens:['감작: 꽃가루를 기억했다','보조 T림프구가 꽃가루를 적으로 착각해 B림프구에게 IgE 항체를 만들라고 했다. IgE가 비만세포 표면에 달라붙었다. 다음에 꽃가루를 만나면 비만세포가 터진다.'],
+  pollen:['꽃가루 날리는 계절','꽃가루가 대량으로 들어온다. 꽃가루는 해롭지 않지만, 몸이 이미 꽃가루에 감작되어 있다면 알레르기 반응이 일어난다.'],
+  allergy:['알레르기 반응','IgE가 붙은 비만세포가 꽃가루를 보고 히스타민을 마구 뿜는다. 쓸데없는 염증으로 조직이 붓고(부종) 콧물이 나며, 면역세포가 느려지고 포도당이 낭비된다. 실제로는 항히스타민제로 히스타민 작용을 막는다.'],
+  noAllergy:['꽃가루는 무해하다','감작되지 않은 몸에서는 꽃가루가 그냥 지나간다. 대식세포가 조용히 치울 뿐이다.'],
+  divide:['세균 분열','세균은 이분법으로 한 마리가 두 마리가 된다. 빨리 잡지 않으면 기하급수적으로 늘어난다.'],
+  mhcHide:['MHC 숨김','E형에 감염된 세포는 MHC를 숨겨 세포독성 T림프구가 알아보지 못한다. NK세포가 나서야 한다.'],
+  alarm:['염증 반응','비만세포가 세균을 발견하고 히스타민을 뿜었다. 혈관이 넓어지고 틈이 생겨 혈장이 새어 나오고(부종), 호중구가 혈관을 빠져나와 몰려온다. 혈장 속 보체 단백질은 세균에 구멍을 낸다.'],
+  mystery:['정체불명의 병원체','처음 보는 병원체는 정체를 알 수 없어 까맣게 보인다. 식세포는 상관없이 먹지만, B·T림프구는 정체가 드러나야 노릴 수 있다.'],
+  reveal:['항원 정체 공개','대식세포가 병원체나 파괴된 감염세포의 잔해(회색 부스러기)를 먹고 그 조각을 표면에 올렸다(항원 제시). 같은 유형이 모두 정체를 드러냈다.'],
+  clone:['클론 선택','몸속엔 저마다 다른 항원에 맞는 B·T림프구가 수없이 있다. 드러난 항원에 딱 맞는 클론이 골라져 출동했다.'],
+  plasma:['형질세포로 분화','보조 T림프구의 신호(사이토카인)를 받은 B림프구가 분열하며 형질세포를 만들기 시작했다. 형질세포가 뿌린 항체가 붙은 병원체는 느려지고, 독소가 중화되며, 식세포에게 2배로 잘 먹힌다(옵소닌화).'],
+  tcAct:['세포독성 T 활성화','보조 T 신호를 받았다. 감염세포 표면에 올라온 항원을 확인하고 퍼포린을 주입해 세포째 파괴한다.'],
+  waiting:['보조 T림프구가 필요하다','B림프구와 세포독성 T림프구는 보조 T림프구의 신호 없이는 활성화되지 않는다. 지휘관을 먼저 보내자.'],
+  meal:['식사 시간','소장에서 흡수된 포도당이 혈액으로 들어온다. 포도당 +60, 10초간 생산 2배.'],
+  fever:['피버 타임! 열이 난다','대식세포가 내보낸 사이토카인이 뇌의 체온 조절 중추를 자극해 열이 오른다. 38~39.9℃의 적당한 열은 병원체 증식을 늦추고 면역세포를 빠르게 한다. 그런데 면역세포가 많을수록 사이토카인도 많아져 열이 더 오른다. 40℃를 넘으면 우리 몸도 지친다.'],
+  highFever:['고열 주의','40℃를 넘었다. 열이 너무 높으면 면역세포도 지치고 단백질이 망가지기 시작한다. 공격이 느려지고 체력과 포도당이 빠져나간다. 세포 수를 줄이거나 해열제를 쓰자.'],
+  antipy:['해열제','해열제가 체온 조절 중추에 작용해 열을 내린다. 고열의 피해는 줄지만, 적당한 열이 주던 도움(병원체 억제)도 같이 줄어든다.'],
+  vaccine:['백신 접종','약하게 만든 D형 항원을 미리 맞았다. D형의 정체가 드러나 있고, D형 기억세포가 이미 준비돼 있다.'],
+  antibiotic:['항생제 투여','세균은 사라졌지만 바이러스는 그대로다. 항생제는 세균에만 듣는다. 감기 대부분은 바이러스라 소용없고, 남용하면 내성균이 생긴다.'],
+  memory:['기억세포 형성','이 유형을 10번 물리쳐 기억세포가 생겼다. 전용 카드가 열렸다. 같은 항원이 다시 오면 훨씬 빠르고 강하게 반응한다(2차 면역반응).'],
+  infected:['감염세포 발생','바이러스가 몸 세포 안으로 숨어 복제를 시작했다. 항체도 식세포도 닿지 않는다. 그대로 두면 세포가 터지며 바이러스를 더 쏟아낸다. NK세포나 세포독성 T림프구가 세포째 없애야 한다.'],
+  mutant:['변이 바이러스 출현','항원이 바뀐 새 유형이다. 기억세포가 알아보지 못하니 다시 정체를 밝혀야 한다.']
+};
+const STAGES=[
+  {name:'피부 상처',goal:'병원체는 처음엔 정체를 알 수 없다. 1차 방어선이 시간을 버는 동안 식세포로 세균을 먹고, 대식세포의 항원 제시로 정체를 밝힌다.',
+   units:['macro','mast','helper','tc'],barriers:['skin','mucus','lyso'],start:160,anti:false,strains:['A','B'],
+   tint:['#ffe6ec','#ffdbe4'],spawns:[[4,45,4.6,'bact','A'],[28,88,4.4,'bact','B'],[50,88,3.6,'bact','A']],events:[[38,'fever'],[60,'meal']]},
+  {name:'림프절',goal:'정체가 드러난 항원에 맞는 B림프구가 보조 T 신호를 받아 형질세포가 되고, 항체로 독소 세균을 중화한다(체액성 면역).',
+   units:['macro','mast','helper','tc'],barriers:['skin','mucus','lyso'],start:210,anti:true,strains:['A','B','C','P'],
+   tint:['#efe6ff','#e6dbfc'],spawns:[[4,95,4.4,'bact','A'],[12,95,5,'bact','B'],[18,95,5.2,'toxin','C'],[6,60,6.5,'pollen','P']],events:[[40,'fever'],[68,'meal']]},
+  {name:'기도·폐',goal:'바이러스가 세포 안으로 숨는다. NK세포와 세포독성 T림프구가 감염세포를 파괴하고(세포성 면역), 반복된 승리는 기억세포를 남긴다.',
+   units:['macro','mast','helper','nk','tc'],barriers:['skin','mucus','lyso','cilia'],start:260,anti:true,strains:['A','D','E','F','P'],
+   tint:['#e4f4f6','#d7eef1'],spawns:[[4,95,2.2,'virus','D'],[24,95,3,'virus','E'],[8,60,7,'bact','A'],[60,95,1.8,'virus','D'],[100,100,1,'mutant','F']],events:[[22,'vaccine'],[40,'pollen'],[58,'fever'],[75,'meal']]}
+];
+
+let S;
+function newState(i,prev){
+  const st=STAGES[i];const spawns=[];
+  st.spawns.forEach(([a,b,iv,k,s])=>{for(let t=a;t<=b;t+=iv*(0.85+Math.random()*.3))spawns.push({t,k,s,lane:Math.floor(Math.random()*ROWS)})});
+  spawns.sort((x,y)=>x.t-y.t);
+  return {stage:i,phase:'setup',t:0,glu:st.start,hp:prev?prev.hp:10,grid:Array.from({length:ROWS},()=>Array(COLS).fill(null)),
+    units:[],plasmaPools:[],hist:[],debris:[],picked:null,enemies:[],abs:[],shots:[],zaps:[],fx:[],waves:[],spawns,events:st.events.map(e=>({t:e[0],k:e[1]})),
+    revealed:prev?{...prev.revealed}:{},kills:prev?{...prev.kills}:{},memory:prev?{...prev.memory}:{},seen:{},flags:prev?{...prev.flags}:{},
+    antiUsed:false,fever:0,meal:0,lastSpawn:spawns.at(-1).t,
+    carry:prev?{hp:prev.hp,revealed:{...prev.revealed},kills:{...prev.kills},memory:{...prev.memory},flags:{...prev.flags}}:null};
+}
+
+// ---------- drawing ----------
+function eyes(x,y,s,dir,mood){
+  const ox=dir*s*.12;
+  [-1,1].forEach(i=>{
+    const ex=x+i*s*.25+ox, ey=y-s*.06;
+    if(mood==='dizzy'){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex,ey,s*.15,0,7);ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle='#4a2338';ctx.beginPath();for(let a=0;a<9;a+=.3)ctx.lineTo(ex+Math.cos(a)*a*s*.013,ey+Math.sin(a)*a*s*.013);ctx.stroke();return;}
+    ctx.fillStyle=mood==='mys'?'#fff':'#3b1a2e';ctx.beginPath();ctx.ellipse(ex,ey,s*.13,s*.155,0,0,7);ctx.fill();
+    ctx.fillStyle=mood==='mys'?'#3b1a2e':'#fff';ctx.beginPath();ctx.arc(ex+s*.04*dir,ey-s*.02,s*(mood==='mys'?.06:.05),0,7);ctx.fill();
+    if(mood!=='mys'){ctx.beginPath();ctx.arc(ex-s*.04,ey+s*.05,s*.022,0,7);ctx.fill();}
+    if(mood==='mean'){ctx.strokeStyle='#3b1a2e';ctx.lineWidth=2.6;ctx.lineCap='round';ctx.beginPath();
+      const inner=i*dir<0;ctx.moveTo(ex-s*.13,ey-s*.24+(inner?0:-4)*i*dir*-1);ctx.lineTo(ex+s*.13,ey-s*.24+(inner?0:4)*i*dir*-1);ctx.stroke();}
+    else if(mood!=='mys'){ctx.fillStyle='rgba(255,120,150,.45)';ctx.beginPath();ctx.ellipse(ex+i*s*.1,ey+s*.2,s*.09,s*.05,0,0,7);ctx.fill();}
+  });
+  if(mood==='mys')return;
+  ctx.strokeStyle='#3b1a2e';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();
+  const mx=x+ox, my=y+s*.16;
+  if(mood==='mean'){ctx.moveTo(mx-s*.1,my+s*.03);ctx.quadraticCurveTo(mx,my-s*.04,mx+s*.1,my+s*.03);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(mx-s*.06,my);ctx.lineTo(mx-s*.02,my);ctx.lineTo(mx-s*.04,my+s*.06);ctx.fill();}
+  else{ctx.moveTo(mx-s*.08,my);ctx.quadraticCurveTo(mx-s*.04,my+s*.06,mx,my);ctx.quadraticCurveTo(mx+s*.04,my+s*.06,mx+s*.08,my);ctx.stroke();}
+}
+function heart(x,y,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,y+r*.9);ctx.bezierCurveTo(x-r*1.4,y,x-r*.7,y-r,x,y-r*.35);ctx.bezierCurveTo(x+r*.7,y-r,x+r*1.4,y,x,y+r*.9);ctx.fill();}
+function shadow(x,y,w){ctx.fillStyle='rgba(150,70,100,.14)';ctx.beginPath();ctx.ellipse(x,y,w,w*.28,0,0,7);ctx.fill();}
+function circ(x,y,r,fill,stroke){ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=2.5;ctx.strokeStyle=stroke;ctx.stroke();}}
+function yShape(x,y,ang,len,color,w=2.5){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();
+  const bx=x-Math.cos(ang)*len,by=y-Math.sin(ang)*len;ctx.moveTo(bx,by);ctx.lineTo(x,y);
+  ctx.lineTo(x+Math.cos(ang-.6)*len*.7,y+Math.sin(ang-.6)*len*.7);ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(ang+.6)*len*.7,y+Math.sin(ang+.6)*len*.7);ctx.stroke();}
+function marker(x,y,r,s,mys){
+  ctx.save();
+  if(mys){circ(x,y,r+3,'#2c2333','#fff');ctx.fillStyle='#fff';ctx.font=`${r*2}px Jua, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',x,y+1);ctx.restore();return;}
+  const c=STRAINS[s].color;circ(x,y,r+3,'#fff',c);ctx.fillStyle=c;ctx.beginPath();
+  const sh=STRAINS[s].shape;
+  if(sh==='circle')ctx.arc(x,y,r*.7,0,7);
+  else if(sh==='tri'){ctx.moveTo(x,y-r*.8);ctx.lineTo(x+r*.8,y+r*.6);ctx.lineTo(x-r*.8,y+r*.6);}
+  else if(sh==='square')ctx.rect(x-r*.6,y-r*.6,r*1.2,r*1.2);
+  else if(sh==='diamond'){ctx.moveTo(x,y-r*.85);ctx.lineTo(x+r*.7,y);ctx.lineTo(x,y+r*.85);ctx.lineTo(x-r*.7,y);}
+  else if(sh==='star'){for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.38:r*.85;ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);}}
+  else if(sh==='cross'){ctx.rect(x-r*.25,y-r*.75,r*.5,r*1.5);ctx.rect(x-r*.75,y-r*.25,r*1.5,r*.5);}
+  else if(sh==='flower'){for(let i=0;i<5;i++){const a=i*1.257;ctx.moveTo(x+Math.cos(a)*r*.45+r*.3,y+Math.sin(a)*r*.45);ctx.arc(x+Math.cos(a)*r*.45,y+Math.sin(a)*r*.45,r*.3,0,7);}}
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function drawUnit(k,x,y,s,time=0,alpha=1,opt={}){
+  ctx.save();ctx.globalAlpha=alpha;
+  const ph=time*3.2+x*.05, bob=Math.abs(Math.sin(ph))*-4;
+  shadow(x,y+s*.48,s*.36);
+  const sq=1+Math.cos(ph*2)*.03;ctx.translate(x,y+s*.45);ctx.scale(1/sq,sq);ctx.translate(-x,-(y+s*.45));y+=bob;
+  if(k==='neut'){circ(x,y,s*.5,'#f8c9d4','#c2788d');[[-.18,.12],[0,.2],[.18,.12]].forEach(([a,b])=>circ(x+a*s,y+b*s,s*.1,'#9a5cc0'));
+    for(let i=0;i<6;i++)circ(x+Math.cos(i)*s*.33,y+Math.sin(i*2)*s*.3,1.6,'#d48aa6');eyes(x,y-s*.05,s,1);}
+  else if(k==='macro'){ctx.beginPath();for(let a=0;a<=6.3;a+=.2){const r=s*(.56+.07*Math.sin(a*5+time*2));ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}
+    ctx.closePath();ctx.fillStyle='#d9cbf5';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#8a73c4';ctx.stroke();circ(x-s*.2,y+s*.22,s*.13,'#a48ad8');eyes(x+s*.05,y-s*.08,s,1);}
+  else if(k==='mast'){
+    if(opt.alarm){x+=Math.sin(time*60)*2.5;}
+    circ(x,y,s*.5,'#f4d6ea','#b071a1');for(let i=0;i<14;i++){const a=i*2.4,r=s*(.18+.22*((i*7)%5)/5);circ(x+Math.cos(a)*r,y+Math.sin(a)*r+s*.12,2.6,'#6d2f78');}
+    if(opt.alarm){
+      [-1,1].forEach(i=>{ctx.strokeStyle='#3b1a2e';ctx.lineWidth=2.6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x+i*s*.32,y-s*.24);ctx.lineTo(x+i*s*.16,y-s*.16);ctx.lineTo(x+i*s*.32,y-s*.08);ctx.stroke();});
+      ctx.fillStyle='#3b1a2e';ctx.beginPath();ctx.ellipse(x+s*.04,y+s*.1,s*.13,s*.16,0,0,7);ctx.fill();ctx.fillStyle='#ff8fa8';ctx.beginPath();ctx.ellipse(x+s*.04,y+s*.18,s*.08,s*.06,0,0,7);ctx.fill();
+    } else eyes(x,y-s*.12,s,1);
+    ctx.fillStyle='#f4b942';ctx.beginPath();ctx.moveTo(x+s*.38,y-s*.05);ctx.lineTo(x+s*(opt.alarm?.8:.68),y-s*(opt.alarm?.3:.2));ctx.lineTo(x+s*(opt.alarm?.8:.68),y+s*(opt.alarm?.2:.12));ctx.closePath();ctx.fill();}
+  else if(k==='helper'){circ(x,y,s*.48,'#c5e3f8','#5f9ccc');circ(x,y+s*.1,s*.3,'#7fb4dc');eyes(x,y-s*.04,s,1);
+    ctx.fillStyle='#2d4f78';ctx.beginPath();ctx.moveTo(x-s*.36,y-s*.32);ctx.lineTo(x+s*.38,y-s*.32);ctx.lineTo(x+s*.3,y-s*.55);ctx.lineTo(x-s*.3,y-s*.55);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#f4b942';ctx.fillRect(x+s*.15,y-s*.47,s*.12,s*.08);}
+  else if(k==='bcell'){for(let i=0;i<6;i++){const a=i*1.05+.3;yShape(x+Math.cos(a)*s*.56,y+Math.sin(a)*s*.56,a,7,'#3f8a52',2);}
+    circ(x,y,s*.44,'#d0f0c3','#5aa86c');circ(x-s*.05,y+s*.1,s*.26,'#8fcf8f');eyes(x,y-s*.06,s,1,opt.sleepy?'':'');
+    if(opt.sleepy){ctx.fillStyle='#5aa86c';ctx.font='15px Jua, sans-serif';ctx.fillText('z',x+s*.4,y-s*.4);}}
+  else if(k==='plasma'){ctx.beginPath();ctx.ellipse(x,y,s*.6,s*.46,0,0,7);ctx.fillStyle='#dff3e4';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#3f9a63';ctx.stroke();
+    ctx.strokeStyle='rgba(63,154,99,.45)';ctx.lineWidth=1.6;for(let i=0;i<3;i++){ctx.beginPath();for(let t=-.4;t<=.4;t+=.05)ctx.lineTo(x+s*.05+t*s,y+s*(.12+i*.1)+Math.sin(t*20+time*3)*2);ctx.stroke();}
+    circ(x-s*.34,y+s*.05,s*.17,'#79c595');for(let i=0;i<6;i++)circ(x-s*.34+Math.cos(i)*s*.09,y+s*.05+Math.sin(i)*s*.09,1.8,'#3f7f57');
+    eyes(x+s*.08,y-s*.1,s*.95,1);}
+  else if(k==='nk'){circ(x,y,s*.5,'#ffd8b8','#d7843f');for(let i=0;i<8;i++){const a=i*.8;circ(x+Math.cos(a)*s*.3,y+Math.sin(a)*s*.28+s*.06,3.2,'#c2611d');}
+    eyes(x,y-s*.08,s,1);ctx.fillStyle='#ffcf4d';ctx.beginPath();ctx.moveTo(x+s*.1,y-s*.6);ctx.lineTo(x-s*.05,y-s*.42);ctx.lineTo(x+s*.04,y-s*.42);ctx.lineTo(x-s*.1,y-s*.25);ctx.lineTo(x+s*.16,y-s*.47);ctx.lineTo(x+s*.06,y-s*.47);ctx.closePath();ctx.fill();}
+  else if(k==='tc'){circ(x,y,s*.48,'#f3a9a9','#b44a4a');circ(x,y+s*.1,s*.28,'#d57272');
+    ctx.fillStyle='#3b1820';ctx.fillRect(x-s*.48,y-s*.3,s*.96,s*.13);ctx.beginPath();ctx.moveTo(x-s*.46,y-s*.25);ctx.lineTo(x-s*.72,y-s*.38);ctx.lineTo(x-s*.68,y-s*.15);ctx.fill();
+    eyes(x,y-s*.04,s,1,'mean');}
+  else if(k==='memory'){ctx.fillStyle=`rgba(255,207,77,${.25+.15*Math.sin(time*5)})`;ctx.beginPath();ctx.arc(x,y,s*.68,0,7);ctx.fill();
+    for(let i=0;i<6;i++){const a=i*1.05+.3;yShape(x+Math.cos(a)*s*.56,y+Math.sin(a)*s*.56,a,7,'#d69400',2);}
+    circ(x,y,s*.46,'#fff1bf','#e0a516');circ(x-s*.05,y+s*.12,s*.24,'#ffd76a');eyes(x,y-s*.06,s,1);
+    ctx.fillStyle='#ffb800';ctx.beginPath();ctx.moveTo(x-s*.3,y-s*.38);ctx.lineTo(x-s*.3,y-s*.6);ctx.lineTo(x-s*.15,y-s*.48);ctx.lineTo(x,y-s*.66);ctx.lineTo(x+s*.15,y-s*.48);ctx.lineTo(x+s*.3,y-s*.6);ctx.lineTo(x+s*.3,y-s*.38);ctx.closePath();ctx.fill();}
+  else if(k==='serum'){ctx.beginPath();for(let a=0;a<=6.3;a+=.25){const r=s*(.5+.06*Math.sin(a*4+time*3));ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r*.75);}ctx.closePath();
+    ctx.fillStyle='rgba(255,226,140,.75)';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#e8b84a';ctx.stroke();
+    for(let i=0;i<5;i++)circ(x-s*.3+i*s*.15,y+s*.15+Math.sin(time*4+i)*2,2.4,'#c98a1c');eyes(x,y-s*.08,s*.8,1);}
+  ctx.restore();
+}
+function hexPath(x,y,r,rot=0){ctx.beginPath();for(let i=0;i<6;i++){const a=rot+i*Math.PI/3;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}ctx.closePath();}
+function capsule(x,y,w,h,fill,stroke){const r=h/2;ctx.beginPath();ctx.moveTo(x-w/2+r,y-r);ctx.lineTo(x+w/2-r,y-r);ctx.arc(x+w/2-r,y,r,-Math.PI/2,Math.PI/2);ctx.lineTo(x-w/2+r,y+r);ctx.arc(x-w/2+r,y,r,Math.PI/2,Math.PI*1.5);ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke();}
+const DARK={fill:'#3d3245',stroke:'#1d1524',line:'#3d3245',dot:'#5a4d63'};
+function drawEnemy(e,time){
+  const lg=(e.lunge||0)/.22, ly=e.ry==null?e.lane:e.ry, x=LEFT+e.x*CELL+(e.ldx||0)*lg*16, y=ly*CELL+CELL/2+Math.sin(time*4+e.id)*2-4+(e.ldy||0)*lg*12, s=ENEMIES[e.k].r*2;
+  const mys=!S.revealed[e.s], st=STRAINS[e.s];
+  shadow(x,ly*CELL+CELL/2+s*.42,s*.4);
+  if(e.k==='pollen'){
+    ctx.save();ctx.translate(x,y);ctx.rotate(time*.6+e.id);
+    for(let i=0;i<14;i++){const a=i*Math.PI/7;circ(Math.cos(a)*s*.5,Math.sin(a)*s*.5,s*.11,mys?DARK.dot:'#f5c518');}
+    circ(0,0,s*.47,mys?DARK.fill:'#ffe066',mys?DARK.stroke:'#d9a400');
+    for(let i=0;i<6;i++){const a=i*1.05;circ(Math.cos(a)*s*.25,Math.sin(a)*s*.25,2.2,mys?DARK.dot:'#e0a800');}
+    ctx.restore();eyes(x,y,s*.75,-1,mys?'mys':'');
+  } else if(e.k==='bact'||e.k==='toxin'){
+    if(STRAINS[e.s].capsule){ctx.fillStyle=mys?'rgba(80,60,90,.22)':'rgba(120,180,240,.28)';ctx.strokeStyle=mys?'rgba(60,40,70,.4)':'rgba(61,143,209,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,s*.72,s*.5,0,0,7);ctx.fill();ctx.stroke();}
+    ctx.strokeStyle=mys?DARK.line:(e.k==='bact'?'#d99a3c':'#6f8a2e');ctx.lineWidth=1.5;
+    for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(x+s*.45,y+i*6);for(let j=1;j<=4;j++)ctx.lineTo(x+s*.45+j*6,y+i*6+Math.sin(time*10+j+i)*3);ctx.stroke();}
+    if(e.k==='toxin'&&!(e.opT>0)){ctx.fillStyle='rgba(140,220,60,.13)';ctx.beginPath();ctx.arc(x,y,CELL*1.15,0,7);ctx.fill();}
+    const body=mys?DARK.fill:(e.k==='bact'?(e.s==='B'?'#ffb3a7':'#f7b955'):'#8ea83c');
+    capsule(x,y,s*1.05,s*.62,body,mys?DARK.stroke:(e.k==='bact'?'#b5741f':'#4f6420'));
+    if(e.k==='toxin'&&!mys){circ(x-s*.2,y+s*.36,3.5,'#a8f04a');circ(x+s*.1,y+s*.4+Math.sin(time*3)*2,3,'#a8f04a');}
+    eyes(x-s*.08,y,s*.75,-1,mys?'mys':'mean');
+  } else if(e.k==='virus'||e.k==='mutant'){
+    const r=s*.42, boss=e.k==='mutant', sp=boss?14:8;
+    ctx.strokeStyle=mys?DARK.line:(boss?'#ff4d4d':st.color);ctx.lineWidth=boss?3:2;
+    for(let i=0;i<12;i++){const a=i*Math.PI/6+time*.4,L=r+(boss&&i%3===0?sp:8);ctx.beginPath();ctx.moveTo(x+Math.cos(a)*r,y+Math.sin(a)*r);ctx.lineTo(x+Math.cos(a)*L,y+Math.sin(a)*L);ctx.stroke();
+      circ(x+Math.cos(a)*L,y+Math.sin(a)*L,boss?3.5:2.6,mys?DARK.dot:(boss?'#ffb0b0':'#fff'));}
+    hexPath(x,y,r,time*.4);ctx.fillStyle=mys?DARK.fill:(boss?'#5a1838':'#8a6ad0');ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=mys?DARK.stroke:(boss?'#ff4d4d':'#4a3291');ctx.stroke();
+    if(e.k==='virus'){const p=Math.min(1,e.age/((STRAINS[e.s]||{}).hide||6));ctx.strokeStyle='#ffb020';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r+14,-Math.PI/2,-Math.PI/2+p*6.28);ctx.stroke();}
+    eyes(x,y,s*(boss?.6:.7),-1,mys?'mys':'mean');
+  } else if(e.k==='infected'){
+    circ(x,y,s*.5,mys?'#6a5d72':'#cfe3b0',mys?DARK.stroke:'#7d9a55');
+    for(let i=0;i<3;i++){hexPath(x-s*.15+i*s*.15,y+s*.22,5,time+i);ctx.fillStyle=mys?DARK.fill:st.color;ctx.fill();}
+    eyes(x,y-s*.08,s*.8,-1,'dizzy');
+  }
+  if(e.opT>0){for(let i=0;i<4;i++){const a=i*1.6+.4;yShape(x+Math.cos(a)*s*.42,y+Math.sin(a)*s*.42,a+Math.PI,7,'#2f9e5c',2.2);}}
+  if(e.slowT>0){ctx.fillStyle='rgba(120,190,240,.22)';ctx.beginPath();ctx.arc(x,y,s*.6,0,7);ctx.fill();}
+  marker(x+s*.38,y-s*.4,7,e.s,mys);
+  if(S.units.some(u=>u.k==='neut'&&u.targets&&u.targets.includes(e))){ctx.fillStyle='#e0577f';ctx.font='20px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('!',x-s*.4,y-s*.42+Math.sin(time*8)*2);}
+  if(e.icon){marker(x+s*.38,y-s*.4,7,e.s,false);return;}
+  const mh=e.maxhp, w=Math.max(30,s*.9);
+  ctx.fillStyle='rgba(120,60,90,.2)';ctx.beginPath();ctx.roundRect(x-w/2,y-s*.62-12,w,7,4);ctx.fill();
+  ctx.fillStyle=e.k==='mutant'?'#ef4a63':'#ff8a5c';ctx.beginPath();ctx.roundRect(x-w/2,y-s*.62-12,Math.max(2,w*Math.max(0,e.hp/mh)),7,4);ctx.fill();
+}
+function drawBarrier(k,x,y,time,hpRatio=1){
+  const s=CELL-8, x0=x-s/2, y0=y-s/2;
+  ctx.save();
+  if(k==='skin'){ctx.fillStyle='#e9a5a5';ctx.beginPath();ctx.roundRect(x0,y0,s,s,10);ctx.fill();ctx.strokeStyle='#b46767';ctx.lineWidth=2;
+    for(let r=0;r<4;r++)for(let c=0;c<3;c++)ctx.strokeRect(x0+c*s/3,y0+r*s/4,s/3,s/4);
+    if(hpRatio<.6){ctx.strokeStyle='#5a2030';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-10,y0+6);ctx.lineTo(x+4,y-6);ctx.lineTo(x-6,y+10);ctx.lineTo(x+8,y0+s-6);ctx.stroke();}
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(x0+6,y0+s-10,s-12,5);ctx.fillStyle='#ffd166';ctx.fillRect(x0+6,y0+s-10,(s-12)*hpRatio,5);}
+  else if(k==='mucus'){ctx.fillStyle='rgba(120,190,235,.35)';ctx.beginPath();ctx.ellipse(x,y,s*.48,s*.42,0,0,7);ctx.fill();ctx.strokeStyle='rgba(120,190,235,.7)';ctx.lineWidth=2;ctx.stroke();
+    for(let i=0;i<4;i++)circ(x-s*.25+i*s*.17,y+Math.sin(time*2+i)*s*.15,4,'rgba(255,255,255,.8)');}
+  else if(k==='lyso'){ctx.fillStyle='rgba(90,180,240,.3)';ctx.beginPath();ctx.ellipse(x,y+s*.15,s*.46,s*.28,0,0,7);ctx.fill();
+    for(let i=0;i<5;i++){const t=(time*.6+i/5)%1;circ(x-s*.3+i*s*.15,y+s*.2-t*s*.5,3+i%2,`rgba(90,180,240,${1-t})`);}}
+  else if(k==='cilia'){ctx.fillStyle='rgba(240,150,170,.25)';ctx.fillRect(x0,y+s*.3,s,s*.2);ctx.strokeStyle='#e88fa5';ctx.lineWidth=2.5;
+    for(let i=0;i<8;i++){const bx=x0+8+i*(s-16)/7, sw=Math.sin(time*5+i*.6)*10;ctx.beginPath();ctx.moveTo(bx,y+s*.32);ctx.quadraticCurveTo(bx+sw*.4,y,bx+sw,y-s*.32);ctx.stroke();}}
+  ctx.restore();
+}
+// ---------- tissue background (pre-rendered once per stage) ----------
+const TISSUE_STYLE=[
+  {sp:50,base:[247,196,190],vary:14,wall:[196,96,110],wallW:2.4,nuc:'rgba(150,70,100,.55)',nucR:.17},
+  {sp:34,base:[232,208,238],vary:12,wall:[158,110,170],wallW:2,nuc:'rgba(110,70,150,.6)',nucR:.26},
+  {sp:78,base:[255,236,238],vary:6,wall:[226,130,146],wallW:7,nuc:null,air:true}
+];
+const TISSUE={};
+function rnd(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function tissueFor(i){
+  if(TISSUE[i])return TISSUE[i];
+  const c=document.createElement('canvas');c.width=W;c.height=H;TISSUE[i]=c;
+  const g=c.getContext('2d');const img=g.createImageData&&g.createImageData(W,H);
+  if(!img||!img.data)return c;
+  const P=TISSUE_STYLE[i],R=rnd(7+i*31),sp=P.sp,gw=Math.ceil(W/sp)+2,gh=Math.ceil(H/sp)+2,pts=[];
+  for(let y=0;y<gh;y++)for(let x=0;x<gw;x++)pts.push({x:(x-.5+R())*sp,y:(y-.5+R())*sp,t:(R()-.5)*2});
+  const d=img.data;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const gx=Math.floor(x/sp)+.5|0,gy=Math.floor(y/sp)+.5|0;let d1=1e9,d2=1e9,best=null;
+    for(let yy=gy-1;yy<=gy+1;yy++)for(let xx=gx-1;xx<=gx+1;xx++){if(xx<0||yy<0||xx>=gw||yy>=gh)continue;const p=pts[yy*gw+xx];const dd=(p.x-x)**2+(p.y-y)**2;
+      if(dd<d1){d2=d1;d1=dd;best=p;}else if(dd<d2)d2=dd;}
+    const edge=Math.sqrt(d2)-Math.sqrt(d1),o=(y*W+x)*4;let r,gg,b;
+    if(edge<P.wallW){[r,gg,b]=P.wall;}
+    else{const k=Math.min(1,(edge-P.wallW)/(sp*.3)),sh=P.air?(.9+.1*k):(.86+.14*k),v=best.t*P.vary;
+      r=(P.base[0]+v)*sh;gg=(P.base[1]+v*.6)*sh;b=(P.base[2]+v*.6)*sh;}
+    d[o]=r;d[o+1]=gg;d[o+2]=b;d[o+3]=255;
+  }
+  g.putImageData(img,0,0);
+  if(P.nuc)for(const p of pts){g.fillStyle=P.nuc;g.beginPath();g.ellipse(p.x+sp*.05,p.y,sp*P.nucR,sp*P.nucR*.8,p.t,0,7);g.fill();
+    g.fillStyle='rgba(90,30,60,.45)';g.beginPath();g.arc(p.x+sp*.08,p.y-sp*.03,sp*.04,0,7);g.fill();}
+  if(i===1){g.strokeStyle='rgba(150,110,170,.35)';g.lineWidth=1.5;for(let k=0;k<26;k++){g.beginPath();let x=R()*W,y=R()*H;g.moveTo(x,y);for(let s=0;s<5;s++){x+=(R()-.5)*90;y+=(R()-.5)*90;g.lineTo(x,y);}g.stroke();}}
+  if(i===2){for(let k=0;k<7;k++){g.strokeStyle='rgba(214,60,85,.45)';g.lineWidth=3;g.beginPath();let x=LEFT,y=R()*H;g.moveTo(x,y);
+    for(let s=0;s<12;s++){x+=80;y+=(R()-.5)*70;g.lineTo(x,y);}g.stroke();}}
+  return c;
+}
+const EDGE=[
+  {name:'상처',fill:'#b8243d',lip:'#e8a2a8'},
+  {name:'림프관',fill:'#c9b8e6',lip:'#8e72b8'},
+  {name:'기도',fill:'#f6e3e6',lip:'#d98a99'}
+];
+function drawVessel(time){
+  ctx.fillStyle='#9e1d35';ctx.fillRect(0,0,LEFT,H);
+  ctx.fillStyle='#cf3550';ctx.fillRect(6,0,LEFT-18,H);
+  for(let i=0;i<18;i++){const y=((i*61+time*46)%(H+40))-20,x=14+((i*23)%26),rot=Math.sin(time+i)*.4;
+    ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle='#e9475f';ctx.beginPath();ctx.ellipse(0,0,10,7,0,0,7);ctx.fill();
+    ctx.fillStyle='#f58b9a';ctx.beginPath();ctx.ellipse(0,0,4.5,3,0,0,7);ctx.fill();ctx.restore();}
+  ctx.fillStyle='#7d1a2f';ctx.fillRect(LEFT-12,0,12,H);
+  for(let y=8;y<H;y+=22){ctx.fillStyle='#f1a9b4';ctx.beginPath();ctx.ellipse(LEFT-6,y+Math.sin(time*2+y)*1.5,5,9,0,0,7);ctx.fill();}
+  ctx.fillStyle='rgba(125,26,47,.75)';ctx.beginPath();ctx.roundRect(11,H/2-30,30,60,15);ctx.fill();ctx.fillStyle='#fff';ctx.font='18px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('혈',26,H/2-5);ctx.fillText('관',26,H/2+19);
+}
+function drawEdge(time){
+  const E=EDGE[S.stage],x0=W-22;
+  ctx.fillStyle=E.fill;ctx.beginPath();ctx.moveTo(W,0);ctx.lineTo(x0,0);
+  for(let y=0;y<=H;y+=20)ctx.lineTo(x0+Math.sin(y*.13+time*1.5)*4+(y%40?3:-3),y);
+  ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=E.lip;ctx.lineWidth=4;ctx.beginPath();for(let y=0;y<=H;y+=20)ctx.lineTo(x0+Math.sin(y*.13+time*1.5)*4+(y%40?3:-3),y);ctx.stroke();
+}
+function drawHeat(time){
+  const t=S.temp||36.8,h=Math.max(0,Math.min(1,(t-37.2)/4.3));
+  if(h<=0.01)return;
+  const burn=t>=40,pulse=.5+.5*Math.sin(time*(burn?9:5));
+  ctx.save();
+  ctx.fillStyle=`rgba(255,${burn?40:110},${burn?30:60},${.08+.16*h+.06*pulse*h})`;ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient&&ctx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,W*.62);
+  if(g&&g.addColorStop){g.addColorStop(0,'rgba(255,60,30,0)');g.addColorStop(1,`rgba(${burn?200:255},${burn?0:50},20,${.25+.45*h+.15*pulse*h})`);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+  ctx.globalCompositeOperation='lighter';
+  for(let i=0;i<6;i++){const y=((H+60)-((time*55+i*90)%(H+120))),a=.05+.07*h;ctx.strokeStyle=`rgba(255,180,120,${a})`;ctx.lineWidth=10;ctx.beginPath();
+    for(let x=LEFT;x<=W;x+=20)ctx.lineTo(x,y+Math.sin(x*.025+time*4+i)*7);ctx.stroke();}
+  for(let i=0;i<Math.round(28*h);i++){const x=LEFT+((i*137+time*30)%(W-LEFT)),y=H-((time*(60+i*7)+i*53)%(H+20)),r=2+(i%3);circ(x,y,r,`rgba(255,${150+i%4*20},60,${.5*h})`);}
+  ctx.globalCompositeOperation='source-over';
+  if(S.feverBanner!=null&&S.feverBanner<2.2){const k=S.feverBanner,sc=k<.3?.4+k/.3*.8:k<.5?1.2-(k-.3):1,al=k>1.7?1-(k-1.7)/.5:1;
+    ctx.globalAlpha=Math.max(0,al);ctx.translate(W/2,H/2-20);ctx.rotate(-.05);ctx.scale(sc,sc);
+    ctx.font='76px Jua, sans-serif';ctx.textAlign='center';ctx.lineJoin='round';ctx.lineWidth=14;ctx.strokeStyle='#7d1a2f';ctx.strokeText('피버 타임!',0,0);
+    ctx.fillStyle='#ffcf4d';ctx.fillText('피버 타임!',0,0);ctx.font='26px Jua, sans-serif';ctx.lineWidth=8;ctx.strokeText('열이 오른다',0,46);ctx.fillStyle='#fff';ctx.fillText('열이 오른다',0,46);}
+  ctx.restore();
+}
+function popScale(pt){if(!pt)return 1;const t=performance.now()/1000-pt;if(t>.9||t<0)return 1;return 1+.5*Math.exp(-t*7)*Math.cos(t*15);}
+function drawBoard(time){
+  ctx.drawImage(tissueFor(S.stage),0,0,W,H);
+  for(let r=0;r<ROWS;r++)if(r%2){ctx.fillStyle='rgba(120,30,55,.05)';ctx.fillRect(LEFT,r*CELL,W-LEFT,CELL);}
+  drawEdge(time);drawVessel(time);
+  const placing=selected&&S.phase==='setup';
+  if(placing){
+    const pulse=.55+.35*Math.sin(time*5);
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(canPlace(c,r)){ctx.strokeStyle=`rgba(255,207,77,${pulse})`;ctx.lineWidth=3;ctx.setLineDash([8,7]);ctx.beginPath();ctx.roundRect(LEFT+c*CELL+8,r*CELL+8,CELL-16,CELL-16,16);ctx.stroke();ctx.setLineDash([]);}
+  }
+  if(hover){const {c,r}=hover;if(c>=0&&c<COLS&&r>=0&&r<ROWS){
+    const cx=LEFT+c*CELL+50,cy=r*CELL+50;
+    if(placing&&canPlace(c,r)){const s=1.12+.05*Math.sin(time*8);ctx.save();ctx.globalAlpha=.75;ctx.translate(cx,cy);ctx.scale(s,s);ctx.translate(-cx,-cy);drawBarrier(selected.k,cx,cy,time,1);ctx.restore();
+      ctx.strokeStyle='#ffcf4d';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(cx-48,cy-48,96,96,18);ctx.stroke();}
+    else if(removeMode||S.picked||placing){ctx.strokeStyle=removeMode?'#e8334f':S.picked?'#3d8fd1':'rgba(80,20,40,.35)';ctx.lineWidth=4;ctx.setLineDash([10,7]);ctx.beginPath();ctx.roundRect(LEFT+c*CELL+5,r*CELL+5,CELL-10,CELL-10,18);ctx.stroke();ctx.setLineDash([]);}
+  }}
+}
+// ---------- camera: zoom punch on placement, zoom-in while a cell is picked ----------
+const cam={x:W/2,y:H/2,z:1,px:W/2,py:H/2,p:0,pt:9};let CAM={cx:W/2,cy:H/2,z:1};
+function camPunch(x,y,a=.08){cam.px=x;cam.py=y;cam.p=a;cam.pt=0;}
+function updateCam(dt){
+  if(S.feverBanner!=null)S.feverBanner+=dt;
+  let tx=W/2,ty=H/2,tz=1;
+  if(S.picked){tx=LEFT+S.picked.x*CELL;ty=S.picked.y*CELL+50;tz=1.12;}
+  const k=Math.min(1,dt*7);cam.x+=(tx-cam.x)*k;cam.y+=(ty-cam.y)*k;cam.z+=(tz-cam.z)*k;
+  cam.pt+=dt;const w=cam.pt<.5?Math.sin(Math.PI*cam.pt/.5):0,pw=cam.p*w,zx=Math.max(0,cam.z-1),tot=zx+pw;
+  CAM=tot<1e-4?{cx:W/2,cy:H/2,z:1}:{cx:(cam.x*zx+cam.px*pw)/tot,cy:(cam.y*zx+cam.py*pw)/tot,z:1+tot};
+  if((S.temp||0)>=40&&S.phase==='wave'){const a=(S.temp-39.5)*2.2;CAM={cx:CAM.cx+(Math.random()-.5)*a*8,cy:CAM.cy+(Math.random()-.5)*a*8,z:Math.max(CAM.z,1.012)};}
+}
+
+// ---------- rules ----------
+let selected=null, hover=null, removeMode=false;
+function cellCenter(c,r){return [LEFT+c*CELL+CELL/2,r*CELL+CELL/2];}
+function unitNear(x,y){let best=null,bd=.6;for(const u of S.units){const d=Math.hypot(u.x-x,u.y-y);if(d<bd){bd=d;best=u;}}return best;}
+function canPlace(c,r){
+  if(!selected||c<0||c>=COLS||r<0||r>=ROWS||S.grid[r][c]||S.phase!=='setup')return false;
+  return S.glu>=BARRIERS[selected.k].cost;
+}
+function place(c,r,px,py){
+  if(removeMode){
+    const u=unitNear(px,py);
+    if(u){if(S.phase==='setup')S.glu+=unitCost(u.k);S.units=S.units.filter(v=>v!==u);return;}
+    const g=S.grid[r][c];if(g){if(S.phase==='setup')S.glu+=BARRIERS[g.k].cost;S.grid[r][c]=null;}return;
+  }
+  if(!selected){
+    if(S.picked){const p=S.picked;
+      if(p.ordered&&Math.abs(p.hx-(c+.5))<.1&&Math.abs(p.hy-r)<.1){p.ordered=false;setInfo('명령 해제. 다시 자유롭게 돌아다닌다.');}
+      else{p.hx=c+.5;p.hy=r;p.ordered=true;setInfo('그 자리로 가서 주변을 지킨다. 같은 칸을 한 번 더 고르면 명령이 풀린다.');}
+      {const [cx,cy]=cellCenter(c,r);camPunch(cx,cy,.06);S.fx.push({x:cx,y:cy,t:0,kind:'place',c:'#3d8fd1'});}
+      S.picked=null;return;}
+    const u=unitNear(px,py);if(u){S.picked=u;u.pt=performance.now()/1000;setInfo(`${unitName(u)} 선택. 지킬 칸을 누른다.`);}
+    return;
+  }
+  if(!canPlace(c,r)){if(S.phase!=='setup')setInfo('1차 방어선은 웨이브 시작 전에만 깔 수 있다. 감염 전부터 있는 방어이기 때문이다.');return;}
+  S.glu-=BARRIERS[selected.k].cost;
+  S.grid[r][c]={k:selected.k,hp:BARRIERS[selected.k].hp||1,maxhp:BARRIERS[selected.k].hp||1,pt:performance.now()/1000};
+  {const [cx,cy]=cellCenter(c,r);camPunch(cx,cy,.09);S.fx.push({x:cx,y:cy,t:0,kind:'place'});}
+  refreshTray();
+}
+function unitCost(k){return UNITS[k].cost;}
+function unitName(u){if(u.k==='memory')return `기억세포 ${u.s}형`;return UNITS[u.k].name;}
+const revealedList=(virusOnly)=>Object.keys(S.revealed).filter(s=>S.revealed[s]&&!STRAINS[s].harmless&&(!virusOnly||STRAINS[s].virus));
+function blockReason(k){
+  const def=UNITS[k];
+  if((k==='helper'||k==='bcell')&&!revealedList().length)return '아직 정체가 드러난 항원이 없다. 대식세포가 먼저 병원체를 먹어야 한다';
+  if(k==='tc'&&!revealedList(true).length)return '정체가 드러난 바이러스 항원이 없다. 대식세포가 바이러스를 먹어야 한다';
+  if(S.phase!=='setup'&&S.phase!=='wave')return '지금은 출동할 수 없다';
+  if(S.glu<def.cost)return `포도당이 모자란다 (${def.cost} 필요)`;
+  return '';
+}
+function chooseStrain(k){
+  let cand=revealedList(k==='tc').filter(s=>!STRAINS[s].harmless);
+  if(k==='tc'&&cand.some(s=>!STRAINS[s].mhc))cand=cand.filter(s=>!STRAINS[s].mhc);
+  if(!cand.length)cand=revealedList(k==='tc');
+  let best=cand[cand.length-1],bc=-1;
+  for(const s of cand){let n=0;for(const e of S.enemies){if(e.s!==s)continue;if(k==='tc')n+=e.k==='infected'?2:e.k==='virus'?1:0;else n+=EXTRA[e.k]?1:0;}if(n>bc){bc=n;best=s;}}
+  return best;
+}
+function laneFor(s){let best=null;for(const e of S.enemies){if(s&&e.s!==s)continue;if(!best||e.x<best.x)best=e;}return best?best.lane:Math.floor(Math.random()*ROWS);}
+function spawnUnit(k,memS){
+  const def=UNITS[k];
+  if(k==='memory'){if(S.glu<def.cost){setInfo(`포도당이 모자란다 (${def.cost} 필요)`);return;}}
+  else{const why=blockReason(k);if(why){setInfo(why);return;}}
+  S.glu-=def.cost;
+  const s=k==='memory'?memS:(k==='bcell'||k==='tc')?chooseStrain(k):null;
+  const y=laneFor(s)+(Math.random()-.5)*.3;
+  const u={k,s,x:.05,y,hx:.5,hy:Math.round(y),hp:def.hp,maxhp:def.hp,cd:0,born:S.t,tick:0,face:1,moving:0,ordered:false,
+    active:!(k==='bcell'||k==='tc'),actT:0,kills:0,state:'seek'};
+  u.pt=performance.now()/1000;S.units.push(u);
+  S.fx.push({x:LEFT,y:y*CELL+50,t:0,kind:'birth'});camPunch(LEFT+40,y*CELL+50,.04);
+  if((k==='bcell'||k==='tc')&&!S.flags.clone){S.flags.clone=1;note('clone');}
+  if((k==='bcell'||k==='tc')&&!hasHelper()&&!S.flags.waiting){S.flags.waiting=1;note('waiting');}
+  setInfo(`${k==='memory'?`기억세포 ${s}형`:def.name} 출동${s?` (${STRAINS[s].name} 담당)`:''}. ${def.desc}`);
+  refreshTray();
+}
+let eid=0;
+function spawn(k,s,lane,x=9.6){
+  const d=ENEMIES[k];S.enemies.push({id:eid++,k,s,lane,x,hp:d.hp,maxhp:d.hp,age:0,slowT:0,opT:0,spawnCd:k==='mutant'?4:k==='infected'?8:0,pushCd:0});
+  if(!S.revealed[s]&&!S.flags.mystery){S.flags.mystery=1;note('mystery');}
+  if(k==='mutant'&&!S.seen.mutant){S.seen.mutant=1;note('mutant');}
+}
+function hasHelper(){return S.units.some(u=>u.k==='helper');}
+function rateMul(u){const t=S.temp||36.8;return t>=40?.75:t>=37.8?1.45:1;}
+function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait}`]);buildTray();}
+function hurt(e,dmg,by){
+  if(e.dead)return;
+  e.hp-=dmg;
+  if(e.hp>0)return;
+  e.dead=1;S.glu+=3;
+  S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'pop',glu:1});
+  if(by==='macro')reveal(e.s);
+  else if(e.k==='infected'&&!S.revealed[e.s])S.debris.push({x:e.x,y:e.lane,s:e.s,t:0});
+  if(S.revealed[e.s]){S.kills[e.s]=(S.kills[e.s]||0)+1;
+    if(S.kills[e.s]>=10&&!S.memory[e.s]&&!STRAINS[e.s].harmless){S.memory[e.s]=1;note('memory',STRAINS[e.s].name);buildTray();}}
+}
+function blockerFor(e){
+  for(const u of S.units){if(Math.abs(u.y-e.lane)>.4)continue;const dx=e.x-u.x;if(dx>-.1&&dx<.6)return u;}
+  for(let c=COLS-1;c>=0;c--){const g=S.grid[e.lane][c];if(!g||!BARRIERS[g.k].block)continue;const dx=e.x-(c+.5);if(dx>-.1&&dx<.62)return g;}
+  return null;
+}
+function moveToward(u,tx,ty,sp,dt){
+  if(S.allergy>0)sp*=.6;if((S.temp||0)>=40)sp*=.8;
+  tx=Math.max(.3,Math.min(COLS-.3,tx));ty=Math.max(0,Math.min(ROWS-1,ty));
+  const dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);
+  if(d<.04){u.moving=0;return true;}
+  const step=Math.min(d,sp*dt);u.x+=dx/d*step;u.y+=dy/d*step;u.moving=1;if(Math.abs(dx)>.02)u.face=dx>0?1:-1;
+  return false;
+}
+function nearest(u,pred){let b=null,bd=1e9;for(const e of S.enemies){if(e.dead||!pred(e))continue;
+  if(u.ordered&&Math.hypot(e.x-u.hx,e.lane-u.hy)>2.6)continue;const d=Math.hypot(e.x-u.x,e.lane-u.y);if(d<bd){bd=d;b=e;}}if(b)u.hasT=1;return b;}
+function approach(u,e,reach,dt){
+  const d=Math.hypot(e.x-u.x,e.lane-u.y);
+  if(d>reach){const side=u.x<=e.x?-1:1;moveToward(u,e.x+side*reach*.75,e.lane,UNITS[u.k].sp,dt);}
+  else{u.moving=0;u.face=e.x>=u.x?1:-1;}
+  return d<=reach+.05;
+}
+function idle(u,dt,x0=.6,x1=8.4){
+  if(u.ordered){moveToward(u,u.hx,u.hy,UNITS[u.k].sp,dt);return;}
+  if(u.wx==null||Math.hypot(u.wx-u.x,u.wy-u.y)<.1){u.wx=x0+Math.random()*(x1-x0);u.wy=Math.random()*(ROWS-1);}
+  moveToward(u,u.wx,u.wy,UNITS[u.k].sp*.55,dt);
+}
+function releaseAntibodies(u,n,dmg){
+  const tg=S.enemies.filter(e=>!e.dead&&e.s===u.s&&EXTRA[e.k]&&Math.hypot(e.x-u.x,e.lane-u.y)<3.2);
+  if(!tg.length)return false;
+  for(let i=0;i<n;i++){const a=i/n*6.28;S.abs.push({x:u.x+Math.cos(a)*.2,y:u.y+Math.sin(a)*.2,vx:Math.cos(a)*2,vy:Math.sin(a)*2,t:tg[i%tg.length],s:u.s,dmg,life:3});}
+  S.waves.push({x:u.x,y:u.y,t:0});u.tick=.25;
+  return true;
+}
+function update(dt){
+  S.t+=dt;
+  S.fever=Math.max(0,S.fever-dt);S.meal=Math.max(0,S.meal-dt);S.antipyT=Math.max(0,(S.antipyT||0)-dt);
+  if(S.temp==null)S.temp=36.8;
+  {const tgt=S.fever>0?Math.min(41.8,38.1+.075*S.units.length+(S.allergy>0?.4:0)+(S.plasmaPools.length*.1))-(S.antipyT>0?1.8:0):36.8;
+   S.temp+=(tgt-S.temp)*Math.min(1,dt*(tgt>S.temp?.55:.35));}
+  const hot=S.temp>=37.8,burn=S.temp>=40;
+  if(burn&&!S.flags.highFever){S.flags.highFever=1;note('highFever');}
+  if(burn){for(const u of S.units)u.hp-=2.5*dt;S.glu=Math.max(0,S.glu-1.5*dt);
+    if(S.temp>=41){S.heatT=(S.heatT||0)+dt;if(S.heatT>8){S.heatT=0;S.hp-=1;S.fx.push({x:LEFT,y:H/2,t:0,kind:'hit'});}}}
+  let regen=3.2;if(burn)regen*=.4;else if(hot)regen*=.8;if(S.meal>0)regen*=2;
+  S.glu+=regen*dt;
+  while(S.spawns.length&&S.spawns[0].t<=S.t){const s=S.spawns.shift();spawn(s.k,s.s,s.lane);}
+  while(S.events.length&&S.events[0].t<=S.t){const ev=S.events.shift();
+    if(ev.k==='meal'){S.glu+=60;S.meal=10;}
+    if(ev.k==='fever'){S.fever=16;S.antipyT=0;S.feverBanner=0;}
+    if(ev.k==='vaccine'){S.revealed.D=1;S.memory.D=1;buildTray();}
+    if(ev.k==='pollen'){for(let i=0;i<14;i++)spawn('pollen','P',i%ROWS,9.6+Math.random()*1.5);if(!S.flags.sens)toastQ.push(NOTES.noAllergy);}
+    note(ev.k);}
+  S.allergy=Math.max(0,(S.allergy||0)-dt);if(S.allergy>0)S.glu=Math.max(0,S.glu-2.2*dt);
+  if(S.revealed.P&&!S.flags.sens&&hasHelper()){S.sensT=(S.sensT||0)+dt;if(S.sensT>5){S.flags.sens=1;note('sens');}}
+
+  // pathogens
+  const born2=[];
+  for(const e of S.enemies){
+    const d=ENEMIES[e.k];e.age+=dt*((S.temp||0)>=37.8?.6:1);e.opT=Math.max(0,e.opT-dt);if(e.alarmT)e.alarmT=Math.max(0,e.alarmT-dt);
+    e.ry=e.ry==null?e.lane:e.ry+(e.lane-e.ry)*Math.min(1,dt*7);
+    const T=STRAINS[e.s]||{};
+    if(e.k==='virus'&&e.age>=(T.hide||6)){e.k='infected';e.hp=ENEMIES.infected.hp;e.maxhp=e.hp;e.spawnCd=8;e.age=0;e.opT=0;if(!S.seen.infected){S.seen.infected=1;note('infected');}continue;}
+    if(e.k==='mutant'||e.k==='infected'){e.spawnCd-=dt;if(e.spawnCd<=0){e.spawnCd=e.k==='mutant'?4:9;e.rel=(e.rel||0)+1;if(e.k==='infected'&&e.rel>=2){e.dead=1;S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'hit'});}const l=e.k==='mutant'?Math.max(0,Math.min(ROWS-1,e.lane+(Math.random()<.5?-1:1))):e.lane;spawn('virus',e.s,l,e.x-.2);}}
+    const c=Math.floor(e.x), g=(c>=0&&c<COLS)?S.grid[e.lane][c]:null;
+    // flagellar dodge: swims sideways away from an approaching phagocyte (not once antibodies tie the flagella)
+    e.dodgeCd=Math.max(0,(e.dodgeCd||0)-dt);
+    if(T.dodge&&e.k==='bact'&&!(e.opT>0)&&e.dodgeCd<=0){const th=S.units.find(u=>(u.k==='macro'||u.k==='neut')&&Math.abs(u.y-e.lane)<.5&&Math.abs(u.x-e.x)<.85);
+      if(th){const opts=[e.lane-1,e.lane+1].filter(l=>l>=0&&l<ROWS);const l=opts[Math.floor(Math.random()*opts.length)];e.lane=l;e.dodgeCd=2.2;S.fx.push({x:LEFT+e.x*CELL,y:e.ry*CELL+50,t:.3,kind:'dust'});}}
+    // viruses are carried around by body fluid
+    if(e.k==='virus'){e.drift=(e.drift||0)+dt;if(e.drift>2.4){e.drift=0;if(Math.random()<.35){const l=e.lane+(Math.random()<.5?-1:1);if(l>=0&&l<ROWS)e.lane=l;}}}
+    // binary fission
+    if(T.divide&&e.k==='bact'&&(e.gen||0)<1&&S.enemies.length<40){e.divT=(e.divT||0)+dt*((S.temp||0)>=37.8?.5:1);if(e.divT>=13){e.divT=0;e.gen=(e.gen||0)+1;
+      const ch={...e,id:eid++,x:e.x+.18,lane:Math.max(0,Math.min(ROWS-1,e.lane+(Math.random()<.5?0:(Math.random()<.5?-1:1)))),hp:ENEMIES.bact.hp,divT:0};born2.push(ch);
+      S.fx.push({x:LEFT+e.x*CELL,y:e.ry*CELL+50,t:.2,kind:'place',c:'#e5484d'});if(!S.flags.divide&&S.revealed[e.s]){S.flags.divide=1;note('divide');}}}
+    let sp=d.speed*(T.spd||1);if((S.temp||0)>=37.8)sp*=.72;if(e.opT>0)sp*=.5;if(e.inPlasma)sp*=.6;e.inPlasma=0;e.slowT=0;
+    if(g){
+      if(g.k==='mucus'){sp*=.5;e.slowT=1;}
+      if(g.k==='lyso'&&(e.k==='bact'||e.k==='toxin'))hurt(e,9*dt);
+      if(g.k==='cilia'){e.pushCd-=dt;if(e.pushCd<=0){e.pushCd=3;e.x=Math.min(9.6,e.x+.6);}}
+    }
+    if(e.k==='toxin'&&!(e.opT>0)){for(const u of S.units)if(Math.hypot(u.x-e.x,u.y-e.lane)<1.15)u.hp-=5*dt;}
+    const b=e.k==='pollen'?null:blockerFor(e);
+    const isB=e.k==='bact'||e.k==='toxin';
+    if(b){if(!(isB&&UNITS[b.k])){b.hp-=d.dps*dt;if(UNITS[b.k])b.hitT=.12;}}else e.x-=sp*dt;
+    // bacteria actively attack nearby immune cells with toxins and enzymes
+    e.lunge=Math.max(0,(e.lunge||0)-dt);
+    if(isB){e.biteCd=(e.biteCd||0)-dt;
+      if(e.biteCd<=0){let tg=null,bd=.75;for(const u of S.units){const dd=Math.hypot(u.x-e.x,u.y-(e.ry??e.lane));if(dd<bd){bd=dd;tg=u;}}
+        if(tg){const dmg=e.k==='toxin'?5:5;tg.hp-=dmg;tg.hitT=.3;e.biteCd=.9;e.lunge=.22;e.ldx=Math.sign(tg.x-e.x)||-1;e.ldy=Math.sign(tg.y-e.lane);
+          S.fx.push({x:LEFT+tg.x*CELL,y:tg.y*CELL+28,t:0,kind:'dmg',n:dmg});S.fx.push({x:LEFT+(tg.x+e.x)/2*CELL,y:((tg.y+(e.ry??e.lane))/2)*CELL+50,t:.2,kind:'bite'});
+          if(!S.flags.bite){S.flags.bite=1;note('bite');}}}}
+    if(e.x<-.2&&e.k==='pollen'){e.dead=1;continue;}
+    if(e.x<-.2){e.dead=1;S.hp-=e.k==='mutant'?5:1;S.fx.push({x:LEFT,y:e.lane*CELL+50,t:0,kind:'hit'});}
+  }
+  S.enemies.push(...born2);
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const g=S.grid[r][c];if(g&&g.hp<=0){S.grid[r][c]=null;S.fx.push({x:LEFT+c*CELL+50,y:r*CELL+50,t:0,kind:'hit'});}}
+
+  // immune cells
+  const helper=hasHelper(), born=[], born2b=[];
+  const makeUnit=(k,s,x,y,extra={})=>{const d=UNITS[k];const u={k,s,x,y,hx:x,hy:Math.round(y),hp:d.hp,maxhp:d.hp,cd:0,born:S.t,tick:0,face:1,moving:0,ordered:false,active:true,actT:0,kills:0,state:'seek',...extra};born.push(u);return u;};
+  for(const u of S.units){
+    const def=UNITS[u.k];
+    u.tick=Math.max(0,u.tick-dt);u.cd-=dt*rateMul(u);
+    u.hitT=Math.max(0,(u.hitT||0)-dt);u.hasT=0;
+    if(u.hp<=0||(def.life&&S.t-u.born>def.life)){u.dead=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:u.infected?'hit':'pop'});
+      if(u.infected){const l=Math.max(0,Math.min(ROWS-1,Math.round(u.y)));for(let i=0;i<3;i++)born2b.push(['bact',u.infected,Math.max(0,Math.min(ROWS-1,l+(i-1))),Math.max(.6,u.x+.1)]);if(!S.flags.macroBurst){S.flags.macroBurst=1;note('macroBurst');}}
+      continue;}
+    // B and cytotoxic T wait for the helper's cytokine signal
+    if(!u.active){
+      if(helper){u.actT+=dt;if(u.actT>=1.5){u.active=true;u.cd=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'birth'});
+        if(u.k==='bcell'&&!S.flags.plasma){S.flags.plasma=1;note('plasma');}
+        if(u.k==='tc'&&!S.flags.tcAct){S.flags.tcAct=1;note('tcAct');}}}
+      idle(u,dt,.5,2.2);continue;
+    }
+    if(u.k==='macro'&&u.infected){
+      // intracellular bacteria: sick macrophage can't fight; helper T nearby activates it (IFN-gamma) to kill them
+      u.hp-=5*dt;u.hitT=Math.max(u.hitT,.05);
+      const h=S.units.find(v=>v.k==='helper'&&Math.hypot(v.x-u.x,v.y-u.y)<1.6);
+      if(h){u.cureT=(u.cureT||0)+dt;if(u.cureT>=2.5){u.infected=null;u.cureT=0;u.activated=1;u.tick=.4;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'place',c:'#3d8fd1'});if(!S.flags.macroCure){S.flags.macroCure=1;note('macroCure');}}}
+      else u.cureT=Math.max(0,(u.cureT||0)-dt*.5);
+      if(u.ordered)moveToward(u,u.hx,u.hy,def.sp*.6,dt);else idle(u,dt,.6,6);
+    } else if(u.k==='macro'){
+      // no long-range sensing: wanders until a pathogen is right next to it
+      const db=S.debris.find(d=>Math.hypot(d.x-u.x,d.y-u.y)<.9);
+      if(db){db.eaten=1;u.tick=.3;reveal(db.s);}
+      const t=nearest(u,e=>EXTRA[e.k]&&Math.hypot(e.x-u.x,e.lane-u.y)<.95);
+      if(t){if(approach(u,t,.55,dt)&&u.cd<=0){u.cd=def.rate;u.tick=.15;
+          let m={bact:1,toxin:.6,virus:1,mutant:.15,pollen:1}[t.k];if(STRAINS[t.s].capsule&&!(t.opT>0))m*=.5;if(t.opT>0)m*=2;if(u.activated)m*=1.5;const was=t.dead;hurt(t,def.dmg*m,'macro');
+          if(!was&&t.dead&&STRAINS[t.s].intracell&&!(t.opT>0)&&!u.activated&&Math.random()<.25){u.infected=t.s;u.cureT=0;if(!S.flags.macroInf){S.flags.macroInf=1;note('macroInf');}}}}
+      else idle(u,dt);
+    } else if(u.k==='neut'){
+      // recruited by the mast cell's alarm: crawls along the chemical trail to bacteria around the alarm spot
+      // only goes after the bacteria the mast cell shouted about; leaves 5 s after they are gone
+      const t=nearest(u,e=>u.targets.includes(e));
+      if(t){u.doneT=0;if(approach(u,t,.55,dt)&&u.cd<=0){u.cd=def.rate;u.tick=.15;
+          let m=t.k==='bact'?1:t.k==='pollen'?1:.6;if(STRAINS[t.s].capsule&&!(t.opT>0))m*=.5;if(t.opT>0)m*=2;hurt(t,def.dmg*m,'neut');}}
+      else{u.doneT=(u.doneT||0)+dt;u.moving=0;if(u.doneT>=5){u.dead=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'pop'});}}
+    } else if(u.k==='nk'){
+      const t=nearest(u,e=>e.k==='infected');
+      if(t){if(approach(u,t,.7,dt)&&u.cd<=0){u.cd=def.rate;u.tick=.15;hurt(t,def.dmg*(STRAINS[t.s].mhc?2:1),'nk');S.zaps.push({x1:u.x,y1:u.y,x2:t.x,y2:t.lane,t:.18,c:'255,160,60'});}}
+      else idle(u,dt);
+    } else if(u.k==='tc'){
+      const t=STRAINS[u.s].mhc?null:(nearest(u,e=>e.k==='infected'&&e.s===u.s)||nearest(u,e=>e.k==='virus'&&e.s===u.s));
+      if(STRAINS[u.s].mhc&&!S.flags.mhcHide){S.flags.mhcHide=1;note('mhcHide');}
+      if(t&&t.k==='infected'){if(approach(u,t,.7,dt)&&u.cd<=0){u.cd=def.rate;u.tick=.15;hurt(t,def.dmg,'tc');S.zaps.push({x1:u.x,y1:u.y,x2:t.x,y2:t.lane,t:.2,c:'240,80,100'});}}
+      else if(t)approach(u,t,1.4,dt);
+      else idle(u,dt);
+    } else if(u.k==='bcell'||u.k==='memory'){
+      // activated B cell (or memory B cell) stays back, divides and differentiates into plasma cells
+      const mine=S.units.filter(v=>v.k==='plasma'&&v.parent===u&&!v.dead).length;
+      const max=u.k==='memory'?4:2, every=u.k==='memory'?2.5:7;
+      const t=nearest(u,e=>e.s===u.s);
+      if(u.ordered)moveToward(u,u.hx,u.hy,def.sp,dt);
+      else if(t)moveToward(u,Math.max(.6,Math.min(t.x-2.5,3.5)),t.lane,def.sp,dt);
+      else idle(u,dt,.6,2.5);
+      u.div=(u.div||0)+dt;
+      if(u.div>=every&&mine<max){u.div=0;u.tick=.3;makeUnit('plasma',u.s,u.x+.2,u.y,{parent:u,boost:u.k==='memory'?1.5:1});
+        S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'birth'});}
+    } else if(u.k==='plasma'){
+      // plasma cell: go to the matching pathogens, release antibodies, then move on
+      if(u.state==='move'){if(moveToward(u,u.wx,u.wy,def.sp,dt)||u.cd<=0)u.state='seek';}
+      else{
+        const t=nearest(u,e=>e.s===u.s&&EXTRA[e.k]);
+        if(t)u.doneT=0;
+        else{u.doneT=(u.doneT||0)+dt;if(u.doneT>=4){u.dead=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'pop'});}}
+        if(t){if(approach(u,t,1.8,dt)&&u.cd<=0){if(releaseAntibodies(u,8,def.dmg*u.boost)){u.cd=def.rate;u.state='move';
+              u.wx=Math.max(.6,Math.min(8.4,u.x+(Math.random()-.5)*3));u.wy=Math.max(0,Math.min(ROWS-1,u.y+(Math.random()<.5?-1.2:1.2)));}}}
+        else idle(u,dt);
+      }
+    } else if(u.k==='mast'){
+      // tissue-resident: drifts slowly; when bacteria come close it sounds the alarm
+      const t=nearest(u,e=>(e.k==='bact'||e.k==='toxin'||(e.k==='pollen'&&S.flags.sens))&&Math.hypot(e.x-u.x,e.lane-u.y)<1.6);
+      if(u.ordered)moveToward(u,u.hx,u.hy,def.sp,dt);
+      else if(t){u.moving=0;u.face=t.x>=u.x?1:-1;}
+      else idle(u,dt,.6,6);
+      u.alarm=Math.max(0,(u.alarm||0)-dt);
+      if(t&&u.cd<=0){
+        const allergic=t.k==='pollen';u.cd=allergic?4:8;u.alarm=1.6;u.tick=.4;
+        if(allergic){S.allergy=Math.max(S.allergy||0,9);if(!S.flags.allergy){S.flags.allergy=1;note('allergy');}}
+        S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'shout'});
+        for(let i=0;i<14;i++){const a=Math.random()*6.28,v=.6+Math.random()*1.2;S.hist.push({x:u.x,y:u.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0});}
+        S.plasmaPools.push({x:u.x+.2,y:u.y,t:0,life:9});
+        const lane=Math.round(u.y);
+        const targets=S.enemies.filter(e=>!e.dead&&(allergic?e.k==='pollen':(e.k==='bact'||e.k==='toxin'))&&Math.hypot(e.x-u.x,e.lane-u.y)<2);
+        targets.forEach(e=>e.alarmT=8);
+        for(let i=0;i<2;i++){const n=makeUnit('neut',null,.05+i*.15,lane+(i-.5)*.3,{targets});n.hx=u.x;n.hy=u.y;}
+        S.fx.push({x:LEFT,y:lane*CELL+50,t:0,kind:'birth'});
+        if(!S.flags.alarm){S.flags.alarm=1;note('alarm');}
+      }
+    } else if(u.k==='helper'){
+      const team=S.units.filter(v=>v.k==='bcell'||v.k==='tc');
+      const sick=S.units.filter(v=>v.k==='macro'&&v.infected).sort((a,b)=>Math.hypot(a.x-u.x,a.y-u.y)-Math.hypot(b.x-u.x,b.y-u.y))[0];
+      if(u.ordered)moveToward(u,u.hx,u.hy,def.sp,dt);
+      else if(sick){moveToward(u,sick.x-.6,sick.y,def.sp*1.3,dt);if(Math.hypot(sick.x-u.x,sick.y-u.y)<1.6&&Math.random()<dt*2)S.fx.push({kind:'signal',x1:u.x,y1:u.y,v:sick,t:0});}
+      else if(team.length){const cx=team.reduce((a,v)=>a+v.x,0)/team.length,cy=team.reduce((a,v)=>a+v.y,0)/team.length;moveToward(u,Math.max(.6,cx-1.2),cy,def.sp,dt);}
+      else idle(u,dt,.6,2);
+      if(team.length||sick)u.hasT=1;
+      u.sig=(u.sig||0)+dt;if(u.sig>1.4&&team.length){u.sig=0;u.worked=1;for(const v of team)S.fx.push({kind:'signal',x1:u.x,y1:u.y,v,t:0});}
+      if(sick)u.worked=1;
+    }
+    // job done: after a while with nothing to do, the cell withdraws (contraction phase)
+    if(S.phase==='wave'&&!u.infected&&u.k!=='neut'&&u.k!=='plasma'){
+      if(u.tick>0||u.hasT){if(u.tick>0)u.worked=1;u.idleT=0;}
+      else u.idleT=(u.idleT||0)+dt;
+      if(u.worked&&u.idleT>9){u.dead=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'leave'});if(!S.flags.leave){S.flags.leave=1;note('leave');}}
+    }
+  }
+  S.units.push(...born);
+  for(const [k,st,l,x] of born2b)spawn(k,st,l,x);
+  S.debris.forEach(d=>d.t+=dt);S.debris=S.debris.filter(d=>!d.eaten&&d.t<14&&!S.revealed[d.s]);
+  // leaked blood plasma: slows pathogens, complement proteins punch holes in bacteria
+  for(const p of S.plasmaPools){p.t+=dt;const r=Math.min(1.2,.3+p.t*1.5);
+    for(const e of S.enemies){if(Math.hypot(e.x-p.x,e.lane-p.y)<r){e.slowT=1;e.inPlasma=1;if(e.k==='bact'||e.k==='toxin')hurt(e,6*dt,'complement');}}}
+  S.plasmaPools=S.plasmaPools.filter(p=>p.t<p.life);
+  for(const h of S.hist){h.t+=dt;h.x+=h.vx*dt;h.y+=h.vy*dt;h.vx*=.96;h.vy*=.96;}
+  S.hist=S.hist.filter(h=>h.t<1.4);
+  if(S.picked&&S.picked.dead)S.picked=null;
+  S.units=S.units.filter(u=>!u.dead);
+  for(let i=0;i<S.units.length;i++)for(let j=i+1;j<S.units.length;j++){const a=S.units[i],b=S.units[j];const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
+    if(d<.45&&d>1e-4){const p=(.45-d)/2;a.x-=dx/d*p;a.y-=dy/d*p;b.x+=dx/d*p;b.y+=dy/d*p;}}
+  for(const u of S.units){u.y=Math.max(0,Math.min(ROWS-1,u.y));u.x=Math.max(.3,Math.min(COLS-.3,u.x));}
+
+  // antibodies home in on their antigen
+  for(const h of S.hist){const a=1-h.t/1.4;ctx.save();ctx.globalAlpha=a;circ(LEFT+h.x*CELL,h.y*CELL+50,3.5,'#9b4dbf');ctx.restore();}
+  for(const a of S.abs){
+    a.life-=dt;
+    if(!a.t||a.t.dead||!EXTRA[a.t.k]){a.t=null;let bd=2.5;for(const e of S.enemies){if(e.dead||e.s!==a.s||!EXTRA[e.k])continue;const d=Math.hypot(e.x-a.x,e.lane-a.y);if(d<bd){bd=d;a.t=e;}}}
+    if(a.t){const dx=a.t.x-a.x,dy=a.t.lane-a.y,d=Math.hypot(dx,dy);
+      a.vx+=(dx/d*6-a.vx)*Math.min(1,dt*6);a.vy+=(dy/d*6-a.vy)*Math.min(1,dt*6);
+      if(d<.22){hurt(a.t,a.dmg,'ab');a.t.opT=6;a.dead=1;}}
+    a.x+=a.vx*dt;a.y+=a.vy*dt;
+    if(a.life<=0||a.x<-.5||a.x>10)a.dead=1;
+  }
+  S.abs=S.abs.filter(a=>!a.dead);
+  S.enemies=S.enemies.filter(e=>!e.dead);
+  S.zaps.forEach(z=>z.t-=dt);S.zaps=S.zaps.filter(z=>z.t>0);
+  S.waves.forEach(w=>w.t+=dt);S.waves=S.waves.filter(w=>w.t<.6);
+  S.fx.forEach(f=>f.t+=dt);S.fx=S.fx.filter(f=>f.t<(f.kind==='shout'?1.2:.8));
+
+  if(S.hp<=0){S.phase='over';showOver();}
+  else if(!S.spawns.length&&!S.enemies.length&&S.t>S.lastSpawn){S.phase='clear';showClear();}
+}
+
+function render(time){
+  ctx.save();ctx.translate(CAM.cx,CAM.cy);ctx.scale(CAM.z,CAM.z);ctx.translate(-CAM.cx,-CAM.cy);
+  drawBoard(time);
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const g=S.grid[r][c];if(g){const [x,y]=cellCenter(c,r),ps=popScale(g.pt);ctx.save();ctx.translate(x,y);ctx.scale(ps,ps);ctx.translate(-x,-y);drawBarrier(g.k,x,y,time,g.hp/g.maxhp);ctx.restore();}}
+  for(const u of S.units)if(u===S.picked||(u.ordered&&Math.hypot(u.x-u.hx,u.y-u.hy)>.3)){
+    ctx.strokeStyle='rgba(61,143,209,.5)';ctx.lineWidth=2;ctx.setLineDash([5,6]);ctx.beginPath();ctx.arc(LEFT+u.hx*CELL,u.hy*CELL+50,16,0,7);ctx.stroke();ctx.setLineDash([]);}
+  for(const p of S.plasmaPools){const r=Math.min(1.2,.3+p.t*1.5)*CELL,a=Math.min(1,(p.life-p.t)/1.5),px=LEFT+p.x*CELL,py=p.y*CELL+50;
+    ctx.save();ctx.globalAlpha=.55*a;ctx.fillStyle='#ffe38c';ctx.beginPath();for(let k=0;k<=6.3;k+=.25){const rr=r*(.92+.08*Math.sin(k*5+time*2));ctx.lineTo(px+Math.cos(k)*rr,py+Math.sin(k)*rr*.8);}ctx.closePath();ctx.fill();
+    ctx.globalAlpha=a;for(let i=0;i<7;i++){const k=i*.9+time*.5;circ(px+Math.cos(k)*r*.55,py+Math.sin(k*1.3)*r*.4,2.6,'#d9a020');}
+    drawUnit('serum',px,py-6,34,time,a);ctx.restore();}
+  for(const d of S.debris){const px=LEFT+d.x*CELL,py=d.y*CELL+56;ctx.save();ctx.globalAlpha=Math.min(1,(14-d.t)/2);for(let i=0;i<6;i++)circ(px+Math.cos(i*1.7)*14,py+Math.sin(i*2.3)*8,4+i%3,'#9c8fa3');marker(px,py-14,6,d.s,true);ctx.restore();}
+  for(const w of S.waves){ctx.strokeStyle=`rgba(47,158,92,${1-w.t/.6})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(LEFT+w.x*CELL,w.y*CELL+50,20+w.t*120,0,7);ctx.stroke();}
+  const sorted=[...S.units].sort((a,b)=>a.y-b.y);
+  for(const u of sorted){
+    const def=UNITS[u.k], x=LEFT+u.x*CELL+(u.hitT>0?Math.sin(time*70)*3:0), y=u.y*CELL+50;
+    let fade=def.life?Math.min(1,(def.life-(S.t-u.born))/5+.3):1;if(u.worked&&u.idleT>6)fade=Math.min(fade,1-(u.idleT-6)/3*.6);
+    if(u===S.picked){ctx.strokeStyle='#3d8fd1';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y+30,30,10,0,0,7);ctx.stroke();}
+    const drawK=u.k;
+    ctx.save();
+    const wob=u.moving?Math.sin(time*16)*.06:0;
+    ctx.translate(x,y);ctx.rotate(wob);if(u.tick)ctx.scale(1.14,.9);{const ps=popScale(u.pt)*(u===S.picked?1.15:1);ctx.scale(ps,ps);}if(u.face<0)ctx.scale(-1,1);ctx.translate(-x,-y);
+    drawUnit(drawK,x,y,u.k==='memory'?64:u.k==='neut'?54:62,time,fade,{sleepy:!u.active,alarm:u.alarm>0});ctx.restore();
+    if(u.hitT>0){ctx.save();ctx.globalAlpha=Math.min(.45,u.hitT*2);ctx.fillStyle='#ff2d4a';ctx.beginPath();ctx.arc(x,y,30,0,7);ctx.fill();ctx.restore();}
+    if(u.infected){ctx.save();ctx.globalAlpha=.55;ctx.fillStyle='#9fbf5a';ctx.beginPath();ctx.arc(x,y,30,0,7);ctx.fill();ctx.restore();
+      for(let i=0;i<4;i++){const a=time*1.5+i*1.57;capsule(x+Math.cos(a)*12,y+Math.sin(a)*9+4,12,7,'#7ab0e8','#3d6fa8');}
+      ctx.fillStyle='#4f7a1c';ctx.font='14px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('감염됨',x,y-44);
+      if(u.cureT>0){ctx.strokeStyle='#3d8fd1';ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,y,36,-Math.PI/2,-Math.PI/2+6.283*Math.min(1,u.cureT/2.5));ctx.stroke();}}
+    else if(u.activated&&u.k==='macro'){ctx.strokeStyle='rgba(61,143,209,.7)';ctx.lineWidth=2.5;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(x,y,34,0,7);ctx.stroke();ctx.setLineDash([]);}
+    if((S.temp||0)>=38.3){const sy=y-24+((time*30+u.x*50)%18);ctx.fillStyle='rgba(120,190,255,.9)';ctx.beginPath();ctx.moveTo(x+20,sy-6);ctx.quadraticCurveTo(x+26,sy+2,x+20,sy+4);ctx.quadraticCurveTo(x+14,sy+2,x+20,sy-6);ctx.fill();}
+    if(u.moving&&Math.random()<.25)S.fx.push({x:x-u.face*20,y:y+28,t:.4,kind:'dust'});
+    if(u.s)marker(x+22,y-36,7,u.s,false);
+    if(u.hp<u.maxhp){ctx.fillStyle='rgba(120,60,90,.18)';ctx.beginPath();ctx.roundRect(x-26,y+38,52,7,4);ctx.fill();ctx.fillStyle='#4cc47a';ctx.beginPath();ctx.roundRect(x-26,y+38,Math.max(2,52*u.hp/u.maxhp),7,4);ctx.fill();}
+    if(!u.active){ctx.fillStyle='#ef5a77';ctx.font='14px Jua, sans-serif';ctx.textAlign='center';ctx.fillText(hasHelper()?'활성화 중…':'신호 대기 ㅠㅠ',x,y-44);}
+  }
+  for(const h of S.hist){const a=1-h.t/1.4;ctx.save();ctx.globalAlpha=a;circ(LEFT+h.x*CELL,h.y*CELL+50,3.5,'#9b4dbf');ctx.restore();}
+  for(const a of S.abs){const ang=Math.atan2(a.vy,a.vx);yShape(LEFT+a.x*CELL,a.y*CELL+50,ang,9,'#2f9e5c',3);}
+  for(const z of S.zaps){ctx.strokeStyle=`rgba(${z.c},${z.t/.2})`;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(LEFT+z.x1*CELL,z.y1*CELL+50);ctx.lineTo(LEFT+z.x2*CELL,z.y2*CELL+50);ctx.stroke();}
+  for(const e of S.enemies)drawEnemy(e,time);
+  for(const f of S.fx){const a=Math.max(0,1-f.t/.8);ctx.save();ctx.globalAlpha=a;
+    if(f.kind==='hit'){ctx.strokeStyle='#ef5a77';ctx.lineWidth=4;ctx.beginPath();ctx.arc(f.x,f.y,10+f.t*60,0,7);ctx.stroke();}
+    else if(f.kind==='signal'){if(f.v){const k=f.t/.8,sx=LEFT+f.x1*CELL,sy=f.y1*CELL+50,tx=LEFT+f.v.x*CELL,ty=f.v.y*CELL+50;circ(sx+(tx-sx)*k,sy+(ty-sy)*k-Math.sin(k*3.14)*20,4,'#3d8fd1');circ(sx+(tx-sx)*Math.max(0,k-.08),sy+(ty-sy)*Math.max(0,k-.08)-Math.sin(Math.max(0,k-.08)*3.14)*20,3,'rgba(61,143,209,.5)');}}
+    else if(f.kind==='shout'){ctx.globalAlpha=Math.max(0,1-f.t/1.2);ctx.strokeStyle='#e0577f';ctx.lineWidth=3;ctx.lineCap='round';
+      for(let i=0;i<8;i++){const an=i*.785+.2,d1=34+f.t*70;ctx.beginPath();ctx.arc(f.x,f.y,d1,an-.25,an+.25);ctx.stroke();
+        if(i%2===0){ctx.fillStyle='#e0577f';ctx.font='20px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('!',f.x+Math.cos(an)*(d1+16),f.y+Math.sin(an)*(d1+16)+7);}}
+      ctx.fillStyle='#fff';ctx.strokeStyle='#e0577f';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(f.x-34,f.y-78,68,26,13);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#e0577f';ctx.font='16px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('세균이다!',f.x,f.y-60);}
+    else if(f.kind==='birth'){ctx.strokeStyle='#ffcf4d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(f.x+10,f.y,8+f.t*50,0,7);ctx.stroke();for(let i=0;i<5;i++){const an=i*1.256;heart(f.x+10+Math.cos(an)*(10+f.t*40),f.y+Math.sin(an)*(10+f.t*40),5,'#ff8fb0');}}
+    else if(f.kind==='place'){ctx.strokeStyle=f.c||'#ffcf4d';ctx.lineWidth=5*(1-f.t/.8)+1;ctx.beginPath();ctx.arc(f.x,f.y,20+f.t*90,0,7);ctx.stroke();for(let i=0;i<8;i++){const an=i*.785,d=30+f.t*70;circ(f.x+Math.cos(an)*d,f.y+Math.sin(an)*d,4*(1-f.t/.8)+1,f.c||'#ffcf4d');}}
+    else if(f.kind==='dmg'){ctx.fillStyle='#e8334f';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.font='17px Jua, sans-serif';ctx.textAlign='center';ctx.strokeText('-'+f.n,f.x,f.y-f.t*40);ctx.fillText('-'+f.n,f.x,f.y-f.t*40);}
+    else if(f.kind==='bite'){ctx.strokeStyle='#e8334f';ctx.lineWidth=3;ctx.lineCap='round';for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(f.x-9+i*7,f.y-10);ctx.lineTo(f.x+i*7,f.y+10);ctx.stroke();}}
+    else if(f.kind==='leave'){for(let i=0;i<6;i++){const an=i*1.05+f.t*3;heart(f.x+Math.cos(an)*(14+f.t*30),f.y-f.t*40+Math.sin(an)*10,4,'#fff');}ctx.fillStyle='#7d2238';ctx.font='15px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('임무 완료',f.x,f.y-30-f.t*30);}
+    else if(f.kind==='dust'){circ(f.x,f.y-f.t*10,3+f.t*6,'rgba(255,255,255,.8)');}
+    else{for(let i=0;i<6;i++){const an=i*1.047+.3,d=12+f.t*55;heart(f.x+Math.cos(an)*d,f.y+Math.sin(an)*d,5+i%2*2,i%2?'#ff8fb0':'#ffcf4d');}
+      if(f.glu){ctx.fillStyle='#e8920c';ctx.font='18px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('+3',f.x,f.y-20-f.t*40);}}
+    ctx.restore();}
+  if(S.picked){const ux=LEFT+S.picked.x*CELL,uy=S.picked.y*CELL+50;
+    ctx.fillStyle='rgba(30,4,12,.38)';ctx.beginPath();ctx.rect(-60,-60,W+120,H+120);ctx.arc(ux,uy,62,0,Math.PI*2,true);ctx.fill();
+    ctx.strokeStyle='#ffcf4d';ctx.lineWidth=3;ctx.setLineDash([6,6]);ctx.lineDashOffset=-time*20;ctx.beginPath();ctx.arc(ux,uy,58+Math.sin(time*6)*3,0,7);ctx.stroke();ctx.setLineDash([]);ctx.lineDashOffset=0;}
+  ctx.restore();
+  drawHeat(time);
+  if(S.allergy>0){ctx.fillStyle=`rgba(255,210,60,${.08+.04*Math.sin(time*6)})`;ctx.fillRect(0,0,W,H);}
+  if(S.phase==='setup'){ctx.fillStyle='rgba(125,34,56,.88)';ctx.beginPath();ctx.roundRect(LEFT+COLS*CELL/2-260,H-44,520,34,17);ctx.fill();ctx.fillStyle='#ffe9ec';ctx.font='18px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('준비 단계 · 1차 방어선을 깔고 시작 버튼을 누른다',LEFT+COLS*CELL/2,H-21);}
+}
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);
+let toastQ=[],toastT=0,TAB='barrier';
+function note(k,extra){const n=NOTES[k];if(!n)return;toastQ.push([n[0]+(extra?`: ${extra}`:''),n[1]]);}
+function tickToast(dt){
+  const el=$('toast');
+  if(toastT>0){toastT-=dt;if(toastT<=0)el.style.opacity=0;return;}
+  if(toastQ.length){const [h,b]=toastQ.shift();el.innerHTML=`<b>${h}</b>${b}`;el.style.opacity=1;toastT=6.5;}
+}
+const DEFAULT_INFO='면역세포 카드를 누르면 혈관에서 바로 출동한다. 판 위 세포를 누르고 칸을 누르면 그 주변을 지키게 할 수 있다.';
+function setInfo(t){$('info').textContent=t;}
+function drawWith(g,fn){const keep=ctx;ctx=g;try{fn();}finally{ctx=keep;}}
+function makeIcon(type,k){
+  const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
+  drawWith(g,()=>{
+    if(type==='unit')drawUnit(k,40,42,56,0);
+    else if(type==='memory'){drawUnit('memory',40,44,52,0);marker(62,18,8,k,!S.revealed[k]);}
+    else{g.save();g.translate(40,40);g.scale(.62,.62);g.translate(-40,-40);drawBarrier(k,40,40,0,1);g.restore();}
+  });
+  return c;
+}
+function setTab(t){
+  TAB=t;
+  [['barrierRow','barrier'],['unitRow','unit'],['autoRow','auto']].forEach(([id,key])=>{$(id).hidden=key!==t;});
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
+  if(t!=='barrier'&&selected){selected=null;}
+  setInfo(t==='barrier'?'준비 단계에 카드를 고르고 칸을 눌러 깐다. 웨이브가 시작되면 더 못 깐다.':t==='auto'?'이 세포들은 직접 부를 수 없다. 몸이 상황에 맞춰 알아서 내보낸다. 카드를 누르면 설명이 나온다.':DEFAULT_INFO);
+}
+function buildTray(){
+  const st=STAGES[S.stage];
+  const br=$('barrierRow'),uh=$('unitHand'),mh=$('memHand'),ar=$('autoRow');
+  br.innerHTML='';uh.innerHTML='';mh.innerHTML='';ar.innerHTML='';
+  st.barriers.forEach(k=>br.appendChild(cardEl('barrier',k)));
+  st.units.forEach(k=>uh.appendChild(cardEl('unit',k)));
+  uh.appendChild(cardEl('unit','bcell'));
+  [...new Set([...Object.keys(S.memory).filter(s=>S.memory[s]),...st.strains])].filter(s=>!STRAINS[s].harmless).forEach(s=>mh.appendChild(cardEl('memory',s)));
+  AUTO.forEach(a=>ar.appendChild(autoCard(a)));
+  refreshTray();
+}
+const AUTO=[
+  {k:'neut',name:'호중구(백혈구)',how:'비만세포가 부를 때',count:()=>S.units.filter(u=>u.k==='neut').length},
+  {k:'serum',name:'혈장',how:'비만세포가 부를 때',count:()=>S.plasmaPools.length},
+  {k:'plasma',name:'형질세포',how:'B림프구가 분화할 때',count:()=>S.units.filter(u=>u.k==='plasma').length}
+];
+function autoCard(a){
+  const d=document.createElement('button');d.type='button';d.className='unit auto';d.dataset.type='auto';d.dataset.k=a.k;
+  const cnt=document.createElement('span');cnt.className='cnt';d.appendChild(cnt);
+  d.appendChild(makeIcon('unit',a.k));
+  const t=document.createElement('div');t.className='txt';t.innerHTML=`<div class="t">${a.name}</div><div class="lk">${a.how}</div>`;d.appendChild(t);
+  d._cnt=cnt;d._auto=a;
+  const desc=a.k==='serum'?'히스타민으로 넓어진 혈관에서 새어 나오는 액체. 고인 곳에선 병원체가 느려지고, 보체 단백질이 세균에 구멍을 낸다':UNITS[a.k].desc;
+  d.onclick=d.onmouseenter=d.onfocus=()=>setInfo(`${a.name}: ${desc}`);
+  return d;
+}
+function cardEl(type,k){
+  const def=type==='barrier'?BARRIERS[k]:type==='memory'?UNITS.memory:UNITS[k];
+  const b=document.createElement('button');b.type='button';b.className='unit';b.id=`card-${type}-${k}`;b.dataset.type=type;b.dataset.k=k;
+  const cost=document.createElement('span');cost.className='cost';cost.textContent=def.cost;b.appendChild(cost);
+  b.appendChild(makeIcon(type,k));
+  const txt=document.createElement('div');txt.className='txt';b.appendChild(txt);
+  b._txt=txt;b._cost=cost;
+  b.onclick=()=>{
+    if(b.dataset.off==='1'){b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');setInfo(offReason(type,k));return;}
+    removeMode=false;S.picked=null;$('removeBtn').classList.remove('sel');
+    if(type==='unit'||type==='memory'){selected=null;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');
+      if(type==='memory')spawnUnit('memory',k);else spawnUnit(k);return;}
+    selected=(selected&&selected.k===k)?null:{type,k};
+    setInfo(selected?`${def.name}: ${def.desc}. 반짝이는 칸을 눌러 깐다.`:DEFAULT_INFO);refreshTray();};
+  b.onmouseenter=b.onfocus=()=>setInfo(cardInfo(type,k));
+  return b;
+}
+function cardInfo(type,k){
+  if(type==='barrier')return `${BARRIERS[k].name}: ${BARRIERS[k].desc}`;
+  if(type==='memory'){if(!S.memory[k])return S.revealed[k]?`${STRAINS[k].name}을 ${10-Math.min(10,S.kills[k]||0)}번 더 물리치면 기억세포가 생긴다.`:'아직 정체를 모르는 항원이다. 대식세포가 정체를 밝혀야 기억도 쌓인다.';
+    return `기억세포 ${k}형: ${STRAINS[k].name} 전용. ${UNITS.memory.desc}`;}
+  const why=blockReason(k);return `${UNITS[k].name}: ${UNITS[k].desc}${why?` · ${why}`:''}`;
+}
+function offReason(type,k){
+  if(type==='barrier')return S.phase!=='setup'?'1차 방어선은 웨이브 시작 전에만 깔 수 있다. 감염 전부터 있는 방어이기 때문이다.':`포도당이 모자란다 (${BARRIERS[k].cost} 필요)`;
+  if(type==='memory')return S.memory[k]?`포도당이 모자란다 (${UNITS.memory.cost} 필요)`:cardInfo(type,k);
+  return blockReason(k);
+}
+function refreshTray(){
+  document.querySelectorAll('.unit').forEach(b=>{
+    const type=b.dataset.type,k=b.dataset.k;
+    if(b._auto){const n=b._auto.count();const t=n?`판 위 ${n}`:'0';if(b._cnt.textContent!==t)b._cnt.textContent=t;b._cnt.classList.toggle('zero',!n);return;}
+    if(!b._txt)return;
+    let cost,off,lock=false,name,sub='',prog='';
+    if(type==='barrier'){cost=BARRIERS[k].cost;name=BARRIERS[k].name;off=S.phase!=='setup'||S.glu<cost;if(S.phase!=='setup')sub='준비 단계 전용';}
+    else if(type==='memory'){cost=UNITS.memory.cost;const open=!!S.memory[k],rev=S.revealed[k],n=Math.min(10,S.kills[k]||0);lock=!open;
+      name=open||rev?`기억세포 ${k}형`:'기억세포 ???';off=lock||S.glu<cost||(S.phase!=='setup'&&S.phase!=='wave');
+      if(lock){sub=rev?`잠김 · ${n}/10`:'잠김 · 정체 불명';prog=`<div class="prog"><i style="width:${rev?n*10:0}%"></i></div>`;}}
+    else{cost=UNITS[k].cost;name=UNITS[k].name;const why=blockReason(k);lock=why.includes('항원');off=!!why;
+      if(lock)sub=k==='tc'?'잠김 · 바이러스 항원':'잠김 · 항원 필요';}
+    b.dataset.off=off?'1':'0';b.setAttribute('aria-disabled',String(off));
+    b.classList.toggle('locked',lock);b.classList.toggle('poor',!lock&&S.glu<cost);b.classList.toggle('off',off&&!lock);
+    b._cost.hidden=lock;
+    const html=`<div class="t">${name}</div>${sub?`<div class="lk">${sub}</div>`:''}${prog}`;
+    if(b._txt.innerHTML!==html)b._txt.innerHTML=html;
+    b.classList.toggle('sel',!!(selected&&selected.k===k&&selected.type===type));
+  });
+  if(selected&&S.phase!=='setup')selected=null;
+  const setup=S.phase==='setup';
+  $('startBtn').disabled=!setup;$('startLbl').textContent=setup?'시작':S.phase==='wave'?'방어 중':'대기';
+  $('antiBtn').disabled=!STAGES[S.stage].anti||S.phase!=='wave'||S.antiUsed;
+  $('pyBtn').disabled=!(S.fever>0)||S.antipyUsed||S.phase!=='wave';
+  $('antiBtn').title=!STAGES[S.stage].anti?'2스테이지부터 쓸 수 있다':S.antiUsed?'이미 썼다':'항생제 (1회)';
+}
+const HEART='<svg viewBox="0 0 24 24"><path fill="#ff6b86" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>';
+let heartsBuilt=false,lastHp=null;
+function refreshHud(){
+  $('glu').textContent=Math.floor(S.glu);$('gluFill').style.width=Math.min(100,S.glu/3)+'%';
+  if(!heartsBuilt){const h=$('hearts');h.innerHTML='';for(let i=0;i<10;i++){const s=document.createElement('span');s.innerHTML=HEART;h.appendChild(s);}heartsBuilt=true;
+    const gb=$('glubar');for(let i=1;i<6;i++){const t=document.createElement('span');t.className='tk';t.style.left=(i*100/6)+'%';gb.appendChild(t);}}
+  if(lastHp!==S.hp){lastHp=S.hp;$('hp').textContent=Math.max(0,S.hp);[...$('hearts').children||[]].forEach((s,i)=>s.classList.toggle('empty',i>=S.hp));}
+  {const t=S.temp||36.8,th=$('thermo'),hot=t>=37.8&&t<40,burn=t>=40;$('tempNum').textContent=t.toFixed(1)+'℃';
+   $('thermoFill').style.width=Math.max(4,Math.min(100,(t-36)/6*100))+'%';th.classList.toggle('hot',hot);th.classList.toggle('burn',burn);
+   $('tempState').textContent=burn?'고열 · 디버프':hot?'적당한 열 · 버프':t>37.2?'오르는 중':'정상';
+   $('game').classList.toggle('hot',hot);$('game').classList.toggle('burn',burn);}
+  $('stageNo').textContent=S.stage+1;$('stageName').textContent=STAGES[S.stage].name;
+  const chips=[];
+  for(const s of STAGES[S.stage].strains){
+    if(S.revealed[s])chips.push(`<span class="chip" style="border-color:${STRAINS[s].color};color:${STRAINS[s].color}">${STRAINS[s].harmless?STRAINS[s].name:`${S.memory[s]?'기억 ':''}${s}형${S.kills[s]&&!S.memory[s]?` ${Math.min(S.kills[s],10)}/10`:''}`}</span>`);
+    else if(S.enemies.some(e=>e.s===s))chips.push('<span class="chip">? 정체 불명</span>');
+  }
+  if(S.revealed&&Object.keys(S.revealed).length)chips.push(hasHelper()?'<span class="chip on">지휘 중</span>':'<span class="chip warn">지휘관 없음</span>');
+  if(S.fever>0)chips.push(`<span class="chip warn">피버 타임 ${Math.ceil(S.fever)}초</span>`);
+  if(S.allergy>0)chips.push(`<span class="chip warn">알레르기 ${Math.ceil(S.allergy)}초</span>`);
+  else if(S.flags.sens)chips.push('<span class="chip">꽃가루 감작</span>');
+  if(S.meal>0)chips.push(`<span class="chip on">식사 ${Math.ceil(S.meal)}초</span>`);
+  const html=chips.join('');if($('chips').innerHTML!==html)$('chips').innerHTML=html;
+}
+function overlay(html){$('overlay').innerHTML=html;$('overlay').hidden=false;}
+function hideOverlay(){$('overlay').hidden=true;}
+function st(){return STAGES[S.stage];}
+function showIntro(){
+  const st=STAGES[S.stage];
+  const tips=[
+    ['오른쪽 상처로 병원체가 몰려온다. 왼쪽 혈관에 닿으면 온몸으로 퍼져 체력(하트)이 깎인다.','준비 단계에서 1차 방어선 카드를 고르고 반짝이는 칸을 눌러 깐다. 웨이브가 시작되면 더 못 깐다.','대식세포(백혈구)는 멀리 있는 세균을 못 알아챈다. 돌아다니다 바로 옆에 와야 먹는다.','비만세포는 세균이 다가오면 소리치며 히스타민을 뿜는다. 그러면 혈장이 새어 나오고 호중구가 몰려온다. 호중구와 혈장은 직접 부를 수 없다.','처음 보는 병원체는 까맣다. 대식세포가 하나를 먹으면 그 유형 전체의 정체가 드러난다.','T림프구는 정체가 드러난 항원이 있어야 열린다. 세포독성 T림프구는 바이러스 항원이 드러나야 쓸 수 있다.','중간에 피버 타임이 온다. 적당한 열은 병원체를 약하게 하지만, 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다. 위의 체온계를 보자.'],
+    ['면역세포 탭의 B림프구는 드러난 항원 하나를 맡는다. 머리 위 표식이 담당 항원이다.','까만 병원체 중엔 해롭지 않은 꽃가루도 섞여 있다. 정체를 밝힌 상태로 보조 T림프구가 있으면 몸이 꽃가루를 적으로 기억해 버린다(감작).','보조 T림프구가 판에 있어야 B림프구가 활성화되어 형질세포를 만든다. 항체를 뿌리는 건 형질세포다.','같은 유형을 10번 물리치면 그 유형의 기억세포가 열린다.'],
+    ['바이러스는 노란 고리가 다 차면(6초) 세포 속으로 숨어 감염세포가 되고, 감염세포는 그 자리에서 바이러스를 복제해 내보내다 결국 터진다.','NK세포는 아무 감염세포나, 세포독성 T림프구는 맡은 항원의 감염세포만 공격한다.','마지막에 새 항원을 가진 변이 바이러스가 온다.','중간에 꽃가루 시즌이 온다. 림프절에서 꽃가루에 감작됐다면 알레르기 반응이 일어난다.']
+  ][S.stage];
+  overlay(`<div class="card"><div class="eyebrow">스테이지 ${S.stage+1} / ${STAGES.length}</div><h2>${st.name}</h2><p>${st.goal}</p>
+  <ul>${tips.map(t=>`<li>${t}</li>`).join('')}</ul><button class="btn" id="goBtn">준비하기</button></div>`);
+  $('goBtn').onclick=()=>{hideOverlay();setTab('barrier');};
+  $('goBtn').focus();
+}
+function showClear(){
+  const last=S.stage===STAGES.length-1;
+  overlay(`<div class="card"><div class="eyebrow">방어 성공</div><h2>${last?'모든 감염을 막아냈다':st().name+' 방어 완료'}</h2>
+  <p>${last?'정체불명의 병원체를 식세포가 먹고, 항원 제시로 정체를 밝히고, 항체와 세포독성 T림프구로 처리하고, 기억세포까지 남겼다. 실제 몸의 면역도 이 순서로 이어진다.':'남은 체력 '+S.hp+'. 다음 부위로 이동한다. 드러난 항원과 기억세포는 그대로 남는다.'}</p>
+  <button class="btn" id="nextBtn">${last?'처음부터 다시':'다음 스테이지'}</button></div>`);
+  $('nextBtn').onclick=()=>{S=last?newState(0):newState(S.stage+1,S);lastHp=null;buildTray();showIntro();};
+  refreshTray();
+}
+function showOver(){
+  overlay(`<div class="card"><div class="eyebrow">감염 확산</div><h2>방어선이 무너졌다</h2>
+  <p>정체를 빨리 밝힐수록 특이적 면역을 일찍 쓸 수 있다. 세균은 식세포와 항체, 바이러스는 숨기 전엔 항체로, 숨은 뒤엔 NK세포와 세포독성 T림프구로 막아야 한다.</p>
+  <button class="btn" id="retryBtn">이 스테이지 다시</button></div>`);
+  $('retryBtn').onclick=()=>{const keep=S.stage>0?S.carry:null;S=newState(S.stage,keep);lastHp=null;buildTray();showIntro();};
+  refreshTray();
+}
+const BOOK_AG=[
+  {row:'세균',sub:'세포 밖에서 스스로 분열해 늘어난다',items:[
+    {k:'bact',s:'A',tags:['편모 회피','이분법'],where:'1·2·3스테이지',weak:'항체가 붙으면 편모가 묶여 못 피한다. 형질세포로 묶고 식세포로 먹는다.'},
+    {k:'bact',s:'B',tags:['협막','세포 내 기생','이분법'],where:'1·2스테이지',weak:'항체를 붙여(옵소닌화) 식세포가 먹게 한다. 감염된 대식세포는 보조 T림프구로 활성화한다.'},
+    {k:'toxin',s:'C',tags:['독소'],where:'2스테이지',weak:'형질세포의 항체가 독소를 중화한다.'}]},
+  {row:'바이러스',sub:'혼자 못 늘어나고 세포 안에 숨어 복제한다',items:[
+    {k:'virus',s:'D',tags:['빠른 전파'],where:'3스테이지',weak:'숨기 전엔 항체, 숨은 뒤엔 세포독성 T림프구와 NK세포.'},
+    {k:'virus',s:'E',tags:['MHC 숨김'],where:'3스테이지',weak:'세포독성 T림프구가 못 알아본다. NK세포가 2배로 강하다.'},
+    {k:'mutant',s:'F',tags:['항원 변이','보스'],where:'3스테이지 마지막',weak:'대식세포로 정체를 다시 밝힌 뒤 형질세포와 T림프구로 처리한다.'},
+    {k:'infected',s:'D',name:'감염세포',tags:['바이러스 공장'],where:'바이러스가 숨으면 생긴다',weak:'NK세포, 세포독성 T림프구. 그대로 두면 바이러스를 내보내다 터진다.',
+     trait:'바이러스가 숨어든 우리 몸 세포. 항체도 식세포도 안쪽까지 닿지 못한다.'}]},
+  {row:'무해한 물질',sub:'병원체가 아니다',items:[
+    {k:'pollen',s:'P',tags:['무해','알레르기 유발'],where:'2·3스테이지',weak:'싸울 필요가 없다. 감작되면 비만세포가 과민 반응한다.'}]}
+];
+const BOOK_BODY=[
+  {row:'1차 방어선',sub:'감염 전부터 있는 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
+  {row:'선천 면역',sub:'누구든 바로 공격한다. 빠르지만 덜 정확하다',items:[
+    {u:'macro',how:'카드로 출동'},{u:'neut',how:'비만세포 경보 때 자동 출동'},{u:'mast',how:'카드로 출동'},
+    {u:'serum',how:'비만세포 경보 때 새어 나옴'},{u:'nk',how:'3스테이지부터 카드로 출동'}]},
+  {row:'지휘',sub:'적응 면역을 켜는 스위치',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
+  {row:'체액성 면역',sub:'항체로 세포 밖 병원체를 처리한다',items:[
+    {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'},{u:'memory',how:'같은 유형 10번 처치로 열림'}]},
+  {row:'세포성 면역',sub:'감염된 세포를 통째로 없앤다',items:[{u:'tc',how:'바이러스 항원이 드러나면 열림'}]}
+];
+function makeEnemyIcon(k,s){
+  const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
+  drawWith(g,()=>{const keep=S.revealed[s];S.revealed[s]=1;g.save();const sc=k==='mutant'?.55:k==='infected'?.75:.95;g.translate(40,46);g.scale(sc,sc);
+    drawEnemy({id:1,k,s,x:-LEFT/CELL,lane:0,ry:-.46,hp:1,maxhp:1,age:0,opT:0,slowT:0,icon:1},0);g.restore();S.revealed[s]=keep;});
+  return c;
+}
+let bookPage='ag';
+function showBook(){
+  overlay(`<div class="card bookcard"><div class="eyebrow">면역 도감</div>
+    <div class="booktabs"><button class="tab" id="bk-ag" data-p="ag">항원</button><button class="tab" id="bk-body" data-p="body">우리 몸</button></div>
+    <div class="bookpage" id="bookPage"></div><button class="btn" id="bookClose">돌아가기</button></div>`);
+  document.querySelectorAll('.booktabs .tab').forEach(b=>b.onclick=()=>{bookPage=b.dataset.p;fillBook();});
+  $('bookClose').onclick=hideOverlay;fillBook();$('bookClose').focus();
+}
+function bookRow(row,sub){const r=document.createElement('section');r.className='bookrow';
+  r.innerHTML=`<div class="rowhead"><b>${row}</b><span>${sub}</span></div>`;const cards=document.createElement('div');cards.className='rowcards';r.appendChild(cards);return [r,cards];}
+function fillBook(){
+  document.querySelectorAll('.booktabs .tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.p===bookPage)));
+  const P=$('bookPage');P.innerHTML='';
+  if(bookPage==='ag'){
+    for(const grp of BOOK_AG){const [r,cards]=bookRow(grp.row,grp.sub);
+      for(const it of grp.items){const st=STRAINS[it.s],found=S.revealed[it.s]&&it.k!=='infected';
+        const e=document.createElement('div');e.className='entry';e.appendChild(makeEnemyIcon(it.k,it.s));
+        const t=document.createElement('div');t.style.minWidth='0';
+        t.innerHTML=`<b>${it.name||st.name}${found?' <em class="found">발견</em>':''}</b><div class="tags">${it.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+          <p>${it.trait||st.trait}</p><dl><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`;
+        e.appendChild(t);cards.appendChild(e);}
+      P.appendChild(r);}
+  } else {
+    for(const grp of BOOK_BODY){const [r,cards]=bookRow(grp.row,grp.sub);
+      for(const it of grp.items){const e=document.createElement('div');e.className='entry';
+        let name,desc;
+        if(it.b){e.appendChild(makeIcon('barrier',it.b));name=BARRIERS[it.b].name;desc=BARRIERS[it.b].desc;}
+        else{e.appendChild(makeIcon('unit',it.u));name=it.u==='serum'?'혈장':UNITS[it.u].name;
+          desc=it.u==='serum'?'히스타민으로 넓어진 혈관에서 새어 나오는 액체. 고인 곳에선 병원체가 느려지고, 보체 단백질이 세균에 구멍을 낸다':UNITS[it.u].desc;}
+        const cost=it.b?BARRIERS[it.b].cost:(UNITS[it.u]&&UNITS[it.u].cost)||0;
+        const t=document.createElement('div');t.style.minWidth='0';
+        t.innerHTML=`<b>${name}</b><div class="tags"><span class="tag how">${it.how}</span>${cost?`<span class="tag">포도당 ${cost}</span>`:''}</div><p>${desc}</p>`;
+        e.appendChild(t);cards.appendChild(e);}
+      P.appendChild(r);}
+  }
+}
+
+function cellFromEvent(ev){const rect=cv.getBoundingClientRect();let x=(ev.clientX-rect.left)*W/rect.width,y=(ev.clientY-rect.top)*H/rect.height;
+  x=CAM.cx+(x-CAM.cx)/CAM.z;y=CAM.cy+(y-CAM.cy)/CAM.z;
+  return {c:Math.floor((x-LEFT)/CELL),r:Math.floor(y/CELL),px:(x-LEFT)/CELL,py:(y-50)/CELL};}
+cv.addEventListener('pointermove',ev=>{hover=cellFromEvent(ev);});
+cv.addEventListener('pointerleave',()=>hover=null);
+cv.addEventListener('pointerdown',ev=>{if(S.phase!=='setup'&&S.phase!=='wave')return;const {c,r,px,py}=cellFromEvent(ev);if(c<0||c>=COLS||r<0||r>=ROWS)return;place(c,r,px,py);hover={c,r};refreshTray();});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{setTab(b.dataset.tab);refreshTray();});
+$('startBtn').onclick=()=>{if(S.phase!=='setup')return;S.phase='wave';S.t=0;selected=null;setTab('unit');camPunch(W/2,H/2,.05);setInfo('웨이브 시작. 면역세포 카드를 눌러 계속 출동시킨다.');refreshTray();};
+$('antiBtn').onclick=()=>{if(S.antiUsed||S.phase!=='wave')return;S.antiUsed=true;
+  S.enemies.forEach(e=>{if(e.k==='bact'||e.k==='toxin'){e.dead=1;S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'pop'});}});
+  S.enemies=S.enemies.filter(e=>!e.dead);note('antibiotic');refreshTray();};
+$('removeBtn').onclick=()=>{removeMode=!removeMode;selected=null;S.picked=null;$('removeBtn').classList.toggle('sel',removeMode);
+  setInfo(removeMode?'지울 세포나 방어선을 누른다. 준비 단계에서 지우면 포도당을 돌려받는다.':DEFAULT_INFO);refreshTray();};
+$('bookBtn').onclick=showBook;
+$('pyBtn').onclick=()=>{if(!(S.fever>0)||S.antipyUsed)return;S.antipyUsed=true;S.antipyT=S.fever;note('antipy');refreshTray();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;removeMode=false;S.picked=null;$('removeBtn').classList.remove('sel');refreshTray();}});
+
+let last=performance.now(),trayTimer=0;
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  const time=now/1000;
+  if(S.phase==='wave'&&$('overlay').hidden)update(dt);
+  updateCam(dt);render(time);tickToast(dt);
+  trayTimer+=dt;if(trayTimer>.2){trayTimer=0;refreshHud();refreshTray();}
+  requestAnimationFrame(loop);
+}
+S=newState(0);
+document.fonts.ready.then(()=>{buildTray();refreshHud();});
+buildTray();setTab('barrier');showIntro();refreshHud();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
