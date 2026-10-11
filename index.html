@@ -125,6 +125,13 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .tag{font-family:var(--display);font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--flesh);color:var(--membrane-d)}
 .tag.how{background:#fff3d6;color:#8a5a06}
 .found{font-style:normal;font-size:11px;background:var(--ok);color:#fff;border-radius:999px;padding:1px 7px;vertical-align:2px}
+.entry.unknown{background:#efe4e7;border-style:dashed;border-color:#c79aa6}
+.entry.unknown b{color:#8c6b76;letter-spacing:2px}
+.entry.unknown canvas{background:#e3d6db}
+.bookprog{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;background:var(--skin);border:2px solid var(--flesh2);border-radius:14px;padding:8px 12px}
+.bookprog b{font-family:var(--display);font-weight:400;font-size:16px;color:var(--membrane-d)}
+.bookprog .bar{flex:1;min-width:120px;height:10px;border-radius:5px;background:var(--flesh2);overflow:hidden}.bookprog .bar i{display:block;height:100%;background:var(--ok)}
+.bookprog span:last-child{width:100%;font-size:12.5px;color:var(--muted)}
 .entry dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:12px;line-height:1.45}
 .entry dt{font-family:var(--display);color:var(--gold)}
 .entry dd{margin:0;color:var(--ink)}
@@ -436,7 +443,7 @@ function drawEnemy(e,time){
   if(e.slowT>0){ctx.fillStyle='rgba(120,190,240,.22)';ctx.beginPath();ctx.arc(x,y,s*.6,0,7);ctx.fill();}
   marker(x+s*.38,y-s*.4,7,e.s,mys);
   if(S.units.some(u=>u.k==='neut'&&u.targets&&u.targets.includes(e))){ctx.fillStyle='#e0577f';ctx.font='20px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('!',x-s*.4,y-s*.42+Math.sin(time*8)*2);}
-  if(e.icon){marker(x+s*.38,y-s*.4,7,e.s,false);return;}
+  if(e.icon){marker(x+s*.38,y-s*.4,7,e.s,mys);return;}
   const mh=e.maxhp, w=Math.max(30,s*.9);
   ctx.fillStyle='rgba(120,60,90,.2)';ctx.beginPath();ctx.roundRect(x-w/2,y-s*.62-12,w,7,4);ctx.fill();
   ctx.fillStyle=e.k==='mutant'?'#ef4a63':'#ff8a5c';ctx.beginPath();ctx.roundRect(x-w/2,y-s*.62-12,Math.max(2,w*Math.max(0,e.hp/mh)),7,4);ctx.fill();
@@ -699,7 +706,7 @@ function spawn(k,s,lane,x=9.6){
 }
 function hasHelper(){return S.units.some(u=>u.k==='helper');}
 function rateMul(u){const t=S.temp||36.8;return t>=40?.75:t>=37.8?1.45:1;}
-function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;SND.play('reveal');toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait}`]);buildTray();}
+function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;discover(s);SND.play('reveal');toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait} 도감에 기록됐다.`]);buildTray();}
 function hurt(e,dmg,by){
   if(e.dead)return;
   e.hp-=dmg;
@@ -760,7 +767,7 @@ function update(dt){
   while(S.events.length&&S.events[0].t<=S.t){const ev=S.events.shift();
     if(ev.k==='meal'){S.glu+=60;S.meal=10;}
     if(ev.k==='fever'){S.fever=16;S.antipyT=0;S.feverBanner=0;SND.play('fever');}
-    if(ev.k==='vaccine'){S.revealed.D=1;S.memory.D=1;buildTray();}
+    if(ev.k==='vaccine'){S.revealed.D=1;S.memory.D=1;discover('D');buildTray();}
     if(ev.k==='pollen'){for(let i=0;i<14;i++)spawn('pollen','P',i%ROWS,9.6+Math.random()*1.5);if(!S.flags.sens)toastQ.push(NOTES.noAllergy);}
     note(ev.k);}
   S.allergy=Math.max(0,(S.allergy||0)-dt);if(S.allergy>0)S.glu=Math.max(0,S.glu-2.2*dt);
@@ -773,7 +780,7 @@ function update(dt){
     const d=ENEMIES[e.k];e.age+=dt*((S.temp||0)>=37.8?.6:1);e.opT=Math.max(0,e.opT-dt);if(e.alarmT)e.alarmT=Math.max(0,e.alarmT-dt);
     e.ry=e.ry==null?e.lane:e.ry+(e.lane-e.ry)*Math.min(1,dt*7);
     const T=STRAINS[e.s]||{};
-    if(e.k==='virus'&&e.age>=(T.hide||6)){e.k='infected';e.hp=ENEMIES.infected.hp;e.maxhp=e.hp;e.spawnCd=8;e.age=0;e.opT=0;if(!S.seen.infected){S.seen.infected=1;note('infected');}continue;}
+    if(e.k==='virus'&&e.age>=(T.hide||6)){e.k='infected';e.hp=ENEMIES.infected.hp;e.maxhp=e.hp;e.spawnCd=8;e.age=0;e.opT=0;if(!S.seen.infected){S.seen.infected=1;discover('infected');note('infected');}continue;}
     if(e.k==='mutant'||e.k==='infected'){e.spawnCd-=dt;if(e.spawnCd<=0){e.spawnCd=e.k==='mutant'?4:9;e.rel=(e.rel||0)+1;if(e.k==='infected'&&e.rel>=2){e.dead=1;S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'hit'});}const l=e.k==='mutant'?Math.max(0,Math.min(ROWS-1,e.lane+(Math.random()<.5?-1:1))):e.lane;spawn('virus',e.s,l,e.x-.2);}}
     const c=Math.floor(e.x), g=(c>=0&&c<COLS)?S.grid[e.lane][c]:null;
     // flagellar dodge: swims sideways away from an approaching phagocyte (not once antibodies tie the flagella)
@@ -1234,13 +1241,15 @@ const BOOK_BODY=[
     {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'},{u:'memory',how:'같은 유형 10번 처치로 열림'}]},
   {row:'세포성 면역',sub:'감염된 세포를 통째로 없앤다',items:[{u:'tc',how:'바이러스나 B형 세균 정체가 드러나면 열림'}]}
 ];
-function makeEnemyIcon(k,s){
+function makeEnemyIcon(k,s,mys){
   const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
-  drawWith(g,()=>{const keep=S.revealed[s];S.revealed[s]=1;g.save();const sc=k==='mutant'?.55:k==='infected'?.75:.95;g.translate(40,46);g.scale(sc,sc);
+  drawWith(g,()=>{const keep=S.revealed[s];S.revealed[s]=mys?0:1;g.save();const sc=k==='mutant'?.55:k==='infected'?.75:.95;g.translate(40,46);g.scale(sc,sc);
     drawEnemy({id:1,k,s,x:-LEFT/CELL,lane:0,ry:-.46,hp:1,maxhp:1,age:0,opT:0,slowT:0,icon:1},0);g.restore();S.revealed[s]=keep;});
   return c;
 }
 let bookPage='ag';
+let DISC={};try{DISC=JSON.parse(localStorage.getItem('immune-defense-book')||'{}')||{};}catch(e){DISC={};}
+function discover(k){if(DISC[k])return;DISC[k]=1;try{localStorage.setItem('immune-defense-book',JSON.stringify(DISC));}catch(e){}}
 function showBook(){
   overlay(`<div class="card bookcard"><div class="eyebrow">면역 도감</div>
     <div class="booktabs"><button class="tab" id="bk-ag" data-p="ag">항원</button><button class="tab" id="bk-body" data-p="body">우리 몸</button></div>
@@ -1254,12 +1263,16 @@ function fillBook(){
   document.querySelectorAll('.booktabs .tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.p===bookPage)));
   const P=$('bookPage');P.innerHTML='';
   if(bookPage==='ag'){
+    const all=BOOK_AG.flatMap(g=>g.items),known=it=>it.k==='infected'?(DISC.infected||S.seen.infected):(DISC[it.s]||S.revealed[it.s]);
+    const n=all.filter(known).length,head=document.createElement('div');head.className='bookprog';
+    head.innerHTML=`<b>발견한 항원 ${n} / ${all.length}</b><span class="bar"><i style="width:${n/all.length*100}%"></i></span><span>처음 보는 병원체는 대식세포가 먹어 정체를 밝혀야 도감에 기록된다.</span>`;P.appendChild(head);
     for(const grp of BOOK_AG){const [r,cards]=bookRow(grp.row,grp.sub);
-      for(const it of grp.items){const st=STRAINS[it.s],found=S.revealed[it.s]&&it.k!=='infected';
-        const e=document.createElement('div');e.className='entry';e.appendChild(makeEnemyIcon(it.k,it.s));
+      for(const it of grp.items){const st=STRAINS[it.s],ok=known(it);
+        const e=document.createElement('div');e.className='entry'+(ok?'':' unknown');e.appendChild(makeEnemyIcon(it.k,it.s,!ok));
         const t=document.createElement('div');t.style.minWidth='0';
-        t.innerHTML=`<b>${it.name||st.name}${found?' <em class="found">발견</em>':''}</b><div class="tags">${it.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
-          <p>${it.trait||st.trait}</p><dl><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`;
+        t.innerHTML=ok?`<b>${it.name||st.name}</b><div class="tags">${it.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+          <p>${it.trait||st.trait}</p><dl><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`
+          :`<b>???</b><div class="tags"><span class="tag">미확인</span></div><p>${it.k==='infected'?'아직 본 적 없다. 무언가가 우리 몸 세포 안으로 숨어들면 나타난다.':'아직 정체를 모르는 존재다. 대식세포가 먹고 항원을 제시하면 기록된다.'}</p><dl><dt>단서</dt><dd>${it.where}에서 만날 수 있다</dd></dl>`;
         e.appendChild(t);cards.appendChild(e);}
       P.appendChild(r);}
   } else {
