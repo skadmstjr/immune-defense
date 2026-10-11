@@ -125,6 +125,14 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .tag{font-family:var(--display);font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--flesh);color:var(--membrane-d)}
 .tag.how{background:#fff3d6;color:#8a5a06}
 .found{font-style:normal;font-size:11px;background:var(--ok);color:#fff;border-radius:999px;padding:1px 7px;vertical-align:2px}
+.tag.kind{background:#e8f3ff;color:#245e93}
+.concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.concept{background:var(--skin);border:2px solid var(--flesh2);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.concept h3{margin:0;font-family:var(--display);font-weight:400;font-size:18px;color:var(--membrane-d)}
+.concept p{margin:0;font-size:13.5px;line-height:1.65;color:var(--ink)}
+.concept p b{color:var(--membrane);font-weight:700}
+.concept .ingame{font-size:12.5px;line-height:1.55;color:var(--muted);background:#fff3d6;border-radius:10px;padding:6px 10px}
+.concept .ingame span{font-family:var(--display);color:#8a5a06;margin-right:6px}
 .entry.unknown{background:#efe4e7;border-style:dashed;border-color:#c79aa6}
 .entry.unknown b{color:#8c6b76;letter-spacing:2px}
 .entry.unknown canvas{background:#e3d6db}
@@ -1218,28 +1226,73 @@ function showOver(){
   refreshTray();
 }
 const BOOK_AG=[
-  {row:'세균',sub:'세포 밖에서 스스로 분열해 늘어난다',items:[
+  {row:'세균',sub:'핵막이 없는 원핵생물이다. 스스로 분열해 증식하고 항생제가 듣는다',items:[
     {k:'bact',s:'A',tags:['편모 회피','이분법'],where:'1·2·3스테이지',weak:'항체가 붙으면 편모가 묶여 못 피한다. 형질세포로 묶고 식세포로 먹는다.'},
     {k:'bact',s:'B',tags:['협막','세포 내 기생','이분법'],where:'1·2스테이지',weak:'항체를 붙여(옵소닌화) 식세포가 먹게 한다. 감염된 대식세포는 보조 T림프구로 활성화한다.'},
     {k:'toxin',s:'C',tags:['독소'],where:'2스테이지',weak:'형질세포의 항체가 독소를 중화한다.'}]},
-  {row:'바이러스',sub:'혼자 못 늘어나고 세포 안에 숨어 복제한다',items:[
+  {row:'바이러스',sub:'세포 구조가 없어 숙주 세포 안에서만 증식한다. 항생제가 듣지 않는다',items:[
     {k:'virus',s:'D',tags:['빠른 전파'],where:'3스테이지',weak:'숨기 전엔 항체, 숨은 뒤엔 세포독성 T림프구와 NK세포.'},
     {k:'virus',s:'E',tags:['MHC 숨김'],where:'3스테이지',weak:'세포독성 T림프구가 못 알아본다. NK세포가 2배로 강하다.'},
     {k:'mutant',s:'F',tags:['항원 변이','보스'],where:'3스테이지 마지막',weak:'대식세포로 정체를 다시 밝힌 뒤 형질세포와 T림프구로 처리한다.'},
     {k:'infected',s:'D',name:'감염세포',tags:['바이러스 공장'],where:'바이러스가 숨으면 생긴다',weak:'NK세포, 세포독성 T림프구. 그대로 두면 바이러스를 내보내다 터진다.',
      trait:'바이러스가 숨어든 우리 몸 세포. 항체도 식세포도 안쪽까지 닿지 못한다.'}]},
-  {row:'무해한 물질',sub:'병원체가 아니다',items:[
+  {row:'무해한 물질',sub:'병원체가 아니지만, 면역계가 착각하면 알레르기를 일으킨다',items:[
     {k:'pollen',s:'P',tags:['무해','알레르기 유발'],where:'2·3스테이지',weak:'싸울 필요가 없다. 감작되면 비만세포가 과민 반응한다.'}]}
 ];
+const BIO={
+  skin:['비특이적 방어 · 물리적 장벽','죽은 세포가 쌓인 각질층이 병원체가 몸 안으로 들어오는 것을 막는다. 상처가 나면 이 장벽이 뚫린다.'],
+  mucus:['비특이적 방어 · 물리적 장벽','호흡기와 소화관 안쪽의 점막에서 나온 끈끈한 점액이 병원체를 붙잡는다.'],
+  lyso:['비특이적 방어 · 화학적 방어','눈물·침·콧물 속 라이소자임이 세균의 세포벽을 분해한다. 세포벽이 없는 바이러스에는 효과가 없다.'],
+  cilia:['비특이적 방어 · 물리적 장벽','기관 안쪽의 섬모가 움직이며 점액에 붙잡힌 이물질을 몸 밖으로 밀어낸다.'],
+  macro:['비특이적 방어 · 식세포 작용 → 항원 제시','병원체를 삼켜 분해하는 식세포다. 분해한 병원체 조각(항원)을 세포 표면에 제시해 보조 T림프구를 활성화하므로, 비특이적 방어와 특이적 방어를 잇는 역할을 한다.'],
+  neut:['비특이적 방어 · 식세포 작용','백혈구 중 수가 가장 많고 감염 부위에 가장 먼저 모인다. 병원체를 먹고 죽은 호중구가 쌓인 것이 고름이다.'],
+  mast:['비특이적 방어 · 염증 반응','손상이나 감염이 생기면 히스타민을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 백혈구가 감염 부위로 쉽게 모이게 한다.'],
+  serum:['비특이적 방어 · 염증 반응','혈액의 액체 성분이다. 염증 반응 때 혈관 밖으로 빠져나와 부위가 붓고(부종), 함께 나온 단백질이 병원체 제거를 돕는다.'],
+  nk:['비특이적 방어 · 심화 내용','자연 살해 세포라고도 한다. 항원을 미리 몰라도 바이러스에 감염된 세포나 암세포를 알아보고 파괴한다. 생명과학Ⅰ 범위를 넘는 심화 내용이다.'],
+  helper:['특이적 방어 · 체액성·세포성 면역의 시작','가슴샘(흉선)에서 성숙하는 T림프구의 한 종류다. 대식세포가 제시한 항원을 인식해 활성화되고, B림프구와 세포독성 T림프구가 활성화되도록 돕는다.'],
+  bcell:['특이적 방어 · 체액성 면역','골수에서 만들어지고 성숙한다. 자신에게 맞는 항원을 인식하고 보조 T림프구의 도움을 받으면 형질세포와 기억세포로 분화한다.'],
+  plasma:['특이적 방어 · 체액성 면역','B림프구가 분화한 세포로 항체를 만들어 분비한다. 항체는 특정 항원에만 결합하며(항원-항체 반응의 특이성), 병원체를 무력화하거나 식세포가 잘 먹도록 돕는다.'],
+  tc:['특이적 방어 · 세포성 면역','가슴샘(흉선)에서 성숙한다. 병원체에 감염된 세포를 직접 찾아가 파괴한다. 항체가 닿지 못하는 세포 안의 병원체를 처리하는 방법이다.'],
+  memory:['특이적 방어 · 2차 면역 반응','1차 면역 반응 때 B림프구가 분화해 만들어지고 오래 살아남는다. 같은 항원이 다시 들어오면 빠르게 형질세포로 분화해 2차 면역 반응을 일으킨다.']
+};
+const AG_IMMUNE={A:'식세포 작용, 체액성 면역(항체)',B:'식세포 작용, 체액성 면역(옵소닌화). 감염된 대식세포는 세포성 면역',C:'체액성 면역(항체의 독소 중화)',
+  D:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',E:'세포 밖에서는 체액성 면역, 세포 안에서는 NK세포',F:'1차 면역 반응을 처음부터 다시 거쳐야 한다',P:'방어가 필요 없지만, 과민 반응(알레르기)이 일어날 수 있다',infected:'세포성 면역(세포독성 T림프구, NK세포)'};
+const CONCEPTS=[
+  {t:'비특이적 방어와 특이적 방어',b:'<b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나는 방어다. 피부·점막 같은 장벽, 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식해 그 항원만 공격하는 방어로, 림프구가 담당하며 처음에는 시간이 걸린다.',
+   g:'1차 방어선·대식세포·비만세포·호중구가 비특이적 방어, 보조 T·B·세포독성 T림프구와 기억세포가 특이적 방어다. 특이적 방어 카드는 항원 정체가 드러나야 열린다.'},
+  {t:'항원과 항체',b:'<b>항원</b>은 면역 반응을 일으키는 물질로, 병원체의 표면 단백질 등이 해당한다. <b>항체</b>는 형질세포가 만드는 단백질로 특정 항원에만 결합한다. 이를 항원-항체 반응의 <b>특이성</b>이라 한다.',
+   g:'항원마다 다른 색과 모양의 표식이 붙어 있다. B림프구와 형질세포는 머리 위 표식과 같은 항원만 공격한다.'},
+  {t:'체액성 면역과 세포성 면역',b:'<b>체액성 면역</b>은 형질세포가 분비한 항체가 체액 속 항원과 결합해 제거하는 방식이다. <b>세포성 면역</b>은 세포독성 T림프구가 병원체에 감염된 세포를 직접 파괴하는 방식이다. 두 방식 모두 보조 T림프구의 도움으로 시작된다.',
+   g:'2스테이지에서 체액성 면역, 3스테이지에서 세포성 면역을 중심으로 다룬다. 보조 T림프구가 없으면 B림프구와 세포독성 T림프구가 활성화되지 않는다.'},
+  {t:'1차 면역 반응과 2차 면역 반응',b:'항원이 처음 들어오면 B림프구가 형질세포와 기억세포로 분화하는 데 시간이 걸려 항체가 늦게, 적게 만들어진다(<b>1차 면역 반응</b>). 같은 항원이 다시 들어오면 기억세포가 빠르게 형질세포로 분화해 항체가 더 빨리, 더 많이 만들어진다(<b>2차 면역 반응</b>).',
+   g:'같은 유형을 10번 물리치면 기억세포 카드가 열린다. 기억세포는 보조 T림프구를 기다리지 않고 형질세포를 빠르게 많이 만든다.',chart:1},
+  {t:'백신의 원리',b:'<b>백신</b>은 독성을 약하게 하거나 없앤 항원을 미리 넣어 1차 면역 반응을 일으키는 것이다. 이때 생긴 기억세포 덕분에 실제 병원체가 들어오면 바로 2차 면역 반응이 일어난다.',
+   g:'3스테이지의 백신 접종 이벤트로 D형의 정체가 미리 드러나고 D형 기억세포가 열린다.'},
+  {t:'염증 반응',b:'상처나 감염 부위에서 비만세포가 <b>히스타민</b>을 분비하면 모세 혈관이 확장되고 혈관 벽의 투과성이 커진다. 그 결과 부위가 붉어지고 열이 나며 붓고, 식세포가 모여 병원체를 제거한다.',
+   g:'비만세포가 세균을 발견하면 경보를 울리고, 혈장이 새어 나오며 호중구가 혈관에서 달려온다.'},
+  {t:'세균과 바이러스',b:'<b>세균</b>은 핵막이 없는 원핵생물로 스스로 분열해 증식하며 항생제로 치료할 수 있다. <b>바이러스</b>는 세포 구조가 없어 살아 있는 숙주 세포 안에서만 증식하며 항생제가 듣지 않는다.',
+   g:'세균은 이분법으로 수를 늘리고, 바이러스는 세포 안으로 숨어 감염세포가 된다. 항생제 버튼은 세균만 없애고 바이러스는 그대로 남긴다.'},
+  {t:'알레르기',b:'꽃가루처럼 해롭지 않은 물질에 면역계가 지나치게 반응하는 것을 <b>알레르기</b>(과민 반응)라 한다. 비만세포가 히스타민을 과하게 분비해 콧물, 가려움, 부기 같은 증상이 나타난다.',
+   g:'꽃가루의 정체가 드러난 상태에서 보조 T림프구가 있으면 몸이 꽃가루를 기억하고(감작), 이후 꽃가루를 만나면 알레르기 반응이 일어난다.'}
+];
+const ABCHART=`<svg viewBox="0 0 320 150" role="img" aria-label="1차와 2차 면역 반응의 항체 농도 그래프" style="width:100%;max-width:360px;display:block;margin:6px 0 2px">
+<line x1="34" y1="122" x2="312" y2="122" stroke="#8c4a5c" stroke-width="1.5"/><line x1="34" y1="122" x2="34" y2="10" stroke="#8c4a5c" stroke-width="1.5"/>
+<path d="M50 121 C 70 121, 78 104, 92 98 S 118 112, 140 116 L 176 117 C 186 117, 190 40, 206 30 S 250 46, 300 60" fill="none" stroke="#c0465f" stroke-width="3" stroke-linecap="round"/>
+<line x1="50" y1="122" x2="50" y2="128" stroke="#7d2238" stroke-width="2"/><line x1="176" y1="122" x2="176" y2="128" stroke="#7d2238" stroke-width="2"/>
+<text x="50" y="141" text-anchor="middle" font-size="11" fill="#7d2238" font-family="Jua, sans-serif">1차 침입</text><text x="176" y="141" text-anchor="middle" font-size="11" fill="#7d2238" font-family="Jua, sans-serif">같은 항원 재침입</text>
+<text x="96" y="90" text-anchor="middle" font-size="11" fill="#c0465f" font-family="Jua, sans-serif">1차 반응</text><text x="214" y="22" text-anchor="middle" font-size="11" fill="#c0465f" font-family="Jua, sans-serif">2차 반응</text>
+<text x="20" y="66" text-anchor="middle" font-size="10" fill="#8c4a5c" font-family="Jua, sans-serif" transform="rotate(-90 20 66)">항체 농도</text>
+<text x="306" y="138" text-anchor="end" font-size="10" fill="#8c4a5c" font-family="Jua, sans-serif">시간</text></svg>`;
+
 const BOOK_BODY=[
-  {row:'1차 방어선',sub:'감염 전부터 있는 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
-  {row:'선천 면역',sub:'누구든 바로 공격한다. 빠르지만 덜 정확하다',items:[
+  {row:'1차 방어선',sub:'비특이적 방어. 감염 전부터 있는 물리적·화학적 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
+  {row:'선천 면역',sub:'비특이적 방어. 병원체를 가리지 않고 바로 반응한다',items:[
     {u:'macro',how:'카드로 출동'},{u:'neut',how:'비만세포 경보 때 자동 출동'},{u:'mast',how:'카드로 출동'},
     {u:'serum',how:'비만세포 경보 때 새어 나옴'},{u:'nk',how:'3스테이지부터 카드로 출동'}]},
-  {row:'지휘',sub:'적응 면역을 켜는 스위치',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
-  {row:'체액성 면역',sub:'항체로 세포 밖 병원체를 처리한다',items:[
+  {row:'지휘',sub:'특이적 방어를 시작하게 하는 림프구',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
+  {row:'체액성 면역',sub:'특이적 방어. 항체로 체액 속 항원을 처리한다',items:[
     {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'},{u:'memory',how:'같은 유형 10번 처치로 열림'}]},
-  {row:'세포성 면역',sub:'감염된 세포를 통째로 없앤다',items:[{u:'tc',how:'바이러스나 B형 세균 정체가 드러나면 열림'}]}
+  {row:'세포성 면역',sub:'특이적 방어. 감염된 세포를 직접 파괴한다',items:[{u:'tc',how:'바이러스나 B형 세균 정체가 드러나면 열림'}]}
 ];
 function makeEnemyIcon(k,s,mys){
   const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
@@ -1252,7 +1305,7 @@ let DISC={};try{DISC=JSON.parse(localStorage.getItem('immune-defense-book')||'{}
 function discover(k){if(DISC[k])return;DISC[k]=1;try{localStorage.setItem('immune-defense-book',JSON.stringify(DISC));}catch(e){}}
 function showBook(){
   overlay(`<div class="card bookcard"><div class="eyebrow">면역 도감</div>
-    <div class="booktabs"><button class="tab" id="bk-ag" data-p="ag">항원</button><button class="tab" id="bk-body" data-p="body">우리 몸</button></div>
+    <div class="booktabs"><button class="tab" id="bk-ag" data-p="ag">항원</button><button class="tab" id="bk-body" data-p="body">우리 몸</button><button class="tab" id="bk-concept" data-p="concept">면역 개념</button></div>
     <div class="bookpage" id="bookPage"></div><button class="btn" id="bookClose">돌아가기</button></div>`);
   document.querySelectorAll('.booktabs .tab').forEach(b=>b.onclick=()=>{bookPage=b.dataset.p;fillBook();});
   $('bookClose').onclick=hideOverlay;fillBook();$('bookClose').focus();
@@ -1271,10 +1324,16 @@ function fillBook(){
         const e=document.createElement('div');e.className='entry'+(ok?'':' unknown');e.appendChild(makeEnemyIcon(it.k,it.s,!ok));
         const t=document.createElement('div');t.style.minWidth='0';
         t.innerHTML=ok?`<b>${it.name||st.name}</b><div class="tags">${it.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
-          <p>${it.trait||st.trait}</p><dl><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`
+          <p>${it.trait||st.trait}</p><dl><dt>면역 반응</dt><dd>${AG_IMMUNE[it.k==='infected'?'infected':it.s]}</dd><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`
           :`<b>???</b><div class="tags"><span class="tag">미확인</span></div><p>${it.k==='infected'?'아직 본 적 없다. 무언가가 우리 몸 세포 안으로 숨어들면 나타난다.':'아직 정체를 모르는 존재다. 대식세포가 먹고 항원을 제시하면 기록된다.'}</p><dl><dt>단서</dt><dd>${it.where}에서 만날 수 있다</dd></dl>`;
         e.appendChild(t);cards.appendChild(e);}
       P.appendChild(r);}
+  } else if(bookPage==='concept'){
+    const head=document.createElement('div');head.className='bookprog';head.innerHTML='<b>생명과학Ⅰ · 방어 작용</b><span>게임 속 장면이 실제로 어떤 면역 원리를 담고 있는지 정리했다.</span>';P.appendChild(head);
+    const grid=document.createElement('div');grid.className='concepts';
+    for(const c of CONCEPTS){const d=document.createElement('section');d.className='concept';
+      d.innerHTML=`<h3>${c.t}</h3><p>${c.b}</p>${c.chart?ABCHART:''}<div class="ingame"><span>게임에서는</span>${c.g}</div>`;grid.appendChild(d);}
+    P.appendChild(grid);
   } else {
     for(const grp of BOOK_BODY){const [r,cards]=bookRow(grp.row,grp.sub);
       for(const it of grp.items){const e=document.createElement('div');e.className='entry';
@@ -1284,7 +1343,8 @@ function fillBook(){
           desc=it.u==='serum'?'히스타민으로 넓어진 혈관에서 새어 나오는 액체. 고인 곳에선 병원체가 느려지고, 보체 단백질이 세균에 구멍을 낸다':UNITS[it.u].desc;}
         const cost=it.b?BARRIERS[it.b].cost:(UNITS[it.u]&&UNITS[it.u].cost)||0;
         const t=document.createElement('div');t.style.minWidth='0';
-        t.innerHTML=`<b>${name}</b><div class="tags"><span class="tag how">${it.how}</span>${cost?`<span class="tag">포도당 ${cost}</span>`:''}</div><p>${desc}</p>`;
+        const bio=BIO[it.b||it.u];
+        t.innerHTML=`<b>${name}</b><div class="tags"><span class="tag kind">${bio[0]}</span></div><p>${bio[1]}</p><dl><dt>게임에서</dt><dd>${desc}</dd><dt>얻는 법</dt><dd>${it.how}${cost?` · 포도당 ${cost}`:''}</dd></dl>`;
         e.appendChild(t);cards.appendChild(e);}
       P.appendChild(r);}
   }
