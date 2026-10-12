@@ -104,6 +104,63 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .round.go svg{width:34px;height:34px}
 .round.go:not(:disabled){animation:breathe 1.6s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.06)}}
+.panel{position:absolute;inset:0;z-index:6;border-radius:24px;overflow:auto;color:var(--ink)}
+.home{background:#3a0f1e;color:var(--light);overflow:hidden;display:grid;place-items:center}
+.home canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+.homein{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:24px 18px;max-width:640px}
+.hbadge{font-family:var(--display);font-size:14px;color:#ffd6de;background:rgba(125,34,56,.85);border:2px solid var(--membrane);border-radius:999px;padding:5px 14px}
+.htitle{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(46px,9vw,84px);line-height:1.05;color:var(--goldbg);text-shadow:0 6px 0 var(--membrane-d),0 0 30px rgba(255,120,80,.35);text-wrap:balance}
+.hsub{margin:0;font-size:16px;line-height:1.7;color:#ffe3e8;word-break:keep-all;text-wrap:balance}
+.hbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(520px,100%);margin-top:6px}
+.hbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--display);font-size:16px;white-space:nowrap;padding:13px 14px;border-radius:16px;border:3px solid var(--membrane);background:var(--skin);color:var(--ink);cursor:pointer;box-shadow:0 5px 0 var(--membrane-d);transition:transform .12s}
+.hbtn svg{width:20px;height:20px;flex:none}
+.hbtn:hover{transform:translateY(-2px)}.hbtn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--membrane-d)}
+.hbtn.main{grid-column:1/-1;font-size:24px;padding:16px;background:var(--goldbg);border-color:var(--golddk);color:#6b3d05;box-shadow:0 6px 0 var(--golddk)}
+.hbtn.main svg{width:26px;height:26px}
+.hbtn:focus-visible,.pback:focus-visible,.pbtn:focus-visible,.chip2:focus-visible,.qopt:focus-visible,.hrestart:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.hrestart{background:none;border:0;color:#ffb3c6;font-family:var(--display);font-size:14px;text-decoration:underline;cursor:pointer}
+.hfoot{margin:6px 0 0;font-size:12.5px;color:#d99aaa;line-height:1.5}
+.study,.quiz{background:var(--flesh);display:flex;flex-direction:column;gap:12px;padding:16px 18px}
+.phead{display:flex;align-items:center;gap:12px}
+.phead b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--membrane-d)}
+.phead span{margin-left:auto;font-family:var(--display);color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.pback{font-family:var(--display);font-size:14px;border:2px solid var(--membrane);background:var(--skin);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.chip2{font-family:var(--display);font-size:13px;border:2px solid var(--flesh2);background:var(--skin);color:var(--muted);border-radius:999px;padding:4px 11px;cursor:pointer}
+.chip2[aria-current="true"]{background:var(--membrane);border-color:var(--membrane);color:#fff}
+.lesson{background:var(--skin);border:2px solid var(--flesh2);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.lesson h2{margin:0;font-family:var(--display);font-weight:400;font-size:24px;color:var(--membrane-d);text-wrap:balance}
+.lesson .lno{font-family:var(--display);font-size:13px;color:var(--gold)}
+.fig{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 6px;background:#fff;border:2px dashed var(--flesh2);border-radius:16px;padding:12px 8px}
+.fnode{display:flex;flex-direction:column;align-items:center;gap:4px;width:92px;text-align:center;font-family:var(--display);font-size:12.5px;color:var(--ink);line-height:1.2;word-break:keep-all}
+.fnode canvas{width:64px;height:64px;background:var(--light);border-radius:50%}
+.farr{font-family:var(--display);font-size:22px;color:var(--membrane)}
+.lesson p{margin:0;font-size:15px;line-height:1.8;max-width:68ch}
+.lesson p b{color:var(--membrane);}
+.keys{display:flex;flex-wrap:wrap;gap:6px}
+.keys span{font-family:var(--display);font-size:13px;background:#e8f3ff;color:#245e93;border-radius:999px;padding:3px 10px}
+.ingame2{font-size:13.5px;line-height:1.6;background:#fff3d6;border-radius:12px;padding:8px 12px;color:var(--ink)}
+.ingame2 span{font-family:var(--display);color:#8a5a06;margin-right:6px}
+.pnav{display:flex;justify-content:space-between;gap:10px}
+.pbtn{font-family:var(--display);font-size:16px;border:3px solid var(--membrane);background:var(--skin);color:var(--ink);border-radius:14px;padding:9px 20px;cursor:pointer;box-shadow:0 4px 0 var(--membrane-d)}
+.pbtn.main{background:var(--goldbg);border-color:var(--golddk);color:#6b3d05;box-shadow:0 4px 0 var(--golddk)}
+.pbtn:disabled{opacity:.4;cursor:default}
+.qbar{height:10px;border-radius:5px;background:var(--flesh2);overflow:hidden}.qbar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.qbox{background:var(--skin);border:2px solid var(--flesh2);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.qbox h2{margin:0;font-family:var(--display);font-weight:400;font-size:21px;line-height:1.45;color:var(--ink);text-wrap:balance}
+.qopts{display:grid;gap:8px}
+.qopt{text-align:left;font-family:var(--body);font-size:15px;line-height:1.5;border:2px solid var(--flesh2);background:#fff;color:var(--ink);border-radius:14px;padding:10px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.qopt .n{font-family:var(--display);color:var(--membrane);flex:none}
+.qopt:hover:not(:disabled){border-color:var(--membrane)}
+.qopt.right{border-color:var(--ok);background:#e9f8ee}.qopt.wrong{border-color:var(--danger);background:#ffecef}
+.qopt:disabled{cursor:default}
+.qexp{font-size:14px;line-height:1.7;background:#fff3d6;border-radius:12px;padding:10px 14px}
+.qexp b{font-family:var(--display);font-weight:400;font-size:16px;margin-right:6px}
+.qres{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.qres .score{font-family:var(--display);font-size:52px;color:var(--membrane-d)}
+.homebtn{width:34px;height:34px;border-radius:50%;border:2px solid var(--membrane);background:var(--bg2);color:var(--flesh);display:grid;place-items:center;cursor:pointer;padding:0}
+.homebtn svg{width:18px;height:18px}
+@media (max-width:680px){.hbtns{grid-template-columns:1fr}.fnode{width:74px}.fnode canvas{width:52px;height:52px}.lesson p{font-size:14.5px}}
 .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(42,11,20,.78);padding:16px;z-index:5;border-radius:24px}
 .card{background:var(--flesh);border:3px solid var(--membrane);border-radius:24px;padding:22px 24px;max-width:500px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 0 var(--membrane-d);color:var(--ink)}
 .card h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0;text-wrap:balance;color:var(--membrane-d)}
@@ -166,6 +223,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 <body>
 <div class="game" id="game">
   <div class="topbar">
+    <button class="homebtn" id="homeBtn" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5V20h-5.5v-5.5h-5V20H4z"/></svg></button>
     <span class="brand">면역 디펜스</span>
     <div class="stagepill"><span class="lv" id="stageNo">1</span><span id="stageName">피부 상처</span></div>
     <div class="thermo" id="thermo" title="체온"><div class="tube"><i id="thermoFill"></i></div><b id="tempNum">36.8℃</b><span id="tempState">정상</span></div>
@@ -212,6 +270,33 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
       <button class="round go" id="startBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="startLbl">시작</span></button>
     </div>
   </div>
+  <section class="panel home" id="home" aria-label="홈">
+    <canvas id="homeBg" width="1000" height="900" aria-hidden="true"></canvas>
+    <div class="homein">
+      <div class="hbadge">생명과학 교육 게임 · 우리 몸의 방어 작용</div>
+      <h1 class="htitle">면역 디펜스</h1>
+      <p class="hsub">우리 몸에 들어온 병원체를 면역세포로 막아 내며<br>면역 반응의 순서와 원리를 직접 경험한다.</p>
+      <div class="hbtns">
+        <button class="hbtn main" id="hStart"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg><span id="hStartLbl">게임 시작</span></button>
+        <button class="hbtn" id="hStudy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5C9.5 18 6.5 18 4 19z"/><path d="M12 6v13.5"/></svg>면역 공부하기</button>
+        <button class="hbtn" id="hQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .7-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg>퀴즈 풀기</button>
+        <button class="hbtn" id="hBook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>면역 도감</button>
+      </div>
+      <button class="hrestart" id="hRestart" hidden>처음부터 다시 시작</button>
+      <p class="hfoot">생명과학Ⅰ · 방어 작용 단원 · 비특이적 방어, 체액성·세포성 면역, 1차·2차 면역 반응</p>
+    </div>
+  </section>
+  <section class="panel study" id="study" hidden aria-label="면역 공부하기">
+    <div class="phead"><button class="pback" id="studyBack">← 홈</button><b>면역 공부하기</b><span id="studyCount"></span></div>
+    <div class="chips2" id="studyNav"></div>
+    <article class="lesson" id="lesson"></article>
+    <div class="pnav"><button class="pbtn" id="studyPrev">이전</button><button class="pbtn main" id="studyNext">다음</button></div>
+  </section>
+  <section class="panel quiz" id="quiz" hidden aria-label="퀴즈">
+    <div class="phead"><button class="pback" id="quizBack">← 홈</button><b>면역 퀴즈</b><span id="quizCount"></span></div>
+    <div class="qbar"><i id="qbarFill"></i></div>
+    <div class="qbox" id="qbox"></div>
+  </section>
   <div class="overlay" id="overlay"></div>
 </div>
 
@@ -1370,18 +1455,115 @@ $('sndBtn').onclick=()=>{SND.init();SND.setMuted(!SND.isMuted());syncSnd();};syn
 $('pyBtn').onclick=()=>{if(!(S.fever>0)||S.antipyUsed)return;S.antipyUsed=true;S.antipyT=S.fever;note('antipy');refreshTray();};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;removeMode=false;S.picked=null;$('removeBtn').classList.remove('sel');refreshTray();}});
 
+// ---------- home, study, quiz ----------
+const LESSONS=[
+ {t:'우리 몸의 방어 체계',fig:[['b','skin','피부·점막'],['u','macro','식세포'],['u','helper','보조 T림프구'],['u','plasma','형질세포·항체'],['u','tc','세포독성 T림프구']],
+  p:'병원체가 몸에 들어오면 우리 몸은 두 겹으로 방어한다. <b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나며, 피부·점막 같은 장벽과 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식한 림프구가 담당하며, 처음에는 시간이 걸리지만 정확하다.',
+  k:['비특이적 방어','특이적 방어','항원','림프구'],g:'1차 방어선과 대식세포·비만세포로 버티는 동안 대식세포가 병원체의 정체를 밝히면, 보조 T·B·세포독성 T림프구 카드가 열린다.'},
+ {t:'1차 방어 · 피부와 점막',fig:[['b','skin','피부'],['b','mucus','점막'],['b','lyso','라이소자임'],['b','cilia','섬모']],
+  p:'피부의 <b>각질층</b>은 병원체의 침입을 막는 물리적 장벽이다. 호흡기와 소화관 안쪽의 <b>점막</b>은 점액으로 병원체를 붙잡고, 기관의 <b>섬모</b>는 점액에 붙은 이물질을 몸 밖으로 밀어낸다. 눈물·침 속의 <b>라이소자임</b>은 세균의 세포벽을 분해한다.',
+  k:['물리적 장벽','화학적 방어','라이소자임'],g:'준비 단계에서만 깔 수 있다. 감염 전부터 이미 있는 방어이기 때문이다. 상처는 이 장벽이 뚫린 상태다.'},
+ {t:'염증 반응과 식세포 작용',fig:[['u','mast','비만세포'],['u','serum','혈장 유출'],['u','neut','호중구'],['u','macro','대식세포']],
+  p:'피부가 뚫려 병원체가 들어오면 <b>비만세포</b>가 <b>히스타민</b>을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 혈장이 빠져나오고 백혈구가 감염 부위로 모이게 한다. 그래서 부위가 붉어지고 열이 나며 붓는다(<b>염증 반응</b>). 모여든 호중구와 대식세포는 병원체를 삼켜 분해한다(<b>식세포 작용</b>).',
+  k:['히스타민','염증 반응','식세포 작용','백혈구'],g:'비만세포가 세균을 보면 소리치며 히스타민을 뿜는다. 그러면 혈장 웅덩이가 생기고 호중구가 혈관에서 달려온다.'},
+ {t:'항원 제시와 보조 T림프구',fig:[['u','macro','대식세포'],['u','helper','보조 T림프구'],['u','bcell','B림프구'],['u','tc','세포독성 T림프구']],
+  p:'대식세포는 삼킨 병원체를 분해해 그 조각(<b>항원</b>)을 세포 표면에 내보인다(<b>항원 제시</b>). <b>보조 T림프구</b>는 제시된 항원을 인식해 활성화되고, 같은 항원을 인식하는 B림프구와 세포독성 T림프구가 활성화되도록 돕는다. 림프구는 골수에서 만들어지며, B림프구는 <b>골수</b>에서, T림프구는 <b>가슴샘(흉선)</b>에서 성숙한다.',
+  k:['항원 제시','보조 T림프구','골수','가슴샘'],g:'처음 보는 병원체는 까맣다. 대식세포가 하나를 먹으면 그 유형 전체의 정체가 드러난다. 보조 T림프구가 판에 없으면 B·세포독성 T림프구는 "신호 대기"만 한다.'},
+ {t:'체액성 면역',fig:[['u','bcell','B림프구'],['u','plasma','형질세포'],['e','bact:C','항원-항체 반응'],['u','memory','기억세포']],
+  p:'활성화된 B림프구는 <b>형질세포</b>와 <b>기억세포</b>로 분화한다. 형질세포는 <b>항체</b>를 만들어 분비하고, 항체는 특정 항원과만 결합한다(<b>항원-항체 반응의 특이성</b>). 항체가 결합한 병원체는 무력화되거나 식세포에게 쉽게 먹히며, 독소는 중화된다. 이처럼 항체로 항원을 제거하는 방어를 <b>체액성 면역</b>이라 한다.',
+  k:['형질세포','항체','특이성','체액성 면역'],g:'B림프구는 머리 위 표식의 항원 하나만 맡는다. 보조 T림프구의 신호를 받으면 형질세포를 만들고, 형질세포가 항체를 뿌린다.'},
+ {t:'세포성 면역',fig:[['u','helper','보조 T림프구'],['u','tc','세포독성 T림프구'],['e','infected:D','감염세포']],
+  p:'바이러스처럼 세포 안으로 들어간 병원체에는 항체가 닿지 않는다. 활성화된 <b>세포독성 T림프구</b>는 병원체에 감염된 세포를 찾아 직접 파괴한다. 이렇게 감염된 세포를 없애는 방어를 <b>세포성 면역</b>이라 한다.',
+  k:['세포독성 T림프구','감염세포','세포성 면역'],g:'바이러스는 6초 안에 세포 속으로 숨어 감염세포가 된다. 세포독성 T림프구가 달라붙어 퍼포린으로 구멍을 뚫고 세포자살시킨다.'},
+ {t:'1차·2차 면역 반응과 백신',chart:1,fig:[['u','bcell','1차: B림프구'],['u','memory','기억세포'],['u','plasma','2차: 빠른 분화']],
+  p:'항원이 처음 들어왔을 때의 <b>1차 면역 반응</b>에서는 항체가 늦게, 적게 만들어지고 <b>기억세포</b>가 생긴다. 같은 항원이 다시 들어오면 기억세포가 빠르게 형질세포로 분화해 <b>2차 면역 반응</b>이 일어나며, 항체가 빠르고 많이 만들어진다. <b>백신</b>은 약하게 만든 항원을 미리 넣어 기억세포를 만들어 두는 방법이다.',
+  k:['1차 면역 반응','2차 면역 반응','기억세포','백신'],g:'같은 유형을 10번 물리치면 기억세포 카드가 열린다. 3스테이지의 백신 접종 이벤트는 D형 기억세포를 미리 만들어 준다.'},
+ {t:'면역이 지나칠 때',fig:[['e','pollen:P','꽃가루'],['u','mast','비만세포'],['u','serum','과민 반응']],
+  p:'면역 반응이 늘 이롭지만은 않다. 꽃가루처럼 해롭지 않은 물질에 지나치게 반응하는 것을 <b>알레르기</b>라 한다. 감염 때 나는 <b>열</b>은 병원체의 증식을 늦추지만 너무 높으면 우리 몸에도 해롭다. 또 <b>항생제</b>는 세균에만 작용하므로 바이러스가 원인인 감기에는 효과가 없다.',
+  k:['알레르기','발열','항생제'],g:'꽃가루에 감작되면 알레르기 반응이 일어나고, 피버 타임에 세포를 너무 풀면 40℃를 넘어 우리 편도 지친다. 항생제 버튼은 세균만 없앤다.'}
+];
+const QUIZ=[
+ {q:'다음 중 비특이적 방어에 해당하지 않는 것은?',o:['피부의 각질층','눈물 속 라이소자임','대식세포의 식세포 작용','형질세포의 항체 생성'],a:3,e:'항체 생성은 특정 항원을 인식해 일어나는 특이적 방어(체액성 면역)다.'},
+ {q:'염증 반응에서 히스타민의 작용으로 옳은 것은?',o:['모세 혈관을 확장시킨다','항체를 만든다','바이러스를 직접 파괴한다','체온을 낮춘다'],a:0,e:'비만세포가 분비한 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여 백혈구가 모이게 한다.'},
+ {q:'대식세포가 삼킨 병원체의 조각을 세포 표면에 내보이는 과정은?',o:['옵소닌화','항원 제시','세포자살','감작'],a:1,e:'항원 제시를 통해 보조 T림프구가 항원을 인식하고 활성화된다.'},
+ {q:'항체를 만들어 분비하는 세포는?',o:['세포독성 T림프구','비만세포','형질세포','대식세포'],a:2,e:'B림프구가 분화한 형질세포가 항체를 만든다.'},
+ {q:'바이러스에 감염된 세포를 직접 파괴하는 면역을 무엇이라 하는가?',o:['체액성 면역','세포성 면역','염증 반응','1차 방어'],a:1,e:'세포독성 T림프구가 감염된 세포를 직접 파괴하는 것이 세포성 면역이다.'},
+ {q:'B림프구와 T림프구가 성숙하는 장소를 바르게 짝지은 것은?',o:['B: 가슴샘, T: 골수','B: 골수, T: 가슴샘','B: 비장, T: 골수','B: 골수, T: 비장'],a:1,e:'두 림프구 모두 골수에서 만들어지며, B림프구는 골수에서, T림프구는 가슴샘(흉선)에서 성숙한다.'},
+ {q:'2차 면역 반응이 1차 면역 반응보다 빠르고 강한 까닭은?',o:['항원의 양이 더 많아서','기억세포가 빠르게 형질세포로 분화해서','비만세포가 더 많아져서','피부가 두꺼워져서'],a:1,e:'1차 면역 반응 때 생긴 기억세포가 같은 항원을 만나면 빠르게 형질세포로 분화한다.'},
+ {q:'백신을 접종하는 목적으로 가장 알맞은 것은?',o:['병원체를 바로 죽이기 위해','1차 면역 반응을 미리 일으켜 기억세포를 만들기 위해','항생제의 효과를 높이기 위해','체온을 올리기 위해'],a:1,e:'백신은 약화된 항원으로 1차 면역 반응을 일으켜 기억세포를 만들어 둔다.'},
+ {q:'감기의 대부분에 항생제가 효과가 없는 까닭은?',o:['감기는 세균이 원인이라서','감기는 바이러스가 원인이고 항생제는 세균에 작용해서','항생제가 항체를 없애서','감기는 비감염성 질병이라서'],a:1,e:'항생제는 세균의 구조나 대사를 공격한다. 세포 구조가 없는 바이러스에는 효과가 없다.'},
+ {q:'꽃가루처럼 해롭지 않은 물질에 면역계가 지나치게 반응하는 것은?',o:['자가 면역','알레르기','2차 면역 반응','항원 제시'],a:1,e:'알레르기(과민 반응)에서는 비만세포가 히스타민을 과하게 분비해 콧물, 가려움, 부기가 나타난다.'}
+];
+let lessonI=0,quizI=0,quizScore=0,fromHome=false,gameStarted=false;
+function panelsOpen(){return !$('home').hidden||!$('study').hidden||!$('quiz').hidden;}
+function showPanel(id){['home','study','quiz'].forEach(k=>$(k).hidden=k!==id);}
+function goHome(){showPanel('home');$('hStartLbl').textContent=gameStarted?'이어서 하기':'게임 시작';$('hRestart').hidden=!gameStarted;$('hStart').focus();}
+function figNode(kind,key,label){const d=document.createElement('div');d.className='fnode';
+  if(kind==='b')d.appendChild(makeIcon('barrier',key));else if(kind==='u')d.appendChild(makeIcon('unit',key));else{const [k,s]=key.split(':');d.appendChild(makeEnemyIcon(k,s,false));}
+  const t=document.createElement('span');t.textContent=label;d.appendChild(t);return d;}
+function renderLesson(){
+  const L=LESSONS[lessonI],el=$('lesson');el.innerHTML='';
+  el.insertAdjacentHTML('beforeend',`<div class="lno">${lessonI+1}장 / ${LESSONS.length}장</div><h2>${L.t}</h2>`);
+  const fig=document.createElement('div');fig.className='fig';
+  L.fig.forEach((f,i)=>{if(i){const a=document.createElement('span');a.className='farr';a.textContent='→';fig.appendChild(a);}fig.appendChild(figNode(...f));});
+  el.appendChild(fig);
+  if(L.chart)el.insertAdjacentHTML('beforeend',`<div class="fig">${ABCHART}</div>`);
+  el.insertAdjacentHTML('beforeend',`<p>${L.p}</p><div class="keys">${L.k.map(k=>`<span>#${k}</span>`).join('')}</div><div class="ingame2"><span>게임에서는</span>${L.g}</div>`);
+  [...$('studyNav').children].forEach((c,i)=>c.setAttribute('aria-current',String(i===lessonI)));
+  $('studyCount').textContent=`${lessonI+1} / ${LESSONS.length}`;
+  $('studyPrev').disabled=lessonI===0;$('studyNext').textContent=lessonI===LESSONS.length-1?'퀴즈 풀러 가기':'다음';
+  $('study').scrollTop=0;
+}
+function openStudy(i=0){lessonI=i;const nav=$('studyNav');nav.innerHTML='';
+  LESSONS.forEach((L,k)=>{const b=document.createElement('button');b.className='chip2';b.textContent=`${k+1}. ${L.t}`;b.onclick=()=>{lessonI=k;renderLesson();};nav.appendChild(b);});
+  showPanel('study');renderLesson();}
+function renderQuiz(){
+  const box=$('qbox');$('qbarFill').style.width=(quizI/QUIZ.length*100)+'%';
+  if(quizI>=QUIZ.length){$('quizCount').textContent='완료';
+    const msg=quizScore>=9?'면역 박사! 이제 게임에서 직접 확인해 보자.':quizScore>=6?'잘했다. 틀린 개념은 공부하기에서 다시 확인해 보자.':'면역 공부하기를 한 번 읽고 다시 도전해 보자.';
+    box.innerHTML=`<div class="qres"><div class="score">${quizScore} / ${QUIZ.length}</div><p>${msg}</p><div class="pnav" style="gap:10px"><button class="pbtn" id="qAgain">다시 풀기</button><button class="pbtn" id="qStudy">공부하기</button><button class="pbtn main" id="qPlay">게임 시작</button></div></div>`;
+    $('qAgain').onclick=()=>{quizI=0;quizScore=0;renderQuiz();};$('qStudy').onclick=()=>openStudy(0);$('qPlay').onclick=startGame;SND.play(quizScore>=6?'clear':'note');return;}
+  const Q=QUIZ[quizI];$('quizCount').textContent=`${quizI+1} / ${QUIZ.length} · 맞힌 개수 ${quizScore}`;
+  box.innerHTML=`<h2>Q${quizI+1}. ${Q.q}</h2><div class="qopts">${Q.o.map((o,i)=>`<button class="qopt" data-i="${i}"><span class="n">${'①②③④'[i]}</span><span>${o}</span></button>`).join('')}</div><div id="qexp"></div>`;
+  box.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i,ok=i===Q.a;if(ok)quizScore++;SND.play(ok?'reveal':'nope');
+    box.querySelectorAll('.qopt').forEach(x=>{x.disabled=true;const j=+x.dataset.i;if(j===Q.a)x.classList.add('right');else if(j===i)x.classList.add('wrong');});
+    $('qexp').innerHTML=`<div class="qexp"><b style="color:${ok?'var(--ok)':'var(--danger)'}">${ok?'정답':'오답'}</b>${Q.e}</div><div class="pnav" style="justify-content:flex-end;margin-top:10px"><button class="pbtn main" id="qNext">${quizI===QUIZ.length-1?'결과 보기':'다음 문제'}</button></div>`;
+    $('qNext').onclick=()=>{quizI++;renderQuiz();};$('qNext').focus();});
+}
+function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
+function startGame(){SND.init();showPanel(null);if(!gameStarted){gameStarted=true;showIntro();}}
+$('hStart').onclick=()=>{SND.play('start');startGame();};
+$('hRestart').onclick=()=>{S=newState(0);lastHp=null;buildTray();setTab('barrier');gameStarted=true;showPanel(null);showIntro();};
+$('hStudy').onclick=()=>openStudy(0);$('hQuiz').onclick=openQuiz;
+$('hBook').onclick=()=>{showPanel(null);fromHome=true;showBook();$('bookClose').onclick=()=>{hideOverlay();if(fromHome){fromHome=false;goHome();}};};
+$('studyBack').onclick=goHome;$('quizBack').onclick=goHome;
+$('studyPrev').onclick=()=>{if(lessonI>0){lessonI--;renderLesson();}};
+$('studyNext').onclick=()=>{if(lessonI<LESSONS.length-1){lessonI++;renderLesson();}else openQuiz();};
+$('homeBtn').onclick=()=>{selected=null;removeMode=false;S.picked=null;goHome();};
+// floating cells behind the title
+const HOMEFLOAT=['macro','neut','mast','helper','bcell','plasma','tc','nk','memory'].map((k,i)=>({k,x:Math.random()*1000,y:Math.random()*900,v:12+Math.random()*18,s:46+Math.random()*30,ph:i}));
+function drawHome(time,dt){
+  const c=$('homeBg');if(!c||$('home').hidden)return;const g=c.getContext('2d');if(!g||!g.clearRect)return;
+  drawWith(g,()=>{g.clearRect(0,0,1000,900);
+    for(let i=0;i<26;i++){const y=((i*83+time*30)%980)-40,x=((i*137)%1000);g.fillStyle='rgba(233,71,95,.55)';g.beginPath();g.ellipse(x,y,14,9,Math.sin(time+i)*.5,0,7);g.fill();g.fillStyle='rgba(245,139,154,.6)';g.beginPath();g.ellipse(x,y,6,4,0,0,7);g.fill();}
+    for(const f of HOMEFLOAT){f.y-=f.v*dt;if(f.y<-60){f.y=960;f.x=Math.random()*1000;}drawUnit(f.k,f.x+Math.sin(time*.8+f.ph)*20,f.y,f.s,time,.9);}
+  });
+}
+
 let last=performance.now(),trayTimer=0;
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   const time=now/1000;
-  if(S.phase==='wave'&&$('overlay').hidden)update(dt);
+  if(S.phase==='wave'&&$('overlay').hidden&&!panelsOpen())update(dt);
+  drawHome(time,dt);
   updateCam(dt);render(time);tickToast(dt);
   trayTimer+=dt;if(trayTimer>.2){trayTimer=0;refreshHud();refreshTray();}
   requestAnimationFrame(loop);
 }
 S=newState(0);
 document.fonts.ready.then(()=>{buildTray();refreshHud();});
-buildTray();setTab('barrier');showIntro();refreshHud();
+buildTray();setTab('barrier');refreshHud();goHome();
 requestAnimationFrame(loop);
 </script>
 </body>
