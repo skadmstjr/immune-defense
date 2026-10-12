@@ -99,7 +99,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .round.go:not(:disabled){animation:breathe 1.6s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.06)}}
 .panel{position:absolute;inset:0;z-index:6;border-radius:24px;overflow:auto;color:var(--ink)}
-.home{background:#3a0f1e;color:var(--light);overflow:hidden;display:grid;place-items:center}
+.home{box-shadow:inset 0 0 0 3px var(--membrane);background:#3a0f1e;color:var(--light);overflow:hidden;display:grid;place-items:center}
 .home canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
 .homein{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:24px 18px;max-width:640px}
 .hbadge{font-family:var(--display);font-size:14px;color:#ffd6de;background:rgba(125,34,56,.85);border:2px solid var(--membrane);border-radius:999px;padding:5px 14px}
@@ -1557,6 +1557,19 @@ function loop(now){
 S=newState(0);
 document.fonts.ready.then(()=>{buildTray();refreshHud();});
 buildTray();setTab('barrier');refreshHud();goHome();
+(function fitScreen(){
+  const g=$('game');let busy=false;
+  function fit(){if(busy)return;busy=true;
+    const vw=document.documentElement.clientWidth,vh=window.innerHeight;
+    if(vw<=680){g.style.width='';g.style.transform='';g.style.marginBottom='';g.style.marginLeft='';document.body.style.overflow='';busy=false;return;}
+    g.style.width='1000px';const h=g.offsetHeight;
+    const sc=Math.max(.3,Math.min((vw-32)/1000,(vh-28)/h,1.6));
+    g.style.transformOrigin='top left';g.style.transform=`scale(${sc})`;g.style.marginBottom=`${h*(sc-1)}px`;g.style.marginLeft=`${((vw-32)-1000*sc)/2}px`;
+    document.body.style.overflow='hidden';busy=false;}
+  window.addEventListener('resize',fit);
+  if(window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(fit)).observe(g);
+  document.fonts&&document.fonts.ready.then(fit);fit();
+})();
 requestAnimationFrame(loop);
 </script>
 </body></html>
