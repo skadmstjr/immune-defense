@@ -210,7 +210,13 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
   .snd{margin-left:auto}.hearts svg{width:12px;height:12px}
   .unit{width:84px}.unit canvas{width:52px;height:52px}
 }
-@media (max-width:680px){.toast{font-size:12.5px;padding:7px 11px;top:6px}.toast b{font-size:15px}}
+@media (max-width:680px){
+  .toast{position:static;transform:none;max-width:none;min-height:88px;border:0;border-top:3px solid var(--membrane);border-radius:0;background:var(--bg2);color:var(--light);text-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;font-size:13px;line-height:1.5;padding:8px 12px 10px;opacity:1!important;transition:background .4s,color .4s}
+  .toast b{font-size:15px;color:var(--goldbg)}
+  .toast.old{color:#c99aa7}.toast.old b{color:#b07a88}
+  .toast.fresh{animation:toastIn .5s ease-out}
+  @keyframes toastIn{0%{background:#7d2238}100%{background:var(--bg2)}}
+}
 @media (prefers-reduced-motion:reduce){.unit,.round{transition:none}.unit.fire,.unit.nope,.round.go:not(:disabled){animation:none}}
 </style></head><body>
 
@@ -227,7 +233,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 
   <div class="arena">
     <canvas id="cv" width="960" height="500" aria-label="게임 판"></canvas>
-    <div class="toast" id="toast" style="opacity:0"></div>
+    <div class="toast old" id="toast" style="opacity:0" aria-live="polite"><b>알림</b>새 소식이 생기면 여기에 뜬다.</div>
   </div>
 
   <div class="dock">
@@ -1145,8 +1151,8 @@ let toastQ=[],toastT=0,TAB='barrier';
 function note(k,extra){const n=NOTES[k];if(!n)return;toastQ.push([n[0]+(extra?`: ${extra}`:''),n[1]]);}
 function tickToast(dt){
   const el=$('toast');
-  if(toastT>0){toastT-=dt;if(toastT<=0)el.style.opacity=0;return;}
-  if(toastQ.length){SND.play('note');const [h,b]=toastQ.shift();el.innerHTML=`<b>${h}</b>${b}`;el.style.opacity=1;toastT=6.5;}
+  if(toastT>0){toastT-=dt;if(toastT<=0){el.style.opacity=0;el.classList.add('old');}return;}
+  if(toastQ.length){SND.play('note');const [h,b]=toastQ.shift();el.innerHTML=`<b>${h}</b>${b}`;el.style.opacity=1;el.classList.remove('old','fresh');void el.offsetWidth;el.classList.add('fresh');toastT=6.5;}
 }
 const DEFAULT_INFO='면역세포 카드를 누르면 혈관에서 바로 출동한다. 판 위 세포를 누르고 칸을 누르면 그 주변을 지키게 할 수 있다.';
 function setInfo(t){$('info').textContent=t;}
