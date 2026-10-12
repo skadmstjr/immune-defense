@@ -1,14 +1,8 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>면역 디펜스</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>면역 디펜스</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
-<style>[hidden]{display:none!important}body{margin:0}</style>
-<style>
+<style>[hidden]{display:none!important}body{margin:0}</style><style>
 /* Layout: game screen. Membrane-framed arena (blood vessel left, tissue field, wound right), top status bar, bottom dock = glucose bar + tabbed card hand + round action buttons. Deep body-interior world, single theme. */
 :root{
   --bg:#2a0b14; --bg2:#3d1221; --flesh:#fbdadd; --flesh2:#f3b8c1; --skin:#fff4f5;
@@ -218,9 +212,8 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 }
 @media (max-width:680px){.toast{font-size:12.5px;padding:7px 11px;top:6px}.toast b{font-size:15px}}
 @media (prefers-reduced-motion:reduce){.unit,.round{transition:none}.unit.fire,.unit.nope,.round.go:not(:disabled){animation:none}}
-</style>
-</head>
-<body>
+</style></head><body>
+
 <div class="game" id="game">
   <div class="topbar">
     <button class="homebtn" id="homeBtn" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5V20h-5.5v-5.5h-5V20H4z"/></svg></button>
@@ -1299,7 +1292,7 @@ function showClear(){
   overlay(`<div class="card"><div class="eyebrow">방어 성공</div><h2>${last?'모든 감염을 막아냈다':st().name+' 방어 완료'}</h2>
   <p>${last?'정체불명의 병원체를 식세포가 먹고, 항원 제시로 정체를 밝히고, 항체와 세포독성 T림프구로 처리하고, 기억세포까지 남겼다. 실제 몸의 면역도 이 순서로 이어진다.':'남은 체력 '+S.hp+'. 다음 부위로 이동한다. 드러난 항원과 기억세포는 그대로 남는다.'}</p>
   <button class="btn" id="nextBtn">${last?'처음부터 다시':'다음 스테이지'}</button></div>`);
-  $('nextBtn').onclick=()=>{S=last?newState(0):newState(S.stage+1,S);lastHp=null;buildTray();showIntro();};
+  $('nextBtn').onclick=()=>{if(last)DISC={};S=last?newState(0):newState(S.stage+1,S);lastHp=null;buildTray();showIntro();};
   refreshTray();
 }
 function showOver(){
@@ -1386,8 +1379,8 @@ function makeEnemyIcon(k,s,mys){
   return c;
 }
 let bookPage='ag';
-let DISC={};try{DISC=JSON.parse(localStorage.getItem('immune-defense-book')||'{}')||{};}catch(e){DISC={};}
-function discover(k){if(DISC[k])return;DISC[k]=1;try{localStorage.setItem('immune-defense-book',JSON.stringify(DISC));}catch(e){}}
+let DISC={};try{localStorage.removeItem('immune-defense-book');}catch(e){}
+function discover(k){DISC[k]=1;}
 function showBook(){
   overlay(`<div class="card bookcard"><div class="eyebrow">면역 도감</div>
     <div class="booktabs"><button class="tab" id="bk-ag" data-p="ag">항원</button><button class="tab" id="bk-body" data-p="body">우리 몸</button><button class="tab" id="bk-concept" data-p="concept">면역 개념</button></div>
@@ -1534,7 +1527,7 @@ function renderQuiz(){
 function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
 function startGame(){SND.init();showPanel(null);if(!gameStarted){gameStarted=true;showIntro();}}
 $('hStart').onclick=()=>{SND.play('start');startGame();};
-$('hRestart').onclick=()=>{S=newState(0);lastHp=null;buildTray();setTab('barrier');gameStarted=true;showPanel(null);showIntro();};
+$('hRestart').onclick=()=>{DISC={};S=newState(0);lastHp=null;buildTray();setTab('barrier');gameStarted=true;showPanel(null);showIntro();};
 $('hStudy').onclick=()=>openStudy(0);$('hQuiz').onclick=openQuiz;
 $('hBook').onclick=()=>{showPanel(null);fromHome=true;showBook();$('bookClose').onclick=()=>{hideOverlay();if(fromHome){fromHome=false;goHome();}};};
 $('studyBack').onclick=goHome;$('quizBack').onclick=goHome;
@@ -1566,5 +1559,4 @@ document.fonts.ready.then(()=>{buildTray();refreshHud();});
 buildTray();setTab('barrier');refreshHud();goHome();
 requestAnimationFrame(loop);
 </script>
-</body>
-</html>
+</body></html>
