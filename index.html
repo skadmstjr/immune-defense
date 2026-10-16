@@ -888,7 +888,7 @@ function place(c,r,px,py){
   if(isUnitSel()){
     if(!canRow(r)){SND.play('nope');if(S.tut&&S.tut.rows)setInfo('안내에 표시된 줄을 누르세요.');return;}
     const sel=selected;
-    if(spawnUnit(sel.type==='memory'?'memory':sel.k,sel.type==='memory'?sel.k:null,r)){selected=null;camPunch(LEFT+40,r*CELL+50,.05);
+    if(spawnUnit(sel.type==='memory'?'memory':sel.k,sel.type==='memory'?sel.k:null,r)){camPunch(LEFT+40,r*CELL+50,.05);
       const b=$(`card-${sel.type}-${sel.k}`);if(b){b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');}}
     refreshTray();return;
   }
