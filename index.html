@@ -124,7 +124,8 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .hbtn.main{grid-column:1/-1;font-size:24px;padding:16px;background:var(--goldbg);border-color:var(--golddk);color:#6b3d05;box-shadow:0 6px 0 var(--golddk)}
 .hbtn.main svg{width:26px;height:26px}
 .hbtn:focus-visible,.pback:focus-visible,.pbtn:focus-visible,.chip2:focus-visible,.qopt:focus-visible,.hrestart:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-.hrestart{background:none;border:0;color:#ffb3c6;font-family:var(--display);font-size:14px;text-decoration:underline;cursor:pointer}
+.hrestart{background:rgba(255,255,255,.06);border:2px solid #ffb3c6;border-radius:999px;color:#ffd3de;font-family:var(--display);font-size:16px;padding:8px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.hrestart:hover{background:rgba(255,179,198,.18)}
 .hfoot{margin:6px 0 0;font-size:12.5px;color:#d99aaa;line-height:1.5}
 .study,.quiz{background:var(--flesh);display:flex;flex-direction:column;gap:12px;padding:16px 18px}
 .phead{display:flex;align-items:center;gap:12px}
@@ -372,7 +373,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
         <button class="hbtn" id="hQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .7-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg>퀴즈 풀기</button>
         <button class="hbtn" id="hBook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>면역 도감</button>
       </div>
-      <button class="hrestart" id="hRestart" hidden>모드 다시 고르기</button>
+      <button class="hrestart" id="hRestart" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>처음부터 다시하기</button>
       <p class="hfoot">생명과학Ⅰ · 방어 작용 단원 · 비특이적 방어, 체액성·세포성 면역, 1차·2차 면역 반응</p>
     </div>
   </section>
@@ -1304,7 +1305,7 @@ function render(time){
   drawHeat(time);
   if(S.allergy>0){ctx.fillStyle=`rgba(255,210,60,${.08+.04*Math.sin(time*6)})`;ctx.fillRect(0,0,W,H);}
   if(S.tut)drawTutBoard(time);
-  if(S.phase==='setup'&&!S.tut){ctx.fillStyle='rgba(125,34,56,.88)';ctx.beginPath();ctx.roundRect(LEFT+12,H/2-17,420,34,17);ctx.fill();ctx.fillStyle='#ffe9ec';ctx.font='17px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('준비 단계 · 상처를 확인하고 1차 방어선을 깐다',LEFT+222,H/2+6);}
+  if(S.phase==='setup'&&!S.tut){ctx.fillStyle='rgba(125,34,56,.88)';ctx.beginPath();ctx.roundRect(LEFT+12,10,420,34,17);ctx.fill();ctx.fillStyle='#ffe9ec';ctx.font='17px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('준비 단계 · 상처를 확인하고 1차 방어선을 깐다',LEFT+222,33);}
 }
 
 // ---------- UI ----------
@@ -1686,8 +1687,8 @@ const TUTS=[
     t:'이번에는 오른쪽 입구로 무언가 들어옵니다.'},
    {next:1,point:{enemy:'pollen'},t:'<b>꽃가루</b>입니다. 병원체는 아니지만 면역 반응을 일으키는 <b>항원</b>입니다. 지금은 비만세포가 반응하지 않습니다.'},
    {next:1,point:{unit:'mast'},t:'몸이 꽃가루를 적으로 잘못 기억하는 것을 <b>감작</b>이라고 합니다. 이 몸이 감작되었다고 해 보겠습니다.'},
-   {enter:()=>{S.flags.sens=1;tSched([[.5,'pollen','P',{lane:4}],[1.3,'pollen','P',{lane:3}],[2.1,'pollen','P',{lane:4}],[2.9,'pollen','P',{lane:3}]]);},rows:ALL_ROWS,point:{unit:'mast'},wait:()=>!!S.flags.allergy,
-    tick:()=>{if(!S.enemies.some(e=>e.k==='pollen')&&!S.spawns.length&&!S.flags.allergy)tSched([[.5,'pollen','P',{lane:4}],[1.5,'pollen','P',{lane:3}]]);},
+   {enter:()=>{S.flags.sens=1;let m=S.units.find(u=>u.k==='mast');if(!m){tPre('mast',3);m=S.units.find(u=>u.k==='mast');}m.cd=0;const l=m.band;tSched([[.5,'pollen','P',{lane:l}],[1.3,'pollen','P',{lane:l}],[2.1,'pollen','P',{lane:l}],[2.9,'pollen','P',{lane:l}]]);},rows:ALL_ROWS,point:{unit:'mast'},wait:()=>!!S.flags.allergy,
+    tick:()=>{if(S.flags.allergy||S.spawns.length)return;let m=S.units.find(u=>u.k==='mast');if(!m){tPre('mast',3);m=S.units.find(u=>u.k==='mast');}if(!S.enemies.some(e=>e.k==='pollen'&&Math.abs(e.lane-m.band)<=1))tSched([[.5,'pollen','P',{lane:m.band}],[1.5,'pollen','P',{lane:m.band}]]);},
     t:'꽃가루가 다시 들어옵니다. 비만세포를 지켜보세요.'},
    {next:1,t:'해롭지 않은 꽃가루에 히스타민을 쏟아냈습니다. 이것이 <b>알레르기</b>입니다. 그동안 세포가 느려지고 포도당이 빠집니다.'},
    {rows:ALL_ROWS,wait:()=>tClear(),t:'꽃가루가 지나가기를 기다리세요. 꽃가루는 체력을 깎지 않습니다.'}
@@ -1918,7 +1919,7 @@ const QUIZ=[
 let lessonI=0,quizI=0,quizScore=0,fromHome=false,gameStarted=false;
 function panelsOpen(){return !$('home').hidden||!$('study').hidden||!$('quiz').hidden||!$('modes').hidden;}
 function showPanel(id){['home','study','quiz','modes'].forEach(k=>$(k).hidden=k!==id);}
-function goHome(){showPanel('home');$('hStartLbl').textContent=gameStarted?'이어서 하기':'게임 시작';$('hRestart').hidden=!gameStarted;$('hStart').focus();}
+function goHome(){showPanel('home');$('hStartLbl').textContent=gameStarted?'이어서 하기':'게임 시작';$('hRestart').hidden=!(gameStarted||Object.keys(TUTDONE).length);$('hStart').focus();}
 function figNode(kind,key,label){const d=document.createElement('div');d.className='fnode';
   if(kind==='b')d.appendChild(makeIcon('barrier',key));else if(kind==='u')d.appendChild(makeIcon('unit',key));else{const [k,s]=key.split(':');d.appendChild(makeEnemyIcon(k,s,false));}
   const t=document.createElement('span');t.textContent=label;d.appendChild(t);return d;}
@@ -1962,7 +1963,7 @@ function renderQuiz(){
 function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
 function startGame(){SND.init();if(gameStarted){resumeGame();return;}const n=TUTS.findIndex((T,i)=>!TUTDONE[i]);if(n>=0)startTut(n);else openModes();}
 $('hStart').onclick=()=>{SND.play('start');startGame();};
-$('hRestart').onclick=()=>{SND.init();openModes();};
+$('hRestart').onclick=()=>{SND.init();TUTDONE={};DISC={};gameStarted=false;$('coach').hidden=true;clearTutPt();SND.play('start');startTut(0);};
 $('modesBack').onclick=goHome;$('cFast').onclick=()=>{TUTFAST=!TUTFAST;SND.play('click');syncFast();};syncFast();$('cSkip').onclick=exitTut;$('cNext').onclick=()=>{if(S.tut){SND.play('click');tutGo(S.tut.step+1);}};
 $('hStudy').onclick=()=>openStudy(0);$('hQuiz').onclick=openQuiz;
 $('hBook').onclick=()=>{showPanel(null);fromHome=true;showBook();$('bookClose').onclick=()=>{hideOverlay();if(fromHome){fromHome=false;goHome();}};};
