@@ -270,7 +270,9 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .dbtn.main{background:var(--goldbg);border-color:var(--golddk);box-shadow:0 3px 0 var(--golddk)}
 .card.wide{max-width:660px}
 .card .bh{margin:4px 0 0;font-family:var(--display);font-weight:400;font-size:19px;color:var(--membrane-d)}
-.card ul.brief{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.6}
+.card ul.brief{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13.5px;line-height:1.5}
+.card ul.brief li b{display:block}
+@media (max-width:680px){.card ul.brief{grid-template-columns:1fr}}
 .card ul.brief b{font-family:var(--display);font-weight:400;color:var(--membrane);margin-right:6px}
 .card .bend{font-family:var(--display);color:var(--gold);margin:0}
 .cardbtns{display:flex;gap:10px;flex-wrap:wrap}
@@ -1606,133 +1608,133 @@ const TUTS=[
  {short:'1차 방어선',name:'튜토리얼 1 · 1차 방어선',sub:'피부 · 분비물 · 점막',
   cfg:{look:0,barriers:['skin','mucus','lyso'],units:[],strains:['A'],start:120,wounds:[{side:1,c:7}],noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,point:{vessel:1},t:'이곳은 피부 바로 아래 조직입니다. 왼쪽의 붉은 띠는 <b>혈관</b>입니다. 병원체가 혈관에 닿으면 혈액을 타고 온몸으로 퍼지고, 위쪽의 하트(몸의 체력)가 하나 줄어듭니다.'},
-   {next:1,point:{wound:0},t:'아래쪽 벽에 <b>상처</b>가 났습니다. 피부가 찢어지면 그 틈으로 세균이 들어옵니다. 세균은 상처에서 나와 혈관 쪽(왼쪽)으로 이동합니다. 상처의 위치는 판마다 바뀌므로, 시작하기 전에 상처가 어디에 났는지 먼저 확인하세요.'},
-   {next:1,point:{el:'glubar'},t:'카드를 쓰려면 <b>포도당</b>이 필요합니다. 우리 몸의 세포는 포도당을 분해해 활동에 필요한 에너지를 얻습니다. 포도당은 시간이 지나면 조금씩 차오르고, 병원체를 물리칠 때도 조금 얻습니다. 카드 왼쪽 위의 숫자가 그 카드에 필요한 포도당입니다.'},
-   {next:1,tab:'barrier',point:{el:'barrierRow'},t:'우리 몸에는 병원체가 들어오기 전부터 이를 막는 장벽이 있습니다. 이것을 <b>1차 방어</b>라고 합니다. 피부, 점막, 눈물과 침 같은 분비물이 여기에 속합니다. 1차 방어는 병원체의 종류를 가리지 않고 막으므로 <b>비특이적 방어</b>에 속합니다.'},
+   {next:1,point:{vessel:1},t:'왼쪽 붉은 띠는 <b>혈관</b>입니다. 병원체가 혈관에 닿으면 온몸으로 퍼져 하트(체력)가 줄어듭니다.'},
+   {next:1,point:{wound:0},t:'아래쪽 벽에 <b>상처</b>가 났습니다. 세균은 이 상처로 들어와 혈관 쪽으로 이동합니다.'},
+   {next:1,point:{el:'glubar'},t:'카드를 쓰려면 <b>포도당</b>이 필요합니다. 세포는 포도당을 분해해 에너지를 얻습니다.'},
+   {next:1,tab:'barrier',point:{el:'barrierRow'},t:'병원체가 들어오기 전부터 있는 장벽을 <b>1차 방어</b>라고 합니다. 종류를 가리지 않고 막는 <b>비특이적 방어</b>입니다.'},
    {tab:'barrier',point:{card:'barrier:skin'},wait:tSel('barrier','skin'),t:'먼저 <b>피부</b> 카드를 누르세요.'},
-   {cells:(c,r)=>r===4&&c>=2&&c<=6,point:{cells:1},wait:()=>!!tGrid('skin',(c,r)=>r===4),t:'세균이 지나갈 아래쪽 줄에서 반짝이는 칸 하나를 누르세요. 피부는 병원체가 지나가지 못하게 막는 벽입니다. 피부의 <b>각질층</b>이 이런 물리적 장벽 역할을 합니다.'},
-   {tab:'barrier',point:{card:'barrier:lyso'},wait:tSel('barrier','lyso'),t:'다음은 <b>분비물</b>입니다. 눈물과 침 속의 <b>라이소자임</b>은 세균의 세포벽을 분해합니다. 분비물 카드를 누르세요.'},
+   {cells:(c,r)=>r===4&&c>=2&&c<=6,point:{cells:1},wait:()=>!!tGrid('skin',(c,r)=>r===4),t:'아래쪽 줄의 반짝이는 칸을 누르세요. 피부는 병원체를 막는 <b>물리적 장벽</b>입니다.'},
+   {tab:'barrier',point:{card:'barrier:lyso'},wait:tSel('barrier','lyso'),t:'<b>분비물</b> 카드를 누르세요. 눈물·침 속 <b>라이소자임</b>이 세균의 세포벽을 분해합니다.'},
    {cells:(c,r)=>{const sk=tGrid('skin',(cc,rr)=>rr===4);return sk&&r===4&&c===sk[0]+1;},point:{cells:1},wait:()=>{const sk=tGrid('skin',(c,r)=>r===4);return !!(sk&&tGrid('lyso',(c,r)=>r===4&&c===sk[0]+1));},
-    t:'피부 바로 오른쪽 칸을 누르세요. 피부에 막혀 멈춘 세균이 이 칸에서 라이소자임에 녹습니다.'},
-   {next:1,tab:'barrier',point:{card:'barrier:mucus'},t:'<b>점막</b>은 끈적한 점액으로 병원체를 붙잡아 느리게 만듭니다. 호흡기와 소화관의 안쪽이 점막으로 덮여 있습니다. 이번에는 쓰지 않아도 되지만, 병원체가 지나가는 길에 깔면 시간을 벌 수 있습니다.'},
-   {start:1,point:{el:'startBtn'},wait:()=>S.phase==='wave',t:'준비가 끝났습니다. <b>시작</b> 버튼을 누르세요. 1차 방어선은 감염이 일어나기 전부터 있는 방어라서, 시작하기 전 준비 단계에만 깔 수 있습니다.'},
+    t:'피부 바로 오른쪽 칸을 누르세요. 막힌 세균이 여기서 녹습니다.'},
+   {next:1,tab:'barrier',point:{card:'barrier:mucus'},t:'<b>점막</b>은 점액으로 병원체를 붙잡아 느리게 만듭니다. 이번에는 쓰지 않아도 됩니다.'},
+   {start:1,point:{el:'startBtn'},wait:()=>S.phase==='wave',t:'<b>시작</b>을 누르세요. 1차 방어선은 시작 전에만 깔 수 있습니다.'},
    {enter:()=>{S.tut.spawned=0;tSched([[1,'bact','A'],[3.5,'bact','A'],[6,'bact','A'],[8.5,'bact','A']]);},point:{wound:0},wait:()=>S.tut.spawned>=4&&tClear(),
-    t:'세균이 상처로 들어옵니다. 피부가 세균을 막고, 분비물이 막힌 세균을 녹이는 모습을 지켜보세요.'},
-   {next:1,t:'1차 방어선이 세균을 모두 막았습니다. 하지만 1차 방어선은 계속 공격받으면 닳고, 병원체가 많아지면 뚫립니다. 그래서 몸 안으로 들어온 병원체를 직접 처리하는 <b>면역세포</b>가 필요합니다.'}
+    t:'세균이 피부에 막히고 분비물에 녹는 모습을 지켜보세요.'},
+   {next:1,t:'1차 방어선은 공격받으면 닳고, 병원체가 많으면 뚫립니다. 그래서 <b>면역세포</b>가 필요합니다.'}
   ],
-  sum:'1차 방어(피부·점막·분비물)는 병원체가 들어오기 전부터 있는 비특이적 방어입니다. 게임에서는 준비 단계에만 깔 수 있고, 상처 위치를 보고 길목에 까는 것이 중요합니다.'},
+  sum:'1차 방어는 감염 전부터 있는 비특이적 방어입니다. 상처 위치를 보고 길목에 까세요.'},
 
  {short:'대식세포',name:'튜토리얼 2 · 대식세포와 항원 제시',sub:'식세포 작용 · 항원 제시',
   cfg:{look:0,barriers:[],units:['macro'],strains:['A'],start:160,wounds:[{side:0,c:7}],noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,tab:'unit',point:{card:'unit:macro'},t:'이제 면역세포가 직접 싸웁니다. <b>대식세포</b>는 백혈구의 한 종류로, 병원체를 삼켜 분해합니다. 이것을 <b>식세포 작용</b>이라고 합니다. 대식세포는 병원체의 종류를 가리지 않고 삼키므로 비특이적 방어에 속합니다.'},
-   {next:1,point:{wound:0},t:'이번 상처는 위쪽 벽에 있습니다. 세균은 맨 위 줄을 따라 혈관 쪽으로 이동합니다.'},
-   {next:1,point:{rows:ALL_ROWS},t:'면역세포는 혈관에서 나와 조직으로 들어갑니다. 카드를 고른 뒤 줄을 누르면 그 줄의 혈관에서 세포가 나옵니다. 출동한 세포는 <b>고른 줄과 그 위아래 한 줄</b> 안에서만 돌아다니므로, 병원체가 지나갈 줄을 골라야 합니다.'},
+   {next:1,tab:'unit',point:{card:'unit:macro'},t:'<b>대식세포</b>는 병원체를 삼켜 분해합니다. 이것을 <b>식세포 작용</b>이라고 합니다.'},
+   {next:1,point:{wound:0},t:'이번 상처는 위쪽에 있습니다. 세균은 맨 위 줄로 이동합니다.'},
+   {next:1,point:{rows:ALL_ROWS},t:'카드를 고르고 줄을 누르면 그 줄에서 세포가 나옵니다. 세포는 <b>고른 줄과 위아래 한 줄</b>에서만 움직입니다.'},
    {tab:'unit',point:{card:'unit:macro'},wait:tSel('unit','macro'),t:'대식세포 카드를 누르세요.'},
-   {rows:[0],point:{rows:[0]},wait:()=>tHas('macro'),t:'세균이 지나갈 맨 위 줄을 누르세요. 대식세포는 이 줄과 바로 아래 줄을 돌아다닙니다.'},
+   {rows:[0],point:{rows:[0]},wait:()=>tHas('macro'),t:'맨 위 줄을 누르세요.'},
    {enter:()=>{tWave();tSched([[1,'bact','A'],[4,'bact','A'],[7,'bact','A'],[10,'bact','A']]);},rows:[0,1],point:{wound:0},wait:()=>!!S.revealed.A,
     tick:()=>{if(tClear()&&!S.revealed.A)tSched([[1,'bact','A'],[4,'bact','A']]);},
-    t:'들어오는 세균이 까맣게 보입니다. 우리 몸이 아직 이 병원체가 무엇인지 모르기 때문입니다. 대식세포는 멀리 있는 병원체는 알아채지 못하고, 돌아다니다 바로 옆에 오면 삼킵니다.'},
-   {next:1,point:{enemy:'any'},t:'대식세포가 세균을 삼킨 뒤, 분해한 조각을 세포 표면에 올려 내보였습니다. 이것을 <b>항원 제시</b>라고 합니다. 이제 이 유형의 세균은 모두 정체가 드러나 색이 보이고, 머리 위에 A 표식이 붙습니다.'},
-   {next:1,t:'<b>항원</b>은 몸에 면역 반응을 일으키는 물질로, 병원체마다 모양이 다릅니다. 항원이 드러나야 특정 항원만 골라 공격하는 <b>특이적 방어</b>(B림프구, T림프구)가 시작됩니다. 대식세포는 비특이적 방어를 하면서, 특이적 방어를 시작하게 하는 다리 역할도 합니다.'},
-   {rows:ALL_ROWS,wait:()=>tClear(),tick:()=>{},t:'남은 세균을 대식세포가 처리하는 모습을 지켜보세요. 포도당이 넉넉하면 대식세포를 하나 더 보내도 됩니다.'}
+    t:'까만 세균은 아직 정체를 모르는 병원체입니다. 대식세포는 바로 옆에 와야 알아챕니다.'},
+   {next:1,point:{enemy:'any'},t:'대식세포가 분해한 조각을 표면에 내보였습니다. 이것이 <b>항원 제시</b>입니다. 이제 세균의 정체가 보입니다.'},
+   {next:1,t:'정체가 드러나야 <b>특이적 방어</b>(B·T림프구)가 시작됩니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),tick:()=>{},t:'남은 세균이 처리되는 것을 지켜보세요.'}
   ],
-  sum:'대식세포는 가까이 온 병원체를 삼켜 분해합니다(식세포 작용, 비특이적 방어). 처음 보는 병원체를 분해하면 항원 제시로 정체를 밝힙니다. 본게임에서는 정체가 드러나야 림프구 카드가 열립니다.'},
+  sum:'대식세포는 병원체를 삼켜 분해하고(식세포 작용), 항원 제시로 정체를 밝힙니다.'},
 
  {short:'비만세포',name:'튜토리얼 3 · 비만세포와 염증 반응',sub:'히스타민 · 호중구 · 꽃가루 알레르기',
   cfg:{look:0,auto:1,edge:1,barriers:[],units:['macro','mast'],strains:['A','P'],start:220,wounds:[{side:1,c:6},{side:1,c:8}],revealed:{A:1,P:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,point:{wounds:1},t:'이번에는 아래쪽 상처 두 곳으로 세균이 한꺼번에 몰려옵니다. 대식세포는 느려서 혼자서는 다 막지 못합니다.'},
-   {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 조직에 머물러 있다가 세균을 발견하면 <b>히스타민</b>을 분비합니다. 히스타민은 모세 혈관을 넓히고 혈관 벽의 틈을 벌려, 혈관 속의 백혈구와 혈장이 감염 부위로 빠져나오게 합니다. 이것을 <b>염증 반응</b>이라고 합니다. 다친 곳이 붉어지고, 붓고, 열이 나는 까닭입니다. 비만세포는 세균을 직접 공격하지 않습니다.'},
+   {next:1,point:{wounds:1},t:'아래쪽 상처 두 곳으로 세균이 몰려옵니다. 대식세포만으로는 부족합니다.'},
+   {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 세균을 발견하면 <b>히스타민</b>을 분비합니다. 혈관이 넓어져 백혈구와 혈장이 모이는 것이 <b>염증 반응</b>입니다.'},
    {tab:'unit',point:{card:'unit:mast'},wait:tSel('unit','mast'),t:'비만세포 카드를 누르세요.'},
-   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('mast'),t:'세균이 지나갈 아래쪽 두 줄 중 하나를 누르세요.'},
+   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('mast'),t:'아래쪽 두 줄 중 하나를 누르세요.'},
    {enter:()=>{tWave();tSched([0,1,2,3,4,5,6].map(i=>[1+i*1.3,'bact','A',{w:i%2}]));},rows:[3,4],point:{unit:'mast'},wait:()=>!!S.flags.alarm,
     tick:()=>{if(tClear()&&!S.flags.alarm)tSched([[1,'bact','A',{w:0}],[2,'bact','A',{w:1}]]);},
-    t:'세균이 몰려옵니다. 비만세포 가까이로 세균이 오면 어떤 일이 일어나는지 지켜보세요.'},
-   {next:1,point:{unit:'mast'},t:'비만세포가 "세균이다!" 하고 히스타민(보라색 알갱이)을 뿜었습니다. 넓어진 혈관에서 <b>호중구</b>가 달려 나오고, 노란 <b>혈장</b> 웅덩이가 생겼습니다. 혈장 속의 <b>보체</b> 단백질은 세균에 구멍을 내고, 웅덩이 안의 병원체는 느려집니다.'},
-   {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 카드로 직접 부를 수 없습니다. 비만세포가 신호를 보낼 때만 나옵니다. <b>자동 출동</b> 탭에서 지금 판에 얼마나 나와 있는지 볼 수 있습니다. 호중구는 비만세포가 알린 세균만 처리하고, 일이 끝나면 사라집니다.'},
-   {next:1,point:{unit:'neut'},t:'여기서 두 방어를 구분해야 합니다. <b>염증 반응</b>은 혈관을 넓혀 백혈구와 혈장을 감염 부위로 <b>불러 모으는</b> 반응입니다. 모여든 호중구가 세균을 삼켜 분해하는 것은 앞에서 대식세포로 본 <b>식세포 작용</b>입니다. 비만세포는 부르기만 하고, 세균을 처리하는 것은 식세포입니다.'},
-   {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요. 대식세포를 함께 보내면 더 빨리 끝납니다.'},
+    t:'비만세포 가까이 세균이 오면 무슨 일이 생기는지 보세요.'},
+   {next:1,point:{unit:'mast'},t:'<b>호중구</b>가 달려오고 노란 <b>혈장</b>이 고였습니다. 혈장 속 보체가 세균에 구멍을 냅니다.'},
+   {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 직접 부를 수 없고, 비만세포가 신호를 보낼 때만 나옵니다.'},
+   {next:1,point:{unit:'neut'},t:'염증 반응은 백혈구를 <b>불러 모으는</b> 반응이고, 세균을 삼키는 건 호중구의 <b>식세포 작용</b>입니다.'},
+   {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요.'},
    {enter:()=>{tSched([[.5,'pollen','P',{lane:4}],[1.5,'pollen','P',{lane:3}],[2.5,'pollen','P',{lane:4}]]);},rows:ALL_ROWS,point:{edge:1},wait:()=>S.enemies.some(e=>e.k==='pollen'&&e.x<8.2),
-    t:'세균을 모두 막았습니다. 이번에는 오른쪽 입구로 무언가가 날아 들어옵니다.'},
-   {next:1,point:{enemy:'pollen'},t:'노란 <b>꽃가루</b>입니다. 꽃가루는 병원체가 아니지만, 몸에 면역 반응을 일으킬 수 있는 물질이므로 <b>항원</b>입니다. 지금 비만세포는 꽃가루를 보고도 가만히 있습니다. 이 몸이 꽃가루를 해로운 것으로 기억하고 있지 않기 때문입니다.'},
-   {next:1,point:{unit:'mast'},t:'그런데 어떤 사람의 몸은 꽃가루를 적으로 잘못 기억합니다. 이것을 <b>감작</b>이라고 합니다. 감작되면 꽃가루에 맞는 항체가 비만세포 표면에 붙어 있다가, 다음에 꽃가루를 만나면 비만세포가 곧바로 히스타민을 쏟아냅니다. 지금부터 이 몸이 꽃가루에 감작되었다고 하겠습니다.'},
+    t:'이번에는 오른쪽 입구로 무언가 들어옵니다.'},
+   {next:1,point:{enemy:'pollen'},t:'<b>꽃가루</b>입니다. 병원체는 아니지만 면역 반응을 일으키는 <b>항원</b>입니다. 지금은 비만세포가 반응하지 않습니다.'},
+   {next:1,point:{unit:'mast'},t:'몸이 꽃가루를 적으로 잘못 기억하는 것을 <b>감작</b>이라고 합니다. 이 몸이 감작되었다고 해 보겠습니다.'},
    {enter:()=>{S.flags.sens=1;tSched([[.5,'pollen','P',{lane:4}],[1.3,'pollen','P',{lane:3}],[2.1,'pollen','P',{lane:4}],[2.9,'pollen','P',{lane:3}]]);},rows:ALL_ROWS,point:{unit:'mast'},wait:()=>!!S.flags.allergy,
     tick:()=>{if(!S.enemies.some(e=>e.k==='pollen')&&!S.spawns.length&&!S.flags.allergy)tSched([[.5,'pollen','P',{lane:4}],[1.5,'pollen','P',{lane:3}]]);},
-    t:'꽃가루가 다시 들어옵니다. 감작된 비만세포가 어떻게 반응하는지 지켜보세요.'},
-   {next:1,t:'<b>알레르기</b> 반응입니다. 해롭지 않은 꽃가루에 비만세포가 히스타민을 쏟아내 쓸데없는 염증이 생겼습니다. 화면이 노랗게 변한 동안 면역세포가 느려지고 포도당이 빠져나갑니다. 실제로 콧물, 재채기, 가려움이 생기는 까닭이며, 항히스타민제는 이 히스타민의 작용을 막는 약입니다.'},
-   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 꽃가루가 지나가기를 기다리세요. 꽃가루는 혈관에 닿아도 체력을 깎지 않습니다.'}
+    t:'꽃가루가 다시 들어옵니다. 비만세포를 지켜보세요.'},
+   {next:1,t:'해롭지 않은 꽃가루에 히스타민을 쏟아냈습니다. 이것이 <b>알레르기</b>입니다. 그동안 세포가 느려지고 포도당이 빠집니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),t:'꽃가루가 지나가기를 기다리세요. 꽃가루는 체력을 깎지 않습니다.'}
   ],
-  sum:'비만세포는 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 감염 부위로 불러 모읍니다. 모여든 호중구가 세균을 삼키는 것은 식세포 작용입니다. 염증 반응과 식세포 작용은 서로 다른 방어이지만, 둘 다 병원체의 종류를 가리지 않는 비특이적 방어입니다. 몸이 꽃가루 같은 해롭지 않은 항원에 감작되면, 비만세포가 지나치게 반응하는 알레르기가 일어납니다.'},
+  sum:'비만세포는 염증 반응으로 백혈구를 불러 모으고, 모인 호중구가 식세포 작용을 합니다. 꽃가루에 감작되면 알레르기가 생깁니다.'},
 
  {short:'B림프구',name:'튜토리얼 4 · 보조 T림프구와 B림프구',sub:'형질세포 · 항체 · 체액성 면역',
   cfg:{look:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['C'],start:300,wounds:[{side:0,c:7}],revealed:{C:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,point:{wound:0},t:'이번 적은 <b>독소를 뿜는 세균</b>입니다. 독소는 가까이 온 면역세포를 다치게 해서, 식세포가 다가가 삼키기 어렵습니다. 이럴 때는 멀리서 <b>항체</b>로 공격합니다. 이 세균의 정체는 이미 드러나 있다고 하겠습니다.'},
-   {next:1,tab:'unit',point:{card:'unit:bcell'},t:'<b>B림프구</b>는 항원 한 종류에만 반응하는 림프구입니다. 몸속에는 저마다 다른 항원에 맞는 B림프구가 아주 많고, 드러난 항원에 꼭 맞는 B림프구가 골라져 출동합니다. 세포 머리 위의 표식이 이 B림프구가 맡은 항원입니다.'},
+   {next:1,point:{wound:0},t:'이번 적은 <b>독소 세균</b>입니다. 가까이 가면 다치므로 멀리서 <b>항체</b>로 공격합니다.'},
+   {next:1,tab:'unit',point:{card:'unit:bcell'},t:'<b>B림프구</b>는 항원 한 종류에만 반응합니다. 머리 위 표식이 맡은 항원입니다.'},
    {tab:'unit',point:{card:'unit:bcell'},wait:tSel('unit','bcell'),t:'B림프구 카드를 누르세요.'},
-   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('bcell'),t:'세균이 지나갈 위쪽 줄 근처를 누르세요.'},
-   {enter:()=>{tWave();},next:1,point:{unit:'bcell'},t:'B림프구 위에 "신호 대기"가 떠 있습니다. B림프구는 항원을 만났다고 바로 일하지 않습니다. <b>보조 T림프구</b>가 같은 항원을 인식하고 신호 물질(<b>사이토카인</b>)을 보내야 활성화됩니다.'},
+   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('bcell'),t:'위쪽 줄 근처를 누르세요.'},
+   {enter:()=>{tWave();},next:1,point:{unit:'bcell'},t:'B림프구가 "신호 대기" 중입니다. <b>보조 T림프구</b>의 신호(<b>사이토카인</b>)가 있어야 활성화됩니다.'},
    {tab:'unit',point:{card:'unit:helper'},wait:tSel('unit','helper'),t:'보조 T림프구 카드를 누르세요.'},
-   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('helper'),t:'B림프구가 있는 줄 근처를 누르세요.'},
-   {point:{unit:'helper'},wait:()=>tHas('plasma'),t:'보조 T림프구가 B림프구에게 신호(파란 점)를 보냅니다. 신호를 받은 B림프구가 어떻게 바뀌는지 지켜보세요.'},
-   {next:1,point:{unit:'plasma'},t:'B림프구가 분열하면서 <b>형질세포</b>를 만들었습니다. 형질세포는 항체를 만들어 내보내는 세포입니다. 활성화된 B림프구 중 일부는 나중을 위해 <b>기억세포</b>로도 남습니다.'},
+   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('helper'),t:'B림프구 근처 줄을 누르세요.'},
+   {point:{unit:'helper'},wait:()=>tHas('plasma'),t:'보조 T림프구가 신호를 보냅니다. B림프구를 지켜보세요.'},
+   {next:1,point:{unit:'plasma'},t:'B림프구가 <b>형질세포</b>로 분화했습니다. 형질세포는 항체를 만듭니다.'},
    {enter:()=>{tSched([0,1,2,3,4].map(i=>[.5+i*2.4,'toxin','C']));},point:{wound:0},wait:()=>S.enemies.some(e=>e.opT>0),
-    t:'독소 세균이 들어옵니다. 형질세포가 무엇을 하는지 지켜보세요.'},
-   {next:1,point:{enemy:'op'},t:'형질세포가 뿌린 <b>항체</b>(Y자 모양)가 세균에 붙었습니다. 항체는 꼭 맞는 항원에만 결합합니다. 이것을 <b>항원 항체 반응의 특이성</b>이라고 합니다. 항체가 붙으면 독소가 중화되고, 세균이 느려지며, 식세포가 두 배로 쉽게 삼킵니다.'},
-   {next:1,t:'이처럼 형질세포가 만든 항체로 항원을 없애는 방어를 <b>체액성 면역</b>이라고 합니다. 항체가 혈액 같은 체액에 녹아 몸을 돌아다니기 때문에 붙은 이름입니다.'},
-   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 독소 세균을 처리하세요. 항체가 붙은 세균은 대식세포가 쉽게 삼킵니다.'}
+    t:'독소 세균이 들어옵니다. 형질세포를 지켜보세요.'},
+   {next:1,point:{enemy:'op'},t:'Y자 모양 <b>항체</b>가 세균에 붙었습니다. 항체는 꼭 맞는 항원에만 결합합니다(<b>특이성</b>).'},
+   {next:1,t:'항체로 항원을 없애는 방어를 <b>체액성 면역</b>이라고 합니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 독소 세균을 처리하세요.'}
   ],
-  sum:'보조 T림프구는 사이토카인으로 B림프구와 세포독성 T림프구를 활성화합니다. 활성화된 B림프구는 형질세포로 분화하고, 형질세포가 만든 항체가 항원과 결합합니다(체액성 면역). 본게임에서는 보조 T림프구가 판에 없으면 B·T림프구가 "신호 대기"만 합니다.'},
+  sum:'보조 T림프구가 B림프구를 활성화하고, B림프구는 형질세포로 분화해 항체를 만듭니다(체액성 면역).'},
 
  {short:'세포독성 T',name:'튜토리얼 5 · 세포독성 T림프구',sub:'감염세포 · 세포성 면역',
   cfg:{look:2,edge:1,auto:1,barriers:[],units:['helper','tc'],strains:['D'],start:300,wounds:[],revealed:{D:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {enter:()=>{tPre('helper',2);},next:1,point:{edge:1},t:'이곳은 기도입니다. 이번에는 숨을 쉴 때 <b>오른쪽 기도 입구</b>로 <b>바이러스</b>가 들어옵니다. 바이러스는 세포 구조가 없어 스스로 증식하지 못하고, 우리 몸의 세포 안에 들어가 그 세포를 이용해 증식합니다.'},
+   {enter:()=>{tPre('helper',2);},next:1,point:{edge:1},t:'이번에는 오른쪽 기도로 <b>바이러스</b>가 들어옵니다. 바이러스는 우리 세포 안에서만 증식합니다.'},
    {enter:()=>{tWave();tSched([[.5,'virus','D',{lane:2}],[1.6,'virus','D',{lane:2}]]);},point:{edge:1},wait:()=>S.enemies.some(e=>e.k==='infected'),
-    t:'바이러스 둘레의 노란 고리를 보세요. 고리가 다 차면 바이러스가 세포 안으로 숨습니다.'},
-   {next:1,point:{enemy:'infected'},t:'바이러스가 세포 안으로 들어가 <b>감염세포</b>가 되었습니다. 세포 안에는 항체가 닿지 않습니다. 그대로 두면 감염세포는 바이러스를 계속 만들어 내보내다가 터집니다.'},
-   {next:1,tab:'unit',point:{card:'unit:tc'},t:'<b>세포독성 T림프구</b>는 감염된 세포를 찾아가 세포째 없앱니다. 감염세포는 표면에 바이러스 조각(항원)을 내보이는데, 세포독성 T림프구는 이 항원을 알아봅니다. 신호를 줄 보조 T림프구는 이미 와 있습니다.'},
+    t:'노란 고리가 다 차면 바이러스가 세포 안으로 숨습니다.'},
+   {next:1,point:{enemy:'infected'},t:'<b>감염세포</b>가 되었습니다. 세포 안에는 항체가 닿지 않습니다.'},
+   {next:1,tab:'unit',point:{card:'unit:tc'},t:'<b>세포독성 T림프구</b>는 감염된 세포를 찾아 세포째 없앱니다. 보조 T림프구는 이미 와 있습니다.'},
    {tab:'unit',point:{card:'unit:tc'},wait:tSel('unit','tc'),t:'세포독성 T림프구 카드를 누르세요.'},
    {enter:()=>{const e=S.enemies.find(e=>e.k==='infected');const l=e?e.lane:2;S.tut.rowsNow=[l-1,l,l+1].filter(r=>r>=0&&r<ROWS);},rowsFn:()=>S.tut.rowsNow,point:{rowsNow:1},wait:()=>tHas('tc'),
-    t:'감염세포가 있는 줄이나 그 위아래 줄을 누르세요.'},
-   {point:{unit:'tc'},wait:()=>!!S.flags.tcKill,t:'세포독성 T림프구가 감염세포에 달라붙는 모습을 지켜보세요.'},
-   {next:1,t:'세포독성 T림프구가 <b>퍼포린</b>으로 감염세포의 세포막에 구멍을 뚫고, 그 틈으로 효소를 넣었습니다. 감염세포는 안의 바이러스와 함께 스스로 죽었습니다. 이것을 <b>세포자살</b>이라고 합니다.'},
-   {next:1,t:'이처럼 세포독성 T림프구가 감염된 세포를 직접 파괴하는 방어를 <b>세포성 면역</b>이라고 합니다. 세포독성 T림프구도 B림프구처럼 <b>보조 T림프구의 신호</b>가 있어야 활성화되고, 정체가 드러난 항원 한 종류만 맡습니다.'},
+    t:'감염세포가 있는 줄 근처를 누르세요.'},
+   {point:{unit:'tc'},wait:()=>!!S.flags.tcKill,t:'세포독성 T림프구를 지켜보세요.'},
+   {next:1,t:'<b>퍼포린</b>으로 구멍을 뚫어 감염세포를 스스로 죽게 했습니다(<b>세포자살</b>).'},
+   {next:1,t:'감염세포를 직접 파괴하는 방어를 <b>세포성 면역</b>이라고 합니다.'},
    {enter:()=>{tSched([[1,'virus','D',{lane:1}],[2.2,'virus','D',{lane:3}],[4,'virus','D',{lane:2}],[5.5,'virus','D',{lane:1}]]);},rows:ALL_ROWS,wait:()=>tClear(),
-    t:'바이러스가 더 들어옵니다. 세포독성 T림프구를 더 보내 감염세포를 정리하세요.'}
+    t:'바이러스가 더 들어옵니다. 감염세포를 정리하세요.'}
   ],
-  sum:'바이러스는 세포 안에 숨어 증식합니다. 항체가 닿지 않는 감염세포는 세포독성 T림프구가 세포째 파괴합니다(세포성 면역). 본게임 3스테이지에서는 NK세포도 감염세포를 공격합니다.'},
+  sum:'항체가 닿지 않는 감염세포는 세포독성 T림프구가 파괴합니다(세포성 면역).'},
 
  {short:'기억세포',name:'튜토리얼 6 · 기억세포와 2차 면역 반응',sub:'1차·2차 면역 반응 · 백신',
   cfg:{look:0,mem:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['A'],start:240,wounds:[{side:1,c:7}],revealed:{A:1},kills:{A:8},noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,tab:'unit',point:{card:'memory:A'},t:'어떤 항원을 처음 만났을 때 일어나는 면역 반응을 <b>1차 면역 반응</b>이라고 합니다. 이때 활성화된 B림프구의 일부는 <b>기억세포</b>로 남아 그 항원을 기억합니다.'},
-   {next:1,tab:'unit',point:{card:'memory:A'},t:'게임에서는 같은 유형의 병원체를 10번 물리치면 그 유형의 기억세포 카드가 열립니다. 지금은 A형 세균을 8번 물리친 상태입니다. 카드 아래의 막대가 진행도입니다.'},
+   {next:1,tab:'unit',point:{card:'memory:A'},t:'항원을 처음 만났을 때의 반응이 <b>1차 면역 반응</b>입니다. 이때 일부 B림프구가 <b>기억세포</b>로 남습니다.'},
+   {next:1,tab:'unit',point:{card:'memory:A'},t:'같은 유형을 10번 물리치면 기억세포 카드가 열립니다. 지금은 8번입니다.'},
    {tab:'unit',point:{card:'unit:macro'},wait:tSel('unit','macro'),t:'대식세포 카드를 누르세요.'},
-   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('macro'),t:'세균이 지나갈 아래쪽 두 줄 중 하나를 누르세요.'},
+   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('macro'),t:'아래쪽 두 줄 중 하나를 누르세요.'},
    {enter:()=>{tWave();tSched([[1,'bact','A'],[4,'bact','A'],[7,'bact','A']]);},rows:ALL_ROWS,point:{wound:0},wait:()=>!!S.memory.A,
     tick:()=>{if(tClear()&&!S.memory.A)tSched([[1,'bact','A'],[3,'bact','A']]);},t:'A형 세균을 두 번 더 물리치세요.'},
    {next:1,tab:'unit',point:{card:'memory:A'},t:'A형 기억세포 카드가 열렸습니다.'},
-   {next:1,t:'곧 A형 세균이 한꺼번에 많이 들어옵니다. <b>기억세포</b>는 보조 T림프구의 신호를 기다리지 않고 곧바로 형질세포로 분화해, 항체를 더 빠르고 많이 만듭니다. 이것을 <b>2차 면역 반응</b>이라고 합니다.'},
+   {next:1,t:'곧 A형 세균이 몰려옵니다. 기억세포는 신호 없이 바로 항체를 많이 만듭니다. 이것이 <b>2차 면역 반응</b>입니다.'},
    {tab:'unit',point:{card:'memory:A'},wait:tSel('memory','A'),t:'A형 기억세포 카드를 누르세요.'},
    {rows:[2,3,4],point:{rows:[2,3,4]},wait:()=>tHas('memory'),t:'아래쪽 줄 근처를 누르세요.'},
    {enter:()=>{tSched([0,1,2,3,4,5,6,7,8,9].map(i=>[1+i*.8,'bact','A']));},rows:ALL_ROWS,point:{wound:0},wait:()=>tClear(),
-    t:'세균이 몰려옵니다. 기억세포가 형질세포를 얼마나 빨리 만들어 내는지 지켜보세요.'},
-   {next:1,t:'2차 면역 반응은 1차보다 빠르고 강합니다. 기억세포가 남아 있기 때문입니다. <b>백신</b>은 약하게 만든 항원을 미리 넣어 1차 면역 반응을 일으키고, 기억세포를 만들어 두는 방법입니다.'}
+    t:'기억세포가 얼마나 빨리 대응하는지 보세요.'},
+   {next:1,t:'2차 면역 반응은 1차보다 빠르고 강합니다. <b>백신</b>은 이 원리로 기억세포를 미리 만들어 둡니다.'}
   ],
-  sum:'처음 만난 항원에는 1차 면역 반응이, 같은 항원을 다시 만나면 기억세포 덕분에 더 빠르고 강한 2차 면역 반응이 일어납니다. 이제 본게임에서 모든 세포를 함께 써 보세요.'}
+  sum:'같은 항원을 다시 만나면 기억세포 덕분에 2차 면역 반응이 빠르고 강하게 일어납니다.'}
 ];
 const BRIEF=[
- ['피버 타임','중간에 열이 오릅니다. 38~39.9℃의 적당한 열은 병원체를 약하게 하고 면역세포를 빠르게 하지만, 세포를 너무 많이 내보내면 40℃를 넘어 우리 편도 지칩니다. 위쪽 체온계를 보고, 너무 오르면 해열제 버튼을 쓰세요.'],
- ['식사 시간','소장에서 흡수된 포도당이 혈액으로 들어옵니다. 포도당이 한꺼번에 늘고, 잠시 동안 두 배로 찹니다.'],
- ['세포 안에 숨는 세균','B형 세균은 대식세포에게 삼켜져도 일부가 살아남아 대식세포를 감염시킵니다. 보조 T림프구가 다가가면 되살아나고, 늦으면 세포독성 T림프구가 정리합니다.'],
- ['꽃가루 시즌','2·3스테이지에서는 꽃가루가 섞여 들어옵니다. 보조 T림프구가 있는 상태에서 꽃가루의 정체가 드러나면 몸이 감작되어, 그 뒤로는 꽃가루마다 알레르기 반응이 일어납니다.'],
- ['백신 접종','3스테이지 초반에 D형 바이러스의 백신을 맞습니다. D형의 정체가 드러나고 기억세포가 미리 준비됩니다.'],
- ['변이 바이러스','3스테이지 마지막에 항원이 바뀐 바이러스가 옵니다. 기억세포가 알아보지 못하므로 다시 정체를 밝혀야 합니다.'],
- ['항생제','2스테이지부터 한 번 쓸 수 있습니다. 판 위의 세균을 한꺼번에 없애지만 바이러스에는 듣지 않습니다.'],
- ['임무 완료','일을 마친 면역세포는 잠시 뒤 물러납니다. 실제로도 감염이 끝나면 대부분 사라지고 기억세포만 남습니다. 필요하면 다시 보내세요.']
+ ['피버 타임','열이 오릅니다. 40℃를 넘지 않게 세포 수를 조절하고, 필요하면 해열제를 쓰세요.'],
+ ['식사 시간','포도당이 한꺼번에 들어옵니다.'],
+ ['세포 안 세균','B형 세균은 대식세포를 감염시킵니다. 보조 T림프구로 살리세요.'],
+ ['꽃가루 시즌','감작되면 꽃가루마다 알레르기가 일어납니다.'],
+ ['백신 접종','D형 기억세포가 미리 생깁니다.'],
+ ['변이 바이러스','항원이 바뀌어 기억세포가 통하지 않습니다.'],
+ ['항생제','세균만 한 번에 없앱니다. 바이러스에는 효과가 없습니다.'],
+ ['임무 완료','일을 마친 세포는 물러납니다. 필요하면 다시 보내세요.']
 ];
 let TUTDONE={};
 function startTut(i){
@@ -1770,7 +1772,7 @@ function tutFinish(){
   const i=S.tut.i,T=TUTS[i];TUTDONE[i]=1;S.paused=true;$('coach').hidden=true;clearTutPt();
   SND.play('clear');
   const nx=i<TUTS.length-1;
-  const brief=nx?'':`<h3 class="bh">본게임에서 만나는 특별한 상황</h3><ul class="brief">${BRIEF.map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join('')}</ul><p class="bend">상처 위치와 "침입!" 예고를 보고, 병원체에 맞는 세포를 보내 몸을 지켜 내세요.</p>`;
+  const brief=nx?'':`<h3 class="bh">본게임에서 만나는 특별한 상황</h3><ul class="brief">${BRIEF.map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join('')}</ul><p class="bend">"침입!" 예고를 보고 알맞은 세포를 보내세요.</p>`;
   overlay(`<div class="card${nx?'':' wide'}"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>${brief}
    <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 난이도 고르기</button>`}${nx?'<button class="btn ghost" id="tList">튜토리얼 건너뛰기</button>':''}</div></div>`);
   if(nx)$('tNext').onclick=()=>startTut(i+1);else $('tMain').onclick=()=>{hideOverlay();openModes();};
