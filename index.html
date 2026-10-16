@@ -81,6 +81,12 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .unit.locked canvas{filter:grayscale(1);opacity:.4}
 .unit.locked .t{color:#a58a93}
 .rowlbl{font-family:var(--display);font-size:12.5px;color:var(--muted);padding:2px 10px 0;border-top:2px dashed var(--flesh2);margin:0 6px}
+.grp{display:flex;flex-direction:column;gap:6px;flex:none;padding-right:12px}
+.grp+.grp{border-left:2px dashed #d99aa8;padding-left:12px}
+.glbl{font-family:var(--display);font-size:12px;color:var(--muted);white-space:nowrap;margin-top:-16px}
+.grow{display:flex;gap:12px}
+.unit .need{color:var(--danger)}
+#unitHand{gap:0}
 .hand.mem{padding-top:14px;padding-bottom:6px;gap:8px}
 .hand.mem .unit{width:136px;flex-direction:row;padding:5px 6px;gap:4px;box-shadow:0 3px 0 var(--membrane-d)}
 .hand.mem .unit canvas{width:34px;height:34px;flex:none}
@@ -242,7 +248,8 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 @keyframes tutglow{50%{box-shadow:0 0 0 7px #ffcf4d,0 0 28px 10px rgba(255,207,77,.95)}}
 .tutarrow{position:absolute;z-index:7;width:28px;height:28px;pointer-events:none;color:#ffcf4d;font-size:26px;line-height:28px;text-align:center;text-shadow:0 2px 0 #7d2238,0 0 6px #7d2238;animation:bob .5s ease-in-out infinite alternate}
 @keyframes bob{to{transform:translateY(-8px)}}
-.modes .mgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
+.modes .mgrid{display:grid;grid-template-columns:1fr 1.35fr;gap:14px}
+.modes .mtut{order:2}
 .mbox{background:var(--skin);border:2px solid var(--flesh2);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .mbox h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;color:var(--membrane-d)}
 .mbox p{margin:0;font-size:14px;color:var(--muted);line-height:1.6}
@@ -285,7 +292,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
   <div class="arena">
     <canvas id="cv" width="960" height="500" aria-label="게임 판"></canvas>
     <div class="toast old" id="toast" style="opacity:0" aria-live="polite"><b>알림</b>새 소식이 생기면 여기에 뜬다.</div>
-    <div class="coach" id="coach" hidden aria-live="polite"><div class="chead"><span id="cStep"></span><button type="button" class="cskip" id="cSkip">튜토리얼 나가기</button></div><div class="ctext" id="cText"></div><div class="cfoot"><span class="cwait" id="cWait"></span><button type="button" class="cnext" id="cNext">다음</button></div></div>
+    <div class="coach" id="coach" hidden aria-live="polite"><div class="chead"><span id="cStep"></span><button type="button" class="cskip" id="cSkip">튜토리얼 건너뛰기</button></div><div class="ctext" id="cText"></div><div class="cfoot"><span class="cwait" id="cWait"></span><button type="button" class="cnext" id="cNext">다음</button></div></div>
   </div>
 
   <div class="dock">
@@ -349,9 +356,9 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
     <div class="qbox" id="qbox"></div>
   </section>
   <section class="panel study modes" id="modes" hidden aria-label="모드 선택">
-    <div class="phead"><button class="pback" id="modesBack">← 홈</button><b>게임 시작</b></div>
+    <div class="phead"><button class="pback" id="modesBack">← 홈</button><b>본게임 · 난이도 선택</b></div>
     <div class="mgrid">
-      <div class="mbox"><h3>튜토리얼</h3><p>면역세포를 하나씩 직접 써 보며 면역 반응을 배웁니다. 처음이라면 1번부터 차례로 해 보세요.</p><div class="tlist" id="tutList"></div></div>
+      <div class="mbox mtut"><h3>튜토리얼 다시 보기</h3><p>면역세포를 하나씩 직접 써 보며 면역 반응을 배웁니다.</p><div class="tlist" id="tutList"></div></div>
       <div class="mbox"><h3>본게임</h3><p>피부 상처, 림프절, 기도·폐의 세 스테이지를 이어서 막습니다. 난이도를 고르세요.</p><div class="dlist" id="diffList"></div></div>
     </div>
   </section>
@@ -370,7 +377,7 @@ const STRAINS={
   A:{name:'세균 A형',color:'#e5484d',shape:'circle',divide:1,dodge:1,
     trait:'편모로 헤엄쳐 다가오는 식세포를 요리조리 피하고, 이분법으로 계속 수를 늘린다. 항체가 붙으면 편모가 묶여 더는 못 피한다.'},
   B:{name:'세균 B형',color:'#3d8fd1',shape:'tri',capsule:1,divide:1,intracell:1,
-    trait:'두꺼운 협막(캡슐)에 싸여 미끄러워서 식세포가 잘 못 잡는다. 먹혀도 일부는 소화되지 않고 대식세포 안에서 살아남아 대식세포를 감염시킨다(세포 내 기생). 항체가 붙어 있으면(옵소닌화) 제대로 먹히고 소화된다.'},
+    trait:'두꺼운 협막(캡슐)에 싸여 미끄러워서 식세포가 잘 못 잡는다. 삼켜져도 일부는 소화되지 않고 대식세포 안에서 살아남아 대식세포를 감염시킨다(세포 내 기생). 항체가 붙어 있으면(옵소닌화) 제대로 삼켜지고 소화된다.'},
   C:{name:'독소 세균 C형',color:'#2f9e5c',shape:'square',
     trait:'독소를 뿜어 주변 면역세포를 해친다. 항체가 독소에 붙어 중화한다.'},
   D:{name:'바이러스 D형',color:'#e39a0c',shape:'star',virus:1,spd:1.35,hide:5,
@@ -384,29 +391,29 @@ const STRAINS={
 };
 const UNITS={
   macro:{name:'대식세포(백혈구)',cost:50,hp:280,sp:.75,rate:1.1,dmg:14,
-    desc:'가까이 온 병원체를 먹는다. 처음 보는 병원체를 먹으면 그 유형의 정체가 드러나 림프구 카드가 열린다.',bio:'비특이적 방어 · 식세포 작용. 먹은 병원체의 조각을 세포 표면에 내보이는 항원 제시로 특이적 방어를 시작하게 한다.',tag:'먹기 · 정체 공개'},
+    desc:'가까이 온 병원체를 삼켜 분해한다. 처음 보는 병원체를 분해하면 그 유형의 정체가 드러나 림프구 카드가 열린다.',bio:'비특이적 방어 · 식세포 작용. 분해한 병원체의 조각을 세포 표면에 내보이는 항원 제시로 특이적 방어를 시작하게 한다.',tag:'식세포 작용 · 항원 제시'},
   mast:{name:'비만세포',cost:40,hp:90,sp:.5,
-    desc:'근처에 세균이 오면 호중구 2마리를 부르고 혈장 웅덩이를 만든다. 직접 공격하지는 않는다.',bio:'비특이적 방어 · 염증 반응. 히스타민이 혈관을 넓혀 백혈구와 혈장이 감염 부위로 나오게 한다.',tag:'지원 요청'},
+    desc:'근처에 세균이 오면 히스타민을 분비해 호중구와 혈장을 불러온다. 직접 공격하지는 않는다.',bio:'비특이적 방어 · 염증 반응. 히스타민이 모세 혈관을 넓혀 백혈구와 혈장이 감염 부위로 나오게 한다. 병원체를 삼키는 일은 모여든 백혈구가 한다.',tag:'염증 반응'},
   neut:{name:'호중구(백혈구)',cost:0,hp:60,sp:1.6,rate:.5,dmg:9,life:40,summon:1,
-    desc:'비만세포가 알린 세균만 쫓아가 먹고, 다 처리하면 5초 뒤 사라진다.',bio:'비특이적 방어 · 식세포 작용. 감염 부위에 가장 먼저 모이는 백혈구로, 죽은 호중구는 고름이 된다.',tag:'세균 먹기'},
+    desc:'비만세포가 알린 세균만 쫓아가 삼켜 분해하고, 다 처리하면 5초 뒤 사라진다.',bio:'비특이적 방어 · 식세포 작용. 염증 반응으로 감염 부위에 가장 먼저 모이는 백혈구로, 죽은 호중구는 고름이 된다.',tag:'식세포 작용'},
   helper:{name:'보조 T림프구',cost:60,hp:90,sp:.8,
-    desc:'판에 있어야 B림프구와 세포독성 T림프구가 활성화된다. 감염된 대식세포 옆에 가면 되살린다.',bio:'특이적 방어. 대식세포가 제시한 항원을 인식하고, 사이토카인을 분비해 다른 림프구를 활성화한다.',tag:'림프구 활성화'},
+    desc:'판에 있어야 B림프구와 세포독성 T림프구가 활성화된다. 감염된 대식세포 옆에 가면 되살린다.',bio:'특이적 방어. 대식세포가 제시한 항원을 인식하고, 사이토카인을 분비해 다른 림프구를 활성화한다.',tag:'B·T림프구 활성화'},
   bcell:{name:'B림프구',cost:70,hp:80,sp:.9,
-    desc:'드러난 항원 하나를 맡아 형질세포를 계속 만들어 낸다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 체액성 면역. 활성화된 B림프구는 형질세포와 기억세포로 분화한다.',tag:'항체 생산'},
+    desc:'드러난 항원 하나를 맡아 형질세포를 계속 만들어 낸다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 체액성 면역. 활성화된 B림프구는 형질세포와 기억세포로 분화한다.',tag:'체액성 면역'},
   plasma:{name:'형질세포',cost:0,hp:70,sp:.9,rate:3.2,dmg:10,life:40,summon:1,
-    desc:'맡은 병원체에 항체를 뿌린다. 항체가 붙은 병원체는 느려지고 독소가 중화되며 식세포에게 2배로 잘 먹힌다.',bio:'체액성 면역. 항체는 특정 항원에만 결합한다(항원-항체 반응의 특이성).',tag:'항체 분비'},
+    desc:'맡은 병원체에 항체를 뿌린다. 항체가 붙은 병원체는 느려지고 독소가 중화되며 식세포가 2배로 쉽게 삼킨다.',bio:'체액성 면역. 항체는 특정 항원에만 결합한다(항원-항체 반응의 특이성).',tag:'항체 분비'},
   nk:{name:'NK세포',cost:50,hp:110,sp:1.2,rate:1,dmg:20,
     desc:'감염세포라면 종류를 가리지 않고 공격한다. 힘은 약하다.',bio:'비특이적 방어. 항원을 몰라도 표면이 이상해진 세포를 알아본다.',tag:'감염세포 공격'},
   tc:{name:'세포독성 T림프구',cost:85,hp:110,sp:1.1,rate:1,dmg:32,
-    desc:'맡은 항원에 감염된 세포를 찾아 파괴한다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 세포성 면역. 퍼포린으로 세포막에 구멍을 내 감염세포를 세포자살시킨다.',tag:'감염세포 제거'},
+    desc:'맡은 항원에 감염된 세포를 찾아 파괴한다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 세포성 면역. 퍼포린으로 세포막에 구멍을 내 감염세포를 세포자살시킨다.',tag:'세포성 면역'},
   memory:{name:'기억세포',cost:60,hp:160,sp:1.2,
-    desc:'보조 T림프구를 기다리지 않고 곧바로 형질세포를 빠르고 많이 만든다. 같은 유형을 10번 물리치면 열린다.',bio:'2차 면역 반응. 1차 면역 반응 때 남은 기억세포가 같은 항원을 다시 만나면 빠르게 형질세포로 분화한다.',tag:'2차 면역'}
+    desc:'보조 T림프구를 기다리지 않고 곧바로 형질세포를 빠르고 많이 만든다. 같은 유형을 10번 물리치면 열린다.',bio:'2차 면역 반응. 1차 면역 반응 때 남은 기억세포가 같은 항원을 다시 만나면 빠르게 형질세포로 분화한다.',tag:'2차 면역 반응'}
 };
 const BARRIERS={
-  skin:{name:'피부',cost:30,hp:240,block:1,desc:'병원체가 지나가지 못하게 막는 벽이다. 계속 공격받으면 뚫린다.',bio:'비특이적 방어 · 1차 방어. 피부의 각질층은 병원체의 침입을 막는 물리적 장벽이다.',tag:'막기'},
-  mucus:{name:'점막',cost:20,desc:'이 칸을 지나는 병원체를 50% 느리게 한다.',bio:'비특이적 방어 · 1차 방어. 호흡기와 소화관 안쪽의 점막은 점액으로 병원체를 붙잡는다.',tag:'느리게'},
-  lyso:{name:'분비물',cost:25,desc:'이 칸에 있는 세균에게 계속 피해를 준다. 바이러스에는 효과가 없다.',bio:'비특이적 방어 · 1차 방어. 눈물·침 속 라이소자임이 세균의 세포벽을 분해한다.',tag:'세균 녹이기'},
-  cilia:{name:'섬모',cost:30,desc:'3초마다 병원체를 오른쪽으로 밀어낸다.',bio:'비특이적 방어 · 1차 방어. 기관의 섬모 운동이 점액에 붙은 이물질을 몸 밖으로 내보낸다.',tag:'밀어내기'}
+  skin:{name:'피부',cost:30,hp:240,block:1,desc:'병원체가 지나가지 못하게 막는 벽이다. 계속 공격받으면 뚫린다.',bio:'비특이적 방어 · 1차 방어. 피부의 각질층은 병원체의 침입을 막는 물리적 장벽이다.',tag:'물리적 장벽'},
+  mucus:{name:'점막',cost:20,desc:'이 칸을 지나는 병원체를 50% 느리게 한다.',bio:'비특이적 방어 · 1차 방어. 호흡기와 소화관 안쪽의 점막은 점액으로 병원체를 붙잡는다.',tag:'점액'},
+  lyso:{name:'분비물',cost:25,desc:'이 칸에 있는 세균에게 계속 피해를 준다. 바이러스에는 효과가 없다.',bio:'비특이적 방어 · 1차 방어. 눈물·침 속 라이소자임이 세균의 세포벽을 분해한다.',tag:'라이소자임'},
+  cilia:{name:'섬모',cost:30,desc:'3초마다 병원체를 오른쪽으로 밀어낸다.',bio:'비특이적 방어 · 1차 방어. 기관의 섬모 운동이 점액에 붙은 이물질을 몸 밖으로 내보낸다.',tag:'섬모 운동'}
 };
 const ENEMIES={
   bact:{name:'세균',hp:40,speed:.36,dps:8,r:22},
@@ -432,10 +439,10 @@ const NOTES={
   divide:['세균 분열','세균은 이분법으로 한 마리가 두 마리가 된다. 빨리 잡지 않으면 기하급수적으로 늘어난다.'],
   mhcHide:['MHC 숨김','E형에 감염된 세포는 MHC를 숨겨 세포독성 T림프구가 알아보지 못한다. NK세포가 나서야 한다.'],
   alarm:['염증 반응','비만세포가 세균을 발견하고 히스타민을 뿜었다. 혈관이 넓어지고 틈이 생겨 혈장이 새어 나오고(부종), 호중구가 혈관을 빠져나와 몰려온다. 혈장 속 보체 단백질은 세균에 구멍을 낸다.'],
-  mystery:['정체불명의 병원체','처음 보는 병원체는 정체를 알 수 없어 까맣게 보인다. 식세포는 상관없이 먹지만, B·T림프구는 정체가 드러나야 노릴 수 있다.'],
-  reveal:['항원 정체 공개','대식세포가 병원체나 파괴된 감염세포의 잔해(회색 부스러기)를 먹고 그 조각을 표면에 올렸다(항원 제시). 같은 유형이 모두 정체를 드러냈다.'],
+  mystery:['정체불명의 병원체','처음 보는 병원체는 정체를 알 수 없어 까맣게 보인다. 식세포는 상관없이 삼키지만, B·T림프구는 정체가 드러나야 노릴 수 있다.'],
+  reveal:['항원 정체 공개','대식세포가 병원체나 파괴된 감염세포의 잔해(회색 부스러기)를 삼키고 그 조각을 표면에 올렸다(항원 제시). 같은 유형이 모두 정체를 드러냈다.'],
   clone:['클론 선택','몸속엔 저마다 다른 항원에 맞는 B·T림프구가 수없이 있다. 드러난 항원에 딱 맞는 클론이 골라져 출동했다.'],
-  plasma:['형질세포로 분화','보조 T림프구의 신호(사이토카인)를 받은 B림프구가 분열하며 형질세포를 만들기 시작했다. 형질세포가 뿌린 항체가 붙은 병원체는 느려지고, 독소가 중화되며, 식세포에게 2배로 잘 먹힌다(옵소닌화).'],
+  plasma:['형질세포로 분화','보조 T림프구의 신호(사이토카인)를 받은 B림프구가 분열하며 형질세포를 만들기 시작했다. 형질세포가 뿌린 항체가 붙은 병원체는 느려지고, 독소가 중화되며, 식세포가 2배로 쉽게 삼킨다(옵소닌화).'],
   tcAct:['세포독성 T 활성화','보조 T 신호를 받았다. 감염세포 표면에 올라온 항원을 확인하고 퍼포린을 주입해 세포째 파괴한다.'],
   waiting:['보조 T림프구가 필요하다','B림프구와 세포독성 T림프구는 보조 T림프구의 신호 없이는 활성화되지 않는다. 지휘관을 먼저 보내자.'],
   meal:['식사 시간','소장에서 흡수된 포도당이 혈액으로 들어온다. 포도당 +60, 10초간 생산 2배.'],
@@ -449,7 +456,7 @@ const NOTES={
   mutant:['변이 바이러스 출현','항원이 바뀐 새 유형이다. 기억세포가 알아보지 못하니 다시 정체를 밝혀야 한다.']
 };
 const STAGES=[
-  {name:'피부 상처',goal:'병원체는 처음엔 정체를 알 수 없다. 1차 방어선이 시간을 버는 동안 식세포로 세균을 먹고, 대식세포의 항원 제시로 정체를 밝힌다.',
+  {name:'피부 상처',goal:'병원체는 처음엔 정체를 알 수 없다. 1차 방어선이 시간을 버는 동안 식세포로 세균을 삼키고, 대식세포의 항원 제시로 정체를 밝힌다.',
    units:['macro','mast','helper','bcell','tc'],barriers:['skin','mucus','lyso'],start:160,anti:false,strains:['A','B'],
    tint:['#ffe6ec','#ffdbe4'],spawns:[[4,45,4.6,'bact','A'],[28,88,4.4,'bact','B'],[50,88,3.6,'bact','A']],events:[[38,'fever'],[60,'meal']]},
   {name:'림프절',goal:'정체가 드러난 항원에 맞는 B림프구가 보조 T 신호를 받아 형질세포가 되고, 항체로 독소 세균을 중화한다(체액성 면역).',
@@ -863,8 +870,8 @@ function unitName(u){if(u.k==='memory')return `기억세포 ${u.s}형`;return UN
 const revealedList=(inside)=>Object.keys(S.revealed).filter(s=>S.revealed[s]&&!STRAINS[s].harmless&&(!inside||STRAINS[s].virus||STRAINS[s].intracell));
 function blockReason(k){
   const def=UNITS[k];
-  if((k==='helper'||k==='bcell')&&!revealedList().length)return '아직 정체가 드러난 항원이 없다. 대식세포가 먼저 병원체를 먹어야 한다';
-  if(k==='tc'&&!revealedList(true).length)return '세포 안에 숨는 병원체(바이러스나 B형 세균)의 정체가 아직 드러나지 않았다. 대식세포가 먼저 먹어야 한다';
+  if((k==='helper'||k==='bcell')&&!revealedList().length)return '아직 정체가 드러난 항원이 없다. 대식세포가 먼저 병원체를 삼켜야 한다';
+  if(k==='tc'&&!revealedList(true).length)return '세포 안에 숨는 병원체(바이러스나 B형 세균)의 정체가 아직 드러나지 않았다. 대식세포가 먼저 삼켜야 한다';
   if(S.phase!=='setup'&&S.phase!=='wave')return '지금은 출동할 수 없다';
   if(S.glu<def.cost)return `포도당이 모자란다 (${def.cost} 필요)`;
   return '';
@@ -916,7 +923,7 @@ function spawnEntry(sp){
 }
 function hasHelper(){return S.units.some(u=>u.k==='helper');}
 function rateMul(u){const t=S.temp||36.8;return t>=40?.75:t>=37.8?1.45:1;}
-function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;discover(s);SND.play('reveal');if(!S.tut)toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait} 도감에 기록됐다.`]);buildTray();}
+function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;discover(s);SND.play('reveal');if(!S.tut)toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 분해한 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait} 도감에 기록됐다.`]);buildTray();}
 function hurt(e,dmg,by){
   if(e.dead)return;
   e.hp-=dmg;
@@ -1301,7 +1308,9 @@ function buildTray(){
   const br=$('barrierRow'),uh=$('unitHand'),mh=$('memHand'),ar=$('autoRow');
   br.innerHTML='';uh.innerHTML='';mh.innerHTML='';ar.innerHTML='';
   st.barriers.forEach(k=>br.appendChild(cardEl('barrier',k)));
-  st.units.forEach(k=>uh.appendChild(cardEl('unit',k)));
+  UNIT_GROUPS.forEach(([lbl,ks])=>{const my=ks.filter(k=>st.units.includes(k));if(!my.length)return;
+    const g=document.createElement('div');g.className='grp';g.innerHTML=`<div class="glbl">${lbl}</div>`;const row=document.createElement('div');row.className='grow';
+    my.forEach(k=>row.appendChild(cardEl('unit',k)));g.appendChild(row);uh.appendChild(g);});
   const showMem=!S.tut||st.mem;
   if(showMem)[...new Set([...Object.keys(S.memory).filter(s=>S.memory[s]),...st.strains])].filter(s=>!STRAINS[s].harmless).forEach(s=>mh.appendChild(cardEl('memory',s)));
   mh.hidden=!showMem;$('memLbl').hidden=!showMem;
@@ -1309,6 +1318,7 @@ function buildTray(){
   $('tab-barrier').hidden=!st.barriers.length;$('tab-unit').hidden=!st.units.length;$('tab-auto').hidden=!!(S.tut&&!st.auto);
   refreshTray();
 }
+const UNIT_GROUPS=[['비특이적 방어',['macro','mast','nk']],['지휘관',['helper']],['특이적 방어 · 지휘관 필요',['bcell','tc']]];
 const AUTO=[
   {k:'neut',name:'호중구(백혈구)',how:'비만세포가 부를 때',count:()=>S.units.filter(u=>u.k==='neut').length},
   {k:'serum',name:'혈장',how:'비만세포가 부를 때',count:()=>S.plasmaPools.length},
@@ -1362,7 +1372,7 @@ function refreshTray(){
       name=open||rev?`기억세포 ${k}형`:'기억세포 ???';off=lock||S.glu<cost||(S.phase!=='setup'&&S.phase!=='wave');
       if(lock){sub=rev?`잠김 · ${n}/10`:'잠김 · 정체 불명';prog=`<div class="prog"><i style="width:${rev?n*10:0}%"></i></div>`;}else sub=UNITS.memory.tag;}
     else{cost=UNITS[k].cost;name=UNITS[k].name;const why=blockReason(k);lock=((k==='helper'||k==='bcell')&&!revealedList().length)||(k==='tc'&&!revealedList(true).length);off=!!why;
-      sub=lock?(k==='tc'?'잠김 · 세포 안 병원체':'잠김 · 항원 필요'):UNITS[k].tag;}
+      sub=lock?(k==='tc'?'잠김 · 세포 안 병원체 정체 필요':'잠김 · 항원 정체 필요'):((k==='bcell'||k==='tc')&&!hasHelper()?'<span class="need">지휘관 필요</span>':UNITS[k].tag);}
     b.dataset.off=off?'1':'0';b.setAttribute('aria-disabled',String(off));
     b.classList.toggle('locked',lock);b.classList.toggle('poor',!lock&&S.glu<cost);b.classList.toggle('off',off&&!lock);
     b._cost.hidden=lock;
@@ -1407,7 +1417,7 @@ function st(){return S.cfg;}
 function showIntro(){
   const st=S.cfg;
   const tips=[
-    ['세균은 위·아래 벽의 상처로 들어와 혈관(왼쪽)으로 향한다. 붉게 깜박이며 "침입!"이 뜨는 상처를 지킨다.','준비 단계에 1차 방어선을 깔고 시작 버튼을 누른다.','처음 보는 병원체는 까맣다. 대식세포가 먹어 정체를 밝혀야 림프구 카드가 열린다.','중간에 피버 타임이 온다. 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다.'],
+    ['세균은 위·아래 벽의 상처로 들어와 혈관(왼쪽)으로 향한다. 붉게 깜박이며 "침입!"이 뜨는 상처를 지킨다.','준비 단계에 1차 방어선을 깔고 시작 버튼을 누른다.','처음 보는 병원체는 까맣다. 대식세포가 삼켜 정체를 밝혀야 림프구 카드가 열린다.','중간에 피버 타임이 온다. 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다.'],
     ['독소 세균은 가까이 간 면역세포를 다치게 한다. B림프구가 만든 항체로 멀리서 중화한다.','B림프구와 세포독성 T림프구는 보조 T림프구가 판에 있어야 움직인다.','오른쪽 림프관으로 꽃가루도 들어온다. 해롭지 않지만 몸이 꽃가루를 적으로 기억하면 알레르기가 생긴다.','같은 유형을 10번 물리치면 그 유형의 기억세포가 열린다.'],
     ['바이러스는 오른쪽 기도로 들어와 몇 초 뒤 세포 속에 숨는다. 감염세포는 세포독성 T림프구나 NK세포로 없앤다.','E형 바이러스는 세포독성 T림프구를 피한다. NK세포를 쓴다.','마지막에 새 항원을 가진 변이 바이러스가 온다. 기억세포가 통하지 않는다.']
   ][S.stage];
@@ -1420,7 +1430,7 @@ function showClear(){
   SND.play('clear');
   const last=S.stage===STAGES.length-1;
   overlay(`<div class="card"><div class="eyebrow">방어 성공</div><h2>${last?'모든 감염을 막아냈다':st().name+' 방어 완료'}</h2>
-  <p>${last?'정체불명의 병원체를 식세포가 먹고, 항원 제시로 정체를 밝히고, 항체와 세포독성 T림프구로 처리하고, 기억세포까지 남겼다. 실제 몸의 면역도 이 순서로 이어진다.':'남은 체력 '+S.hp+'. 다음 부위로 이동한다. 드러난 항원과 기억세포는 그대로 남는다.'}</p>
+  <p>${last?'정체불명의 병원체를 식세포가 삼키고, 항원 제시로 정체를 밝히고, 항체와 세포독성 T림프구로 처리하고, 기억세포까지 남겼다. 실제 몸의 면역도 이 순서로 이어진다.':'남은 체력 '+S.hp+'. 다음 부위로 이동한다. 드러난 항원과 기억세포는 그대로 남는다.'}</p>
   <button class="btn" id="nextBtn">${last?'모드 선택으로':'다음 스테이지'}</button></div>`);
   $('nextBtn').onclick=()=>{if(last){hideOverlay();openModes();return;}S=newState(S.stage+1,S);lastHp=null;buildTray();setTab('barrier');showIntro();};
   refreshTray();
@@ -1435,8 +1445,8 @@ function showOver(){
 }
 const BOOK_AG=[
   {row:'세균',sub:'핵막이 없는 원핵생물이다. 스스로 분열해 증식하고 항생제가 듣는다',items:[
-    {k:'bact',s:'A',tags:['편모 회피','이분법'],where:'1·2·3스테이지',weak:'항체가 붙으면 편모가 묶여 못 피한다. 형질세포로 묶고 식세포로 먹는다.'},
-    {k:'bact',s:'B',tags:['협막','세포 내 기생','이분법'],where:'1·2스테이지',weak:'항체를 붙여(옵소닌화) 식세포가 먹게 한다. 감염된 대식세포는 보조 T림프구로 활성화한다.'},
+    {k:'bact',s:'A',tags:['편모 회피','이분법'],where:'1·2·3스테이지',weak:'항체가 붙으면 편모가 묶여 못 피한다. 형질세포로 묶고 식세포가 삼키게 한다.'},
+    {k:'bact',s:'B',tags:['협막','세포 내 기생','이분법'],where:'1·2스테이지',weak:'항체를 붙여(옵소닌화) 식세포가 삼키게 한다. 감염된 대식세포는 보조 T림프구로 활성화한다.'},
     {k:'toxin',s:'C',tags:['독소'],where:'2스테이지',weak:'형질세포의 항체가 독소를 중화한다.'}]},
   {row:'바이러스',sub:'세포 구조가 없어 숙주 세포 안에서만 증식한다. 항생제가 듣지 않는다',items:[
     {k:'virus',s:'D',tags:['빠른 전파'],where:'3스테이지',weak:'숨기 전엔 항체, 숨은 뒤엔 세포독성 T림프구와 NK세포.'},
@@ -1453,13 +1463,13 @@ const BIO={
   lyso:['비특이적 방어 · 화학적 방어','눈물·침·콧물 속 라이소자임이 세균의 세포벽을 분해한다. 세포벽이 없는 바이러스에는 효과가 없다.'],
   cilia:['비특이적 방어 · 물리적 장벽','기관 안쪽의 섬모가 움직이며 점액에 붙잡힌 이물질을 몸 밖으로 밀어낸다.'],
   macro:['비특이적 방어 · 식세포 작용 → 항원 제시','병원체를 삼켜 분해하는 식세포다. 분해한 병원체 조각(항원)을 세포 표면에 제시해 보조 T림프구를 활성화하므로, 비특이적 방어와 특이적 방어를 잇는 역할을 한다.'],
-  neut:['비특이적 방어 · 식세포 작용','백혈구 중 수가 가장 많고 감염 부위에 가장 먼저 모인다. 병원체를 먹고 죽은 호중구가 쌓인 것이 고름이다.'],
+  neut:['비특이적 방어 · 식세포 작용','백혈구 중 수가 가장 많고 감염 부위에 가장 먼저 모인다. 병원체를 삼키고 죽은 호중구가 쌓인 것이 고름이다.'],
   mast:['비특이적 방어 · 염증 반응','손상이나 감염이 생기면 히스타민을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 백혈구가 감염 부위로 쉽게 모이게 한다.'],
   serum:['비특이적 방어 · 염증 반응','혈액의 액체 성분이다. 염증 반응 때 혈관 밖으로 빠져나와 부위가 붓고(부종), 함께 나온 단백질이 병원체 제거를 돕는다.'],
   nk:['비특이적 방어 · 심화 내용','자연 살해 세포라고도 한다. 항원을 미리 몰라도 바이러스에 감염된 세포나 암세포를 알아보고 파괴한다. 생명과학Ⅰ 범위를 넘는 심화 내용이다.'],
   helper:['특이적 방어 · 체액성·세포성 면역의 시작','가슴샘(흉선)에서 성숙하는 T림프구의 한 종류다. 대식세포가 제시한 항원을 인식해 활성화되고, B림프구와 세포독성 T림프구가 활성화되도록 돕는다.'],
   bcell:['특이적 방어 · 체액성 면역','골수에서 만들어지고 성숙한다. 자신에게 맞는 항원을 인식하고 보조 T림프구의 도움을 받으면 형질세포와 기억세포로 분화한다.'],
-  plasma:['특이적 방어 · 체액성 면역','B림프구가 분화한 세포로 항체를 만들어 분비한다. 항체는 특정 항원에만 결합하며(항원-항체 반응의 특이성), 병원체를 무력화하거나 식세포가 잘 먹도록 돕는다.'],
+  plasma:['특이적 방어 · 체액성 면역','B림프구가 분화한 세포로 항체를 만들어 분비한다. 항체는 특정 항원에만 결합하며(항원-항체 반응의 특이성), 병원체를 무력화하거나 식세포가 잘 삼키도록 돕는다.'],
   tc:['특이적 방어 · 세포성 면역','가슴샘(흉선)에서 성숙한다. 병원체에 감염된 세포를 직접 찾아가 파괴한다. 항체가 닿지 못하는 세포 안의 병원체를 처리하는 방법이다.'],
   memory:['특이적 방어 · 2차 면역 반응','1차 면역 반응 때 B림프구가 분화해 만들어지고 오래 살아남는다. 같은 항원이 다시 들어오면 빠르게 형질세포로 분화해 2차 면역 반응을 일으킨다.']
 };
@@ -1526,14 +1536,14 @@ function fillBook(){
   if(bookPage==='ag'){
     const all=BOOK_AG.flatMap(g=>g.items),known=it=>it.k==='infected'?(DISC.infected||S.seen.infected):(DISC[it.s]||S.revealed[it.s]);
     const n=all.filter(known).length,head=document.createElement('div');head.className='bookprog';
-    head.innerHTML=`<b>발견한 항원 ${n} / ${all.length}</b><span class="bar"><i style="width:${n/all.length*100}%"></i></span><span>처음 보는 병원체는 대식세포가 먹어 정체를 밝혀야 도감에 기록된다.</span>`;P.appendChild(head);
+    head.innerHTML=`<b>발견한 항원 ${n} / ${all.length}</b><span class="bar"><i style="width:${n/all.length*100}%"></i></span><span>처음 보는 병원체는 대식세포가 삼켜 정체를 밝혀야 도감에 기록된다.</span>`;P.appendChild(head);
     for(const grp of BOOK_AG){const [r,cards]=bookRow(grp.row,grp.sub);
       for(const it of grp.items){const st=STRAINS[it.s],ok=known(it);
         const e=document.createElement('div');e.className='entry'+(ok?'':' unknown');e.appendChild(makeEnemyIcon(it.k,it.s,!ok));
         const t=document.createElement('div');t.style.minWidth='0';
         t.innerHTML=ok?`<b>${it.name||st.name}</b><div class="tags">${it.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
           <p>${it.trait||st.trait}</p><dl><dt>면역 반응</dt><dd>${AG_IMMUNE[it.k==='infected'?'infected':it.s]}</dd><dt>약점</dt><dd>${it.weak}</dd><dt>등장</dt><dd>${it.where}</dd></dl>`
-          :`<b>???</b><div class="tags"><span class="tag">미확인</span></div><p>${it.k==='infected'?'아직 본 적 없다. 무언가가 우리 몸 세포 안으로 숨어들면 나타난다.':'아직 정체를 모르는 존재다. 대식세포가 먹고 항원을 제시하면 기록된다.'}</p><dl><dt>단서</dt><dd>${it.where}에서 만날 수 있다</dd></dl>`;
+          :`<b>???</b><div class="tags"><span class="tag">미확인</span></div><p>${it.k==='infected'?'아직 본 적 없다. 무언가가 우리 몸 세포 안으로 숨어들면 나타난다.':'아직 정체를 모르는 존재다. 대식세포가 삼키고 항원을 제시하면 기록된다.'}</p><dl><dt>단서</dt><dd>${it.where}에서 만날 수 있다</dd></dl>`;
         e.appendChild(t);cards.appendChild(e);}
       P.appendChild(r);}
   } else if(bookPage==='concept'){
@@ -1611,40 +1621,41 @@ const TUTS=[
  {short:'대식세포',name:'튜토리얼 2 · 대식세포와 항원 제시',sub:'식세포 작용 · 항원 제시',
   cfg:{look:0,barriers:[],units:['macro'],strains:['A'],start:160,wounds:[{side:0,c:7}],noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,tab:'unit',point:{card:'unit:macro'},t:'이제 면역세포가 직접 싸웁니다. <b>대식세포</b>는 백혈구의 한 종류로, 병원체를 삼켜 분해합니다. 이것을 <b>식세포 작용</b>이라고 합니다. 대식세포는 병원체의 종류를 가리지 않고 먹으므로 비특이적 방어에 속합니다.'},
+   {next:1,tab:'unit',point:{card:'unit:macro'},t:'이제 면역세포가 직접 싸웁니다. <b>대식세포</b>는 백혈구의 한 종류로, 병원체를 삼켜 분해합니다. 이것을 <b>식세포 작용</b>이라고 합니다. 대식세포는 병원체의 종류를 가리지 않고 삼키므로 비특이적 방어에 속합니다.'},
    {next:1,point:{wound:0},t:'이번 상처는 위쪽 벽에 있습니다. 세균은 맨 위 줄을 따라 혈관 쪽으로 이동합니다.'},
    {next:1,point:{rows:ALL_ROWS},t:'면역세포는 혈관에서 나와 조직으로 들어갑니다. 카드를 고른 뒤 줄을 누르면 그 줄의 혈관에서 세포가 나옵니다. 출동한 세포는 <b>고른 줄과 그 위아래 한 줄</b> 안에서만 돌아다니므로, 병원체가 지나갈 줄을 골라야 합니다.'},
    {tab:'unit',point:{card:'unit:macro'},wait:tSel('unit','macro'),t:'대식세포 카드를 누르세요.'},
    {rows:[0],point:{rows:[0]},wait:()=>tHas('macro'),t:'세균이 지나갈 맨 위 줄을 누르세요. 대식세포는 이 줄과 바로 아래 줄을 돌아다닙니다.'},
    {enter:()=>{tWave();tSched([[1,'bact','A'],[4,'bact','A'],[7,'bact','A'],[10,'bact','A']]);},rows:[0,1],point:{wound:0},wait:()=>!!S.revealed.A,
     tick:()=>{if(tClear()&&!S.revealed.A)tSched([[1,'bact','A'],[4,'bact','A']]);},
-    t:'들어오는 세균이 까맣게 보입니다. 우리 몸이 아직 이 병원체가 무엇인지 모르기 때문입니다. 대식세포는 멀리 있는 병원체는 알아채지 못하고, 돌아다니다 바로 옆에 오면 먹습니다.'},
+    t:'들어오는 세균이 까맣게 보입니다. 우리 몸이 아직 이 병원체가 무엇인지 모르기 때문입니다. 대식세포는 멀리 있는 병원체는 알아채지 못하고, 돌아다니다 바로 옆에 오면 삼킵니다.'},
    {next:1,point:{enemy:'any'},t:'대식세포가 세균을 삼킨 뒤, 분해한 조각을 세포 표면에 올려 내보였습니다. 이것을 <b>항원 제시</b>라고 합니다. 이제 이 유형의 세균은 모두 정체가 드러나 색이 보이고, 머리 위에 A 표식이 붙습니다.'},
    {next:1,t:'<b>항원</b>은 몸에 면역 반응을 일으키는 물질로, 병원체마다 모양이 다릅니다. 항원이 드러나야 특정 항원만 골라 공격하는 <b>특이적 방어</b>(B림프구, T림프구)가 시작됩니다. 대식세포는 비특이적 방어를 하면서, 특이적 방어를 시작하게 하는 다리 역할도 합니다.'},
-   {rows:ALL_ROWS,wait:()=>tClear(),tick:()=>{},t:'남은 세균을 대식세포가 처리하는 모습을 지켜보세요. 포도당이 넉넉하면 대식세포를 한 마리 더 보내도 됩니다.'}
+   {rows:ALL_ROWS,wait:()=>tClear(),tick:()=>{},t:'남은 세균을 대식세포가 처리하는 모습을 지켜보세요. 포도당이 넉넉하면 대식세포를 하나 더 보내도 됩니다.'}
   ],
-  sum:'대식세포는 가까이 온 병원체를 먹습니다(식세포 작용, 비특이적 방어). 처음 보는 병원체를 먹으면 항원 제시로 정체를 밝힙니다. 본게임에서는 정체가 드러나야 림프구 카드가 열립니다.'},
+  sum:'대식세포는 가까이 온 병원체를 삼켜 분해합니다(식세포 작용, 비특이적 방어). 처음 보는 병원체를 분해하면 항원 제시로 정체를 밝힙니다. 본게임에서는 정체가 드러나야 림프구 카드가 열립니다.'},
 
  {short:'비만세포',name:'튜토리얼 3 · 비만세포와 염증 반응',sub:'히스타민 · 호중구 · 혈장',
   cfg:{look:0,auto:1,barriers:[],units:['macro','mast'],strains:['A'],start:220,wounds:[{side:1,c:6},{side:1,c:8}],revealed:{A:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
    {next:1,point:{wounds:1},t:'이번에는 아래쪽 상처 두 곳으로 세균이 한꺼번에 몰려옵니다. 대식세포는 느려서 혼자서는 다 막지 못합니다.'},
-   {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 조직에 머물러 있다가 세균을 발견하면 <b>히스타민</b>을 분비합니다. 히스타민은 모세 혈관을 넓히고 혈관 벽의 틈을 벌려, 혈관 속의 백혈구와 혈장이 감염 부위로 빠져나오게 합니다. 이것을 <b>염증 반응</b>이라고 합니다. 다친 곳이 붉어지고, 붓고, 열이 나는 까닭입니다.'},
+   {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 조직에 머물러 있다가 세균을 발견하면 <b>히스타민</b>을 분비합니다. 히스타민은 모세 혈관을 넓히고 혈관 벽의 틈을 벌려, 혈관 속의 백혈구와 혈장이 감염 부위로 빠져나오게 합니다. 이것을 <b>염증 반응</b>이라고 합니다. 다친 곳이 붉어지고, 붓고, 열이 나는 까닭입니다. 비만세포는 세균을 직접 공격하지 않습니다.'},
    {tab:'unit',point:{card:'unit:mast'},wait:tSel('unit','mast'),t:'비만세포 카드를 누르세요.'},
    {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('mast'),t:'세균이 지나갈 아래쪽 두 줄 중 하나를 누르세요.'},
    {enter:()=>{tWave();tSched([0,1,2,3,4,5,6].map(i=>[1+i*1.3,'bact','A',{w:i%2}]));},rows:[3,4],point:{unit:'mast'},wait:()=>!!S.flags.alarm,
     tick:()=>{if(tClear()&&!S.flags.alarm)tSched([[1,'bact','A',{w:0}],[2,'bact','A',{w:1}]]);},
     t:'세균이 몰려옵니다. 비만세포 가까이로 세균이 오면 어떤 일이 일어나는지 지켜보세요.'},
    {next:1,point:{unit:'mast'},t:'비만세포가 "세균이다!" 하고 히스타민(보라색 알갱이)을 뿜었습니다. 넓어진 혈관에서 <b>호중구</b>가 달려 나오고, 노란 <b>혈장</b> 웅덩이가 생겼습니다. 혈장 속의 <b>보체</b> 단백질은 세균에 구멍을 내고, 웅덩이 안의 병원체는 느려집니다.'},
-   {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 카드로 직접 부를 수 없습니다. 비만세포가 신호를 보낼 때만 나옵니다. <b>자동 출동</b> 탭에서 지금 판에 얼마나 나와 있는지 볼 수 있습니다. 호중구는 비만세포가 알린 세균만 먹고, 일이 끝나면 사라집니다.'},
+   {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 카드로 직접 부를 수 없습니다. 비만세포가 신호를 보낼 때만 나옵니다. <b>자동 출동</b> 탭에서 지금 판에 얼마나 나와 있는지 볼 수 있습니다. 호중구는 비만세포가 알린 세균만 처리하고, 일이 끝나면 사라집니다.'},
+   {next:1,point:{unit:'neut'},t:'여기서 두 방어를 구분해야 합니다. <b>염증 반응</b>은 혈관을 넓혀 백혈구와 혈장을 감염 부위로 <b>불러 모으는</b> 반응입니다. 모여든 호중구가 세균을 삼켜 분해하는 것은 앞에서 대식세포로 본 <b>식세포 작용</b>입니다. 비만세포는 부르기만 하고, 세균을 처리하는 것은 식세포입니다.'},
    {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요. 대식세포를 함께 보내면 더 빨리 끝납니다.'}
   ],
-  sum:'비만세포는 직접 싸우지 않고, 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 부릅니다. 모두 병원체의 종류를 가리지 않는 비특이적 방어입니다.'},
+  sum:'비만세포는 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 감염 부위로 불러 모읍니다. 모여든 호중구가 세균을 삼키는 것은 식세포 작용입니다. 염증 반응과 식세포 작용은 서로 다른 방어이지만, 둘 다 병원체의 종류를 가리지 않는 비특이적 방어입니다.'},
 
  {short:'B림프구',name:'튜토리얼 4 · 보조 T림프구와 B림프구',sub:'형질세포 · 항체 · 체액성 면역',
   cfg:{look:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['C'],start:300,wounds:[{side:0,c:7}],revealed:{C:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
-   {next:1,point:{wound:0},t:'이번 적은 <b>독소를 뿜는 세균</b>입니다. 독소는 가까이 온 면역세포를 다치게 해서, 식세포가 다가가 먹기 어렵습니다. 이럴 때는 멀리서 <b>항체</b>로 공격합니다. 이 세균의 정체는 이미 드러나 있다고 하겠습니다.'},
+   {next:1,point:{wound:0},t:'이번 적은 <b>독소를 뿜는 세균</b>입니다. 독소는 가까이 온 면역세포를 다치게 해서, 식세포가 다가가 삼키기 어렵습니다. 이럴 때는 멀리서 <b>항체</b>로 공격합니다. 이 세균의 정체는 이미 드러나 있다고 하겠습니다.'},
    {next:1,tab:'unit',point:{card:'unit:bcell'},t:'<b>B림프구</b>는 항원 한 종류에만 반응하는 림프구입니다. 몸속에는 저마다 다른 항원에 맞는 B림프구가 아주 많고, 드러난 항원에 꼭 맞는 B림프구가 골라져 출동합니다. 세포 머리 위의 표식이 이 B림프구가 맡은 항원입니다.'},
    {tab:'unit',point:{card:'unit:bcell'},wait:tSel('unit','bcell'),t:'B림프구 카드를 누르세요.'},
    {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('bcell'),t:'세균이 지나갈 위쪽 줄 근처를 누르세요.'},
@@ -1655,9 +1666,9 @@ const TUTS=[
    {next:1,point:{unit:'plasma'},t:'B림프구가 분열하면서 <b>형질세포</b>를 만들었습니다. 형질세포는 항체를 만들어 내보내는 세포입니다. 활성화된 B림프구 중 일부는 나중을 위해 <b>기억세포</b>로도 남습니다.'},
    {enter:()=>{tSched([0,1,2,3,4].map(i=>[.5+i*2.4,'toxin','C']));},point:{wound:0},wait:()=>S.enemies.some(e=>e.opT>0),
     t:'독소 세균이 들어옵니다. 형질세포가 무엇을 하는지 지켜보세요.'},
-   {next:1,point:{enemy:'op'},t:'형질세포가 뿌린 <b>항체</b>(Y자 모양)가 세균에 붙었습니다. 항체는 꼭 맞는 항원에만 결합합니다. 이것을 <b>항원 항체 반응의 특이성</b>이라고 합니다. 항체가 붙으면 독소가 중화되고, 세균이 느려지며, 식세포에게 두 배로 잘 먹힙니다.'},
+   {next:1,point:{enemy:'op'},t:'형질세포가 뿌린 <b>항체</b>(Y자 모양)가 세균에 붙었습니다. 항체는 꼭 맞는 항원에만 결합합니다. 이것을 <b>항원 항체 반응의 특이성</b>이라고 합니다. 항체가 붙으면 독소가 중화되고, 세균이 느려지며, 식세포가 두 배로 쉽게 삼킵니다.'},
    {next:1,t:'이처럼 형질세포가 만든 항체로 항원을 없애는 방어를 <b>체액성 면역</b>이라고 합니다. 항체가 혈액 같은 체액에 녹아 몸을 돌아다니기 때문에 붙은 이름입니다.'},
-   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 독소 세균을 처리하세요. 항체가 붙은 세균은 대식세포가 쉽게 먹습니다.'}
+   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 독소 세균을 처리하세요. 항체가 붙은 세균은 대식세포가 쉽게 삼킵니다.'}
   ],
   sum:'보조 T림프구는 사이토카인으로 B림프구와 세포독성 T림프구를 활성화합니다. 활성화된 B림프구는 형질세포로 분화하고, 형질세포가 만든 항체가 항원과 결합합니다(체액성 면역). 본게임에서는 보조 T림프구가 판에 없으면 B·T림프구가 "신호 대기"만 합니다.'},
 
@@ -1736,11 +1747,11 @@ function tutFinish(){
   SND.play('clear');
   const nx=i<TUTS.length-1;
   overlay(`<div class="card"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>
-   <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 시작하기</button>`}<button class="btn ghost" id="tList">모드 선택</button></div></div>`);
+   <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 난이도 고르기</button>`}<button class="btn ghost" id="tList">튜토리얼 건너뛰기</button></div></div>`);
   if(nx)$('tNext').onclick=()=>startTut(i+1);else $('tMain').onclick=()=>{hideOverlay();openModes();};
-  $('tList').onclick=()=>{hideOverlay();openModes();};
+  $('tList').onclick=()=>{TUTS.forEach((T,i)=>TUTDONE[i]=1);hideOverlay();openModes();};
 }
-function exitTut(){if(!S.tut)return;$('coach').hidden=true;clearTutPt();$('game').classList.remove('tutmode');gameStarted=false;openModes();}
+function exitTut(){if(!S.tut)return;TUTS.forEach((T,i)=>TUTDONE[i]=1);$('coach').hidden=true;clearTutPt();$('game').classList.remove('tutmode');gameStarted=false;openModes();}
 function resumeGame(){showPanel(null);if(S.tut){$('game').classList.add('tutmode');if(tutStep())$('coach').hidden=false;}}
 let tutPtEl=null;
 function clearTutPt(){if(tutPtEl)tutPtEl.classList.remove('tutpt');tutPtEl=null;$('tutArrow').hidden=true;}
@@ -1810,17 +1821,20 @@ const LESSONS=[
  {t:'우리 몸의 방어 체계',fig:[['b','skin','피부·점막'],['u','macro','식세포'],['u','helper','보조 T림프구'],['u','plasma','형질세포·항체'],['u','tc','세포독성 T림프구']],
   p:'병원체가 몸에 들어오면 우리 몸은 두 겹으로 방어한다. <b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나며, 피부·점막 같은 장벽과 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식한 림프구가 담당하며, 처음에는 시간이 걸리지만 정확하다.',
   k:['비특이적 방어','특이적 방어','항원','림프구'],g:'1차 방어선과 대식세포·비만세포로 버티는 동안 대식세포가 병원체의 정체를 밝히면, 보조 T·B·세포독성 T림프구 카드가 열린다.'},
- {t:'1차 방어 · 피부와 점막',fig:[['b','skin','피부'],['b','mucus','점막'],['b','lyso','라이소자임'],['b','cilia','섬모']],
+ {t:'1차 방어 · 피부와 점막',sep:'·',fig:[['b','skin','피부'],['b','mucus','점막'],['b','lyso','라이소자임'],['b','cilia','섬모']],
   p:'피부의 <b>각질층</b>은 병원체의 침입을 막는 물리적 장벽이다. 호흡기와 소화관 안쪽의 <b>점막</b>은 점액으로 병원체를 붙잡고, 기관의 <b>섬모</b>는 점액에 붙은 이물질을 몸 밖으로 밀어낸다. 눈물·침 속의 <b>라이소자임</b>은 세균의 세포벽을 분해한다.',
   k:['물리적 장벽','화학적 방어','라이소자임'],g:'준비 단계에서만 깔 수 있다. 감염 전부터 이미 있는 방어이기 때문이다. 상처는 이 장벽이 뚫린 상태다.'},
- {t:'염증 반응과 식세포 작용',fig:[['u','mast','비만세포'],['u','serum','혈장 유출'],['u','neut','호중구'],['u','macro','대식세포']],
-  p:'피부가 뚫려 병원체가 들어오면 <b>비만세포</b>가 <b>히스타민</b>을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 혈장이 빠져나오고 백혈구가 감염 부위로 모이게 한다. 그래서 부위가 붉어지고 열이 나며 붓는다(<b>염증 반응</b>). 모여든 호중구와 대식세포는 병원체를 삼켜 분해한다(<b>식세포 작용</b>).',
-  k:['히스타민','염증 반응','식세포 작용','백혈구'],g:'비만세포가 세균을 보면 소리치며 히스타민을 뿜는다. 그러면 혈장 웅덩이가 생기고 호중구가 혈관에서 달려온다.'},
+ {t:'식세포 작용',sep:'·',fig:[['u','macro','대식세포'],['u','neut','호중구']],
+  p:'백혈구 중 <b>대식세포</b>와 <b>호중구</b>는 병원체를 세포 안으로 삼켜 분해한다. 이것을 <b>식세포 작용</b>이라 한다. 식세포는 병원체의 종류를 가리지 않고 삼키므로 식세포 작용은 <b>비특이적 방어</b>에 속한다. 대식세포는 분해한 병원체의 조각을 세포 표면에 내보여 특이적 방어를 시작하게 하는 역할도 한다.',
+  k:['식세포','대식세포','호중구','비특이적 방어'],g:'대식세포는 멀리 있는 병원체를 알아채지 못하고, 돌아다니다 바로 옆에 와야 삼킨다. 처음 보는 병원체를 분해하면 그 유형의 정체가 드러난다.'},
+ {t:'염증 반응',fig:[['u','mast','비만세포'],['u','serum','히스타민 → 혈관 확장'],['u','neut','백혈구가 모임']],
+  p:'피부가 뚫려 병원체가 들어오면 <b>비만세포</b>가 <b>히스타민</b>을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 혈장이 빠져나오고 백혈구가 감염 부위로 모이게 한다. 그래서 부위가 붉어지고 열이 나며 붓는다. 이것이 <b>염증 반응</b>이다. 염증 반응은 백혈구를 <b>불러 모으는</b> 반응이고, 모여든 백혈구가 병원체를 삼키는 것은 앞 장의 식세포 작용이다.',
+  k:['비만세포','히스타민','염증 반응','혈관 확장'],g:'비만세포는 직접 싸우지 않는다. 세균을 보면 히스타민을 뿜고, 그러면 혈장 웅덩이가 생기고 호중구가 혈관에서 달려온다.'},
  {t:'항원 제시와 보조 T림프구',fig:[['u','macro','대식세포'],['u','helper','보조 T림프구'],['u','bcell','B림프구'],['u','tc','세포독성 T림프구']],
   p:'대식세포는 삼킨 병원체를 분해해 그 조각(<b>항원</b>)을 세포 표면에 내보인다(<b>항원 제시</b>). <b>보조 T림프구</b>는 제시된 항원을 인식해 활성화되고, 같은 항원을 인식하는 B림프구와 세포독성 T림프구가 활성화되도록 돕는다. 림프구는 골수에서 만들어지며, B림프구는 <b>골수</b>에서, T림프구는 <b>가슴샘(흉선)</b>에서 성숙한다.',
-  k:['항원 제시','보조 T림프구','골수','가슴샘'],g:'처음 보는 병원체는 까맣다. 대식세포가 하나를 먹으면 그 유형 전체의 정체가 드러난다. 보조 T림프구가 판에 없으면 B·세포독성 T림프구는 "신호 대기"만 한다.'},
+  k:['항원 제시','보조 T림프구','골수','가슴샘'],g:'처음 보는 병원체는 까맣다. 대식세포가 하나를 삼키면 그 유형 전체의 정체가 드러난다. 보조 T림프구가 판에 없으면 B·세포독성 T림프구는 "신호 대기"만 한다.'},
  {t:'체액성 면역',fig:[['u','bcell','B림프구'],['u','plasma','형질세포'],['e','bact:C','항원-항체 반응'],['u','memory','기억세포']],
-  p:'활성화된 B림프구는 <b>형질세포</b>와 <b>기억세포</b>로 분화한다. 형질세포는 <b>항체</b>를 만들어 분비하고, 항체는 특정 항원과만 결합한다(<b>항원-항체 반응의 특이성</b>). 항체가 결합한 병원체는 무력화되거나 식세포에게 쉽게 먹히며, 독소는 중화된다. 이처럼 항체로 항원을 제거하는 방어를 <b>체액성 면역</b>이라 한다.',
+  p:'활성화된 B림프구는 <b>형질세포</b>와 <b>기억세포</b>로 분화한다. 형질세포는 <b>항체</b>를 만들어 분비하고, 항체는 특정 항원과만 결합한다(<b>항원-항체 반응의 특이성</b>). 항체가 결합한 병원체는 무력화되거나 식세포에게 쉽게 삼켜지며, 독소는 중화된다. 이처럼 항체로 항원을 제거하는 방어를 <b>체액성 면역</b>이라 한다.',
   k:['형질세포','항체','특이성','체액성 면역'],g:'B림프구는 머리 위 표식의 항원 하나만 맡는다. 보조 T림프구의 신호를 받으면 형질세포를 만들고, 형질세포가 항체를 뿌린다.'},
  {t:'세포성 면역',fig:[['u','helper','보조 T림프구'],['u','tc','세포독성 T림프구'],['e','infected:D','감염세포']],
   p:'바이러스처럼 세포 안으로 들어간 병원체에는 항체가 닿지 않는다. 활성화된 <b>세포독성 T림프구</b>는 병원체에 감염된 세포를 찾아 직접 파괴한다. 이렇게 감염된 세포를 없애는 방어를 <b>세포성 면역</b>이라 한다.',
@@ -1855,7 +1869,7 @@ function renderLesson(){
   const L=LESSONS[lessonI],el=$('lesson');el.innerHTML='';
   el.insertAdjacentHTML('beforeend',`<div class="lno">${lessonI+1}장 / ${LESSONS.length}장</div><h2>${L.t}</h2>`);
   const fig=document.createElement('div');fig.className='fig';
-  L.fig.forEach((f,i)=>{if(i){const a=document.createElement('span');a.className='farr';a.textContent='→';fig.appendChild(a);}fig.appendChild(figNode(...f));});
+  L.fig.forEach((f,i)=>{if(i){const a=document.createElement('span');a.className='farr';a.textContent=L.sep||'→';fig.appendChild(a);}fig.appendChild(figNode(...f));});
   el.appendChild(fig);
   if(L.chart)el.insertAdjacentHTML('beforeend',`<div class="fig">${ABCHART}</div>`);
   el.insertAdjacentHTML('beforeend',`<p>${L.p}</p><div class="keys">${L.k.map(k=>`<span>#${k}</span>`).join('')}</div><div class="ingame2"><span>게임에서는</span>${L.g}</div>`);
@@ -1882,7 +1896,7 @@ function renderQuiz(){
     $('qNext').onclick=()=>{quizI++;renderQuiz();};$('qNext').focus();});
 }
 function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
-function startGame(){SND.init();if(gameStarted)resumeGame();else openModes();}
+function startGame(){SND.init();if(gameStarted){resumeGame();return;}const n=TUTS.findIndex((T,i)=>!TUTDONE[i]);if(n>=0)startTut(n);else openModes();}
 $('hStart').onclick=()=>{SND.play('start');startGame();};
 $('hRestart').onclick=()=>{SND.init();openModes();};
 $('modesBack').onclick=goHome;$('cSkip').onclick=exitTut;$('cNext').onclick=()=>{if(S.tut){SND.play('click');tutGo(S.tut.step+1);}};
