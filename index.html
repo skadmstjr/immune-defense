@@ -81,12 +81,18 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .unit.locked canvas{filter:grayscale(1);opacity:.4}
 .unit.locked .t{color:#a58a93}
 .rowlbl{font-family:var(--display);font-size:12.5px;color:var(--muted);padding:2px 10px 0;border-top:2px dashed var(--flesh2);margin:0 6px}
-.hand.mem{padding-top:20px}
+.hand.mem{padding-top:14px;padding-bottom:6px;gap:8px}
+.hand.mem .unit{width:136px;flex-direction:row;padding:5px 6px;gap:4px;box-shadow:0 3px 0 var(--membrane-d)}
+.hand.mem .unit canvas{width:34px;height:34px;flex:none}
+.hand.mem .unit .txt{align-items:flex-start;min-width:0}.hand.mem .unit .t,.hand.mem .unit .lk{text-align:left}.hand.mem .unit .t{font-size:12.5px}.hand.mem .unit .lk{font-size:10.5px}.hand.mem .unit .prog{width:100%}.hand.mem .unit .cost{width:26px;height:22px;font-size:12px;top:-10px;left:-10px}
+.hand.mem .unit.locked{box-shadow:none}
 .unit.auto{cursor:help;background:#fff;border-color:#d79aa8;box-shadow:0 5px 0 #c58494}
 .unit .cnt{position:absolute;top:-10px;right:-10px;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--membrane);color:#fff;font-size:13px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
 .unit .cnt.zero{background:#d9b3bc}
 .prog{height:5px;width:80%;border-radius:3px;background:#e2cfd4;overflow:hidden}.prog i{display:block;height:100%;background:#c79aa6}
-.info{font-size:13.5px;color:var(--muted);line-height:1.5;padding:2px 6px 0;min-height:2.6em}
+.info{font-size:13.5px;color:var(--muted);line-height:1.5;padding:2px 6px 0;min-height:4.6em}
+.info b{font-family:var(--display);font-weight:400;color:var(--ink);font-size:15px;margin-right:2px}.info em{font-style:normal;color:var(--danger)}
+.info .bio{display:block;font-size:12.5px;color:#a0687a}.info .how{display:block;color:var(--gold);font-family:var(--display);font-size:13px}
 .actions{display:flex;align-items:flex-end;gap:10px}
 .smalls{display:grid;grid-template-columns:repeat(2,54px);gap:8px}
 .round{width:54px;height:54px;border-radius:50%;border:3px solid var(--membrane);background:var(--skin);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:var(--display);font-size:11.5px;color:var(--ink);box-shadow:0 4px 0 var(--membrane-d);cursor:pointer;padding:0;transition:transform .1s,box-shadow .1s}
@@ -217,7 +223,52 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
   .toast.fresh{animation:toastIn .5s ease-out}
   @keyframes toastIn{0%{background:#7d2238}100%{background:var(--bg2)}}
 }
-@media (prefers-reduced-motion:reduce){.unit,.round{transition:none}.unit.fire,.unit.nope,.round.go:not(:disabled){animation:none}}
+
+.coach{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:min(680px,94%);z-index:4;background:rgba(255,244,245,.97);border:3px solid var(--goldbg);border-radius:18px;padding:10px 16px 12px;color:var(--ink);box-shadow:0 5px 0 rgba(125,34,56,.35),0 10px 30px rgba(0,0,0,.25)}
+.coach.low{top:auto;bottom:10px}
+.coach.pop{animation:coachIn .35s cubic-bezier(.3,1.5,.5,1)}
+@keyframes coachIn{0%{transform:translateX(-50%) scale(.95);opacity:.3}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.chead{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:14px;color:var(--gold)}
+.chead span span{color:var(--muted);margin-left:8px;font-size:13px}
+.cskip{margin-left:auto;flex:none;background:none;border:0;color:var(--muted);font-family:var(--display);font-size:13px;text-decoration:underline;cursor:pointer;padding:2px}
+.ctext{font-size:15.5px;line-height:1.65;margin-top:4px;word-break:keep-all}
+.ctext b{color:var(--membrane)}
+.cfoot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:6px}
+.cwait{font-family:var(--display);font-size:13px;color:#fff;background:var(--membrane);border-radius:999px;padding:3px 12px}
+.cnext{font-family:var(--display);font-size:16px;background:var(--goldbg);color:#6b3d05;border:0;border-radius:999px;padding:7px 24px;cursor:pointer;box-shadow:0 3px 0 var(--golddk)}
+.cnext:focus-visible,.cskip:focus-visible,.tbtn:focus-visible,.dbtn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.tutmode .toast{display:none}
+.tutpt{box-shadow:0 0 0 4px #ffcf4d,0 0 18px 6px rgba(255,207,77,.8)!important;animation:tutglow 1s ease-in-out infinite}
+@keyframes tutglow{50%{box-shadow:0 0 0 7px #ffcf4d,0 0 28px 10px rgba(255,207,77,.95)}}
+.tutarrow{position:absolute;z-index:7;width:28px;height:28px;pointer-events:none;color:#ffcf4d;font-size:26px;line-height:28px;text-align:center;text-shadow:0 2px 0 #7d2238,0 0 6px #7d2238;animation:bob .5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-8px)}}
+.modes .mgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
+.mbox{background:var(--skin);border:2px solid var(--flesh2);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.mbox h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;color:var(--membrane-d)}
+.mbox p{margin:0;font-size:14px;color:var(--muted);line-height:1.6}
+.tlist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tbtn{display:flex;align-items:center;gap:10px;text-align:left;border:3px solid var(--membrane);background:#fff;border-radius:14px;padding:8px 10px;cursor:pointer;box-shadow:0 3px 0 var(--membrane-d);color:var(--ink)}
+.tbtn:hover,.dbtn:hover{transform:translateY(-2px)}
+.tbtn .tn{width:30px;height:30px;flex:none;border-radius:50%;background:var(--goldbg);color:#6b3d05;display:grid;place-items:center;font-family:var(--display);font-size:16px}
+.tbtn .tt{display:flex;flex-direction:column;min-width:0}
+.tbtn b{font-family:var(--display);font-weight:400;font-size:16px}
+.tbtn small{font-size:12px;color:var(--muted);word-break:keep-all}
+.tbtn .ck{margin-left:auto;font-family:var(--display);font-size:12px;color:var(--ok);flex:none}
+.tbtn.done{border-color:var(--ok);box-shadow:0 3px 0 #1f6e40}
+.tbtn.done .tn{background:var(--ok);color:#fff}
+.dlist{display:flex;flex-direction:column;gap:8px}
+.dbtn{text-align:left;border:3px solid var(--membrane);background:#fff;border-radius:14px;padding:10px 14px;cursor:pointer;box-shadow:0 3px 0 var(--membrane-d);color:var(--ink);display:flex;flex-direction:column;gap:2px}
+.dbtn b{font-family:var(--display);font-weight:400;font-size:19px}
+.dbtn small{font-size:12.5px;color:var(--muted)}
+.dbtn.main{background:var(--goldbg);border-color:var(--golddk);box-shadow:0 3px 0 var(--golddk)}
+.cardbtns{display:flex;gap:10px;flex-wrap:wrap}
+.btn.ghost{background:var(--skin);border:3px solid var(--membrane);color:var(--ink);box-shadow:0 4px 0 var(--membrane-d)}
+@media (max-width:680px){
+  .coach{position:static;transform:none;width:auto;border-radius:0;border-width:3px 0 0;border-color:var(--membrane);box-shadow:none;padding:8px 12px 10px}
+  .coach.pop{animation:none}.ctext{font-size:14px}.chead{font-size:12.5px;align-items:flex-start}.cskip{white-space:nowrap;font-size:12px}
+  .modes .mgrid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.tutpt,.tutarrow{animation:none}.unit,.round{transition:none}.unit.fire,.unit.nope,.round.go:not(:disabled){animation:none}}
 </style></head><body>
 
 <div class="game" id="game">
@@ -234,6 +285,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
   <div class="arena">
     <canvas id="cv" width="960" height="500" aria-label="게임 판"></canvas>
     <div class="toast old" id="toast" style="opacity:0" aria-live="polite"><b>알림</b>새 소식이 생기면 여기에 뜬다.</div>
+    <div class="coach" id="coach" hidden aria-live="polite"><div class="chead"><span id="cStep"></span><button type="button" class="cskip" id="cSkip">튜토리얼 나가기</button></div><div class="ctext" id="cText"></div><div class="cfoot"><span class="cwait" id="cWait"></span><button type="button" class="cnext" id="cNext">다음</button></div></div>
   </div>
 
   <div class="dock">
@@ -252,7 +304,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
         <div class="hand" id="barrierRow"></div>
         <div id="unitRow" hidden>
           <div class="hand" id="unitHand"></div>
-          <div class="rowlbl">기억세포 · 같은 유형을 10번 물리치면 열린다</div>
+          <div class="rowlbl" id="memLbl">기억세포 · 같은 유형을 10번 물리치면 열린다</div>
           <div class="hand mem" id="memHand"></div>
         </div>
         <div class="hand" id="autoRow" hidden></div>
@@ -281,7 +333,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
         <button class="hbtn" id="hQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .7-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></svg>퀴즈 풀기</button>
         <button class="hbtn" id="hBook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>면역 도감</button>
       </div>
-      <button class="hrestart" id="hRestart" hidden>처음부터 다시 시작</button>
+      <button class="hrestart" id="hRestart" hidden>모드 다시 고르기</button>
       <p class="hfoot">생명과학Ⅰ · 방어 작용 단원 · 비특이적 방어, 체액성·세포성 면역, 1차·2차 면역 반응</p>
     </div>
   </section>
@@ -296,7 +348,15 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
     <div class="qbar"><i id="qbarFill"></i></div>
     <div class="qbox" id="qbox"></div>
   </section>
+  <section class="panel study modes" id="modes" hidden aria-label="모드 선택">
+    <div class="phead"><button class="pback" id="modesBack">← 홈</button><b>게임 시작</b></div>
+    <div class="mgrid">
+      <div class="mbox"><h3>튜토리얼</h3><p>면역세포를 하나씩 직접 써 보며 면역 반응을 배웁니다. 처음이라면 1번부터 차례로 해 보세요.</p><div class="tlist" id="tutList"></div></div>
+      <div class="mbox"><h3>본게임</h3><p>피부 상처, 림프절, 기도·폐의 세 스테이지를 이어서 막습니다. 난이도를 고르세요.</p><div class="dlist" id="diffList"></div></div>
+    </div>
+  </section>
   <div class="overlay" id="overlay"></div>
+  <div class="tutarrow" id="tutArrow" hidden aria-hidden="true">▼</div>
 </div>
 
 <script>
@@ -324,29 +384,29 @@ const STRAINS={
 };
 const UNITS={
   macro:{name:'대식세포(백혈구)',cost:50,hp:280,sp:.75,rate:1.1,dmg:14,
-    desc:'느리고 튼튼한 식세포. 멀리 있는 병원체는 못 알아채고 돌아다니다 바로 옆에 오면 먹는다. 먹은 병원체의 조각을 표면에 올려 그 유형의 정체를 드러낸다(항원 제시)'},
+    desc:'가까이 온 병원체를 먹는다. 처음 보는 병원체를 먹으면 그 유형의 정체가 드러나 림프구 카드가 열린다.',bio:'비특이적 방어 · 식세포 작용. 먹은 병원체의 조각을 세포 표면에 내보이는 항원 제시로 특이적 방어를 시작하게 한다.',tag:'먹기 · 정체 공개'},
   mast:{name:'비만세포',cost:40,hp:90,sp:.5,
-    desc:'조직에 머무는 경보 담당. 세균이 다가오면 소리치며 히스타민을 뿜는다. 혈관이 넓어져 혈장이 새어 나오고 호중구가 몰려온다(염증 반응)'},
+    desc:'근처에 세균이 오면 호중구 2마리를 부르고 혈장 웅덩이를 만든다. 직접 공격하지는 않는다.',bio:'비특이적 방어 · 염증 반응. 히스타민이 혈관을 넓혀 백혈구와 혈장이 감염 부위로 나오게 한다.',tag:'지원 요청'},
   neut:{name:'호중구(백혈구)',cost:0,hp:60,sp:1.6,rate:.5,dmg:9,life:40,summon:1,
-    desc:'비만세포가 부를 때만 혈관을 빠져나와 달려온다. 비만세포가 경보를 울린 세균만 빠르게 먹고, 다 처리하면 5초 뒤 사라진다(죽은 호중구가 고름이 된다)'},
+    desc:'비만세포가 알린 세균만 쫓아가 먹고, 다 처리하면 5초 뒤 사라진다.',bio:'비특이적 방어 · 식세포 작용. 감염 부위에 가장 먼저 모이는 백혈구로, 죽은 호중구는 고름이 된다.',tag:'세균 먹기'},
   helper:{name:'보조 T림프구',cost:60,hp:90,sp:.8,
-    desc:'사이토카인으로 B림프구와 세포독성 T림프구를 활성화하는 지휘관. 정체가 드러난 항원이 있어야 출동한다'},
+    desc:'판에 있어야 B림프구와 세포독성 T림프구가 활성화된다. 감염된 대식세포 옆에 가면 되살린다.',bio:'특이적 방어. 대식세포가 제시한 항원을 인식하고, 사이토카인을 분비해 다른 림프구를 활성화한다.',tag:'림프구 활성화'},
   bcell:{name:'B림프구',cost:70,hp:80,sp:.9,
-    desc:'드러난 항원 하나에 딱 맞는 클론이 출동한다(클론 선택). 보조 T 신호를 받으면 뒤에서 분열하며 형질세포를 만들어 낸다'},
+    desc:'드러난 항원 하나를 맡아 형질세포를 계속 만들어 낸다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 체액성 면역. 활성화된 B림프구는 형질세포와 기억세포로 분화한다.',tag:'항체 생산'},
   plasma:{name:'형질세포',cost:0,hp:70,sp:.9,rate:3.2,dmg:10,life:40,summon:1,
-    desc:'B림프구가 분화해서만 생긴다. 맡은 항원이 있는 곳으로 가서 항체를 뿌리고 다른 곳으로 옮겨 간다. 맡은 병원체가 다 사라지면 4초 뒤 사라진다'},
+    desc:'맡은 병원체에 항체를 뿌린다. 항체가 붙은 병원체는 느려지고 독소가 중화되며 식세포에게 2배로 잘 먹힌다.',bio:'체액성 면역. 항체는 특정 항원에만 결합한다(항원-항체 반응의 특이성).',tag:'항체 분비'},
   nk:{name:'NK세포',cost:50,hp:110,sp:1.2,rate:1,dmg:20,
-    desc:'항원을 몰라도 감염세포를 알아보고 공격하는 선천 면역 세포. 바로 싸우지만 힘은 약하다'},
+    desc:'감염세포라면 종류를 가리지 않고 공격한다. 힘은 약하다.',bio:'비특이적 방어. 항원을 몰라도 표면이 이상해진 세포를 알아본다.',tag:'감염세포 공격'},
   tc:{name:'세포독성 T림프구',cost:85,hp:110,sp:1.1,rate:1,dmg:32,
-    desc:'세포 안에 숨는 병원체(바이러스, B형 세균)의 항원 하나를 맡는다. 보조 T 신호를 받으면 그 항원을 단 감염세포나 감염된 대식세포에 달라붙어 퍼포린으로 구멍을 뚫고 그랜자임을 넣어 세포자살시킨다'},
+    desc:'맡은 항원에 감염된 세포를 찾아 파괴한다. 보조 T림프구가 있어야 시작한다.',bio:'특이적 방어 · 세포성 면역. 퍼포린으로 세포막에 구멍을 내 감염세포를 세포자살시킨다.',tag:'감염세포 제거'},
   memory:{name:'기억세포',cost:60,hp:160,sp:1.2,
-    desc:'예전에 싸운 항원을 기억하는 B림프구. 보조 T를 기다리지 않고 곧바로 형질세포를 빠르게 많이 만들고, 항체도 더 잘 붙는다(2차 면역반응)'}
+    desc:'보조 T림프구를 기다리지 않고 곧바로 형질세포를 빠르고 많이 만든다. 같은 유형을 10번 물리치면 열린다.',bio:'2차 면역 반응. 1차 면역 반응 때 남은 기억세포가 같은 항원을 다시 만나면 빠르게 형질세포로 분화한다.',tag:'2차 면역'}
 };
 const BARRIERS={
-  skin:{name:'피부',cost:30,hp:240,block:1,desc:'통과할 수 없는 벽. 계속 맞으면 뚫린다'},
-  mucus:{name:'점막',cost:20,desc:'점액이 붙잡아 지나가는 병원체를 50% 느리게 한다'},
-  lyso:{name:'분비물',cost:25,desc:'라이소자임이 세균 벽을 녹인다. 바이러스에는 효과 없음'},
-  cilia:{name:'섬모',cost:30,desc:'섬모 운동으로 3초마다 병원체를 뒤로 밀어낸다'}
+  skin:{name:'피부',cost:30,hp:240,block:1,desc:'병원체가 지나가지 못하게 막는 벽이다. 계속 공격받으면 뚫린다.',bio:'비특이적 방어 · 1차 방어. 피부의 각질층은 병원체의 침입을 막는 물리적 장벽이다.',tag:'막기'},
+  mucus:{name:'점막',cost:20,desc:'이 칸을 지나는 병원체를 50% 느리게 한다.',bio:'비특이적 방어 · 1차 방어. 호흡기와 소화관 안쪽의 점막은 점액으로 병원체를 붙잡는다.',tag:'느리게'},
+  lyso:{name:'분비물',cost:25,desc:'이 칸에 있는 세균에게 계속 피해를 준다. 바이러스에는 효과가 없다.',bio:'비특이적 방어 · 1차 방어. 눈물·침 속 라이소자임이 세균의 세포벽을 분해한다.',tag:'세균 녹이기'},
+  cilia:{name:'섬모',cost:30,desc:'3초마다 병원체를 오른쪽으로 밀어낸다.',bio:'비특이적 방어 · 1차 방어. 기관의 섬모 운동이 점액에 붙은 이물질을 몸 밖으로 내보낸다.',tag:'밀어내기'}
 };
 const ENEMIES={
   bact:{name:'세균',hp:40,speed:.36,dps:8,r:22},
@@ -390,26 +450,33 @@ const NOTES={
 };
 const STAGES=[
   {name:'피부 상처',goal:'병원체는 처음엔 정체를 알 수 없다. 1차 방어선이 시간을 버는 동안 식세포로 세균을 먹고, 대식세포의 항원 제시로 정체를 밝힌다.',
-   units:['macro','mast','helper','tc'],barriers:['skin','mucus','lyso'],start:160,anti:false,strains:['A','B'],
+   units:['macro','mast','helper','bcell','tc'],barriers:['skin','mucus','lyso'],start:160,anti:false,strains:['A','B'],
    tint:['#ffe6ec','#ffdbe4'],spawns:[[4,45,4.6,'bact','A'],[28,88,4.4,'bact','B'],[50,88,3.6,'bact','A']],events:[[38,'fever'],[60,'meal']]},
   {name:'림프절',goal:'정체가 드러난 항원에 맞는 B림프구가 보조 T 신호를 받아 형질세포가 되고, 항체로 독소 세균을 중화한다(체액성 면역).',
-   units:['macro','mast','helper','tc'],barriers:['skin','mucus','lyso'],start:210,anti:true,strains:['A','B','C','P'],
+   units:['macro','mast','helper','bcell','tc'],barriers:['skin','mucus','lyso'],start:210,anti:true,strains:['A','B','C','P'],
    tint:['#efe6ff','#e6dbfc'],spawns:[[4,95,4.4,'bact','A'],[12,95,5,'bact','B'],[18,95,5.2,'toxin','C'],[6,60,6.5,'pollen','P']],events:[[40,'fever'],[68,'meal']]},
   {name:'기도·폐',goal:'바이러스가 세포 안으로 숨는다. NK세포와 세포독성 T림프구가 감염세포를 파괴하고(세포성 면역), 반복된 승리는 기억세포를 남긴다.',
-   units:['macro','mast','helper','nk','tc'],barriers:['skin','mucus','lyso','cilia'],start:260,anti:true,strains:['A','D','E','F','P'],
+   units:['macro','mast','helper','bcell','nk','tc'],barriers:['skin','mucus','lyso','cilia'],start:260,anti:true,strains:['A','D','E','F','P'],
    tint:['#e4f4f6','#d7eef1'],spawns:[[4,95,2.2,'virus','D'],[24,95,3,'virus','E'],[8,60,7,'bact','A'],[60,95,1.8,'virus','D'],[100,100,1,'mutant','F']],events:[[22,'vaccine'],[40,'pollen'],[58,'fever'],[75,'meal']]}
 ];
 
 let S;
-function newState(i,prev){
-  const st=STAGES[i];const spawns=[];
-  st.spawns.forEach(([a,b,iv,k,s])=>{for(let t=a;t<=b;t+=iv*(0.85+Math.random()*.3))spawns.push({t,k,s,lane:Math.floor(Math.random()*ROWS)})});
+const DIFF={easy:{name:'쉬움',iv:1.5,hp:.7,glu:60,regen:1.25},normal:{name:'보통',iv:1,hp:1,glu:0,regen:1},hard:{name:'어려움',iv:.8,hp:1.25,glu:-20,regen:.9}};
+let DIFFK='normal';
+// wounds: bacteria enter through cuts in the top or bottom wall, 1-4 cells from the right edge
+function makeWounds(n=2){const out=[];let guard=0;while(out.length<n&&guard++<50){const w={side:Math.random()<.5?0:1,c:COLS-1-Math.floor(Math.random()*4)};if(!out.some(o=>o.side===w.side&&o.c===w.c))out.push(w);}return out;}
+const isWoundK=k=>k==='bact'||k==='toxin';
+function newState(i,prev,opt={}){
+  const cfg=opt.cfg||STAGES[i];const dk=opt.diff||(prev&&prev.diffK)||DIFFK;const dm=opt.cfg?DIFF.normal:DIFF[dk];
+  const wounds=cfg.wounds?cfg.wounds.map(w=>({...w})):makeWounds(2);
+  const spawns=[];
+  (cfg.spawns||[]).forEach(([a,b,iv,k,s])=>{for(let t=a;t<=b;t+=iv*dm.iv*(0.85+Math.random()*.3))spawns.push({t,k,s,lane:Math.floor(Math.random()*ROWS),w:Math.floor(Math.random()*wounds.length)})});
   spawns.sort((x,y)=>x.t-y.t);
-  return {stage:i,phase:'setup',t:0,glu:st.start,hp:prev?prev.hp:10,grid:Array.from({length:ROWS},()=>Array(COLS).fill(null)),
-    units:[],plasmaPools:[],hist:[],debris:[],picked:null,enemies:[],abs:[],shots:[],zaps:[],fx:[],waves:[],spawns,events:st.events.map(e=>({t:e[0],k:e[1]})),
-    revealed:prev?{...prev.revealed}:{},kills:prev?{...prev.kills}:{},memory:prev?{...prev.memory}:{},seen:{},flags:prev?{...prev.flags}:{},
-    antiUsed:false,fever:0,meal:0,lastSpawn:spawns.at(-1).t,
-    carry:prev?{hp:prev.hp,revealed:{...prev.revealed},kills:{...prev.kills},memory:{...prev.memory},flags:{...prev.flags}}:null};
+  return {stage:i,cfg,tut:opt.tut||null,diffK:dk,dm,wounds,phase:'setup',t:0,glu:cfg.start+dm.glu,hp:prev?prev.hp:10,grid:Array.from({length:ROWS},()=>Array(COLS).fill(null)),
+    units:[],plasmaPools:[],hist:[],debris:[],picked:null,enemies:[],abs:[],shots:[],zaps:[],fx:[],waves:[],spawns,events:(cfg.events||[]).map(e=>({t:e[0],k:e[1]})),
+    revealed:prev?{...prev.revealed}:{...(cfg.revealed||{})},kills:prev?{...prev.kills}:{...(cfg.kills||{})},memory:prev?{...prev.memory}:{},seen:{},flags:prev?{...prev.flags}:{},
+    antiUsed:false,fever:0,meal:0,lastSpawn:spawns.length?spawns.at(-1).t:0,
+    carry:prev?{hp:prev.hp,revealed:{...prev.revealed},kills:{...prev.kills},memory:{...prev.memory},flags:{...prev.flags},diffK:dk}:null};
 }
 
 // ---------- drawing ----------
@@ -590,7 +657,7 @@ function tissueFor(i){
   return c;
 }
 const EDGE=[
-  {name:'상처',fill:'#b8243d',lip:'#e8a2a8'},
+  {name:'',fill:'#e9a8b2',lip:'#f6d3d8'},
   {name:'림프관',fill:'#c9b8e6',lip:'#8e72b8'},
   {name:'기도',fill:'#f6e3e6',lip:'#d98a99'}
 ];
@@ -605,7 +672,7 @@ function drawVessel(time){
   ctx.fillStyle='rgba(125,26,47,.75)';ctx.beginPath();ctx.roundRect(11,H/2-30,30,60,15);ctx.fill();ctx.fillStyle='#fff';ctx.font='18px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('혈',26,H/2-5);ctx.fillText('관',26,H/2+19);
 }
 function drawEdge(time){
-  const E=EDGE[S.stage],x0=W-22;
+  const E=EDGE[S.cfg.look??S.stage],x0=W-22;
   ctx.fillStyle=E.fill;ctx.beginPath();ctx.moveTo(W,0);ctx.lineTo(x0,0);
   for(let y=0;y<=H;y+=20)ctx.lineTo(x0+Math.sin(y*.13+time*1.5)*4+(y%40?3:-3),y);
   ctx.lineTo(W,H);ctx.closePath();ctx.fill();
@@ -630,12 +697,40 @@ function drawHeat(time){
     ctx.fillStyle='#ffcf4d';ctx.fillText('피버 타임!',0,0);ctx.font='26px Jua, sans-serif';ctx.lineWidth=8;ctx.strokeText('열이 오른다',0,46);ctx.fillStyle='#fff';ctx.fillText('열이 오른다',0,46);}
   ctx.restore();
 }
+function upcoming(win=3){if(!(S.phase==='wave'||S.phase==='setup'))return [];const t0=S.phase==='setup'?0:S.t;return S.spawns.filter(sp=>sp.t-t0<=win);}
+function drawWounds(time){
+  const soon=upcoming(3),hot=new Set(),edge={};
+  for(const sp of soon){const en=entryOf(sp);if(en.wound)hot.add(en.wound);else (edge[en.lane]=edge[en.lane]||[]).push(sp);}
+  S.wounds.forEach((w,i)=>{
+    const x=LEFT+w.c*CELL+50,y=w.side?H:0,dir=w.side?-1:1,on=hot.has(w),p=.5+.5*Math.sin(time*(on?9:3));
+    ctx.save();
+    if(on||S.phase==='setup'){ctx.fillStyle=`rgba(232,51,79,${on?.18+.18*p:.08+.08*p})`;ctx.beginPath();ctx.ellipse(x,y,70,58,0,0,7);ctx.fill();}
+    ctx.fillStyle='#7d1a2f';ctx.beginPath();ctx.moveTo(x-38,y);for(let k=0;k<=8;k++){const xx=x-38+k*9.5;ctx.lineTo(xx,y+dir*(k%2?16:10)+dir*Math.sin(time*2+k)*1.5);}ctx.lineTo(x+38,y);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#e8a2a8';ctx.lineWidth=3;ctx.lineJoin='round';ctx.beginPath();for(let k=0;k<=8;k++){const xx=x-38+k*9.5;ctx.lineTo(xx,y+dir*(k%2?16:10)+dir*Math.sin(time*2+k)*1.5);}ctx.stroke();
+    for(let k=0;k<3;k++){const yy=y+dir*(20+((time*18+k*9)%18));circ(x-14+k*14,yy,2.6,'#c0263f');}
+    ctx.font='14px Jua, sans-serif';ctx.textAlign='center';const ly=y+dir*34;
+    ctx.fillStyle=on?'#e8334f':'rgba(125,26,47,.82)';ctx.beginPath();ctx.roundRect(x-26,ly-11,52,22,11);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(on?'침입!':'상처',x,ly+5);
+    if(on){const sp=soon.find(q=>entryOf(q).wound===w);if(sp){ctx.fillStyle='#fff';ctx.strokeStyle='#e8334f';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+44,ly,13,0,7);ctx.fill();ctx.stroke();marker(x+44,ly,7,sp.s,!S.revealed[sp.s]);}}
+    ctx.restore();
+  });
+  const E=EDGE[S.cfg.look??S.stage];
+  if(E&&E.name&&(S.cfg.spawns||[]).some(sp=>!isWoundK(sp[3]))||S.tut&&S.cfg.edge){const nm=(E&&E.name)||'입구';ctx.save();ctx.fillStyle='rgba(125,26,47,.75)';ctx.beginPath();ctx.roundRect(W-50,H/2-12-nm.length*12,28,24+nm.length*24,14);ctx.fill();ctx.fillStyle='#fff';ctx.font='17px Jua, sans-serif';ctx.textAlign='center';[...nm].forEach((ch,i)=>ctx.fillText(ch,W-36,H/2+6-nm.length*12+i*24+12));ctx.restore();}
+  for(const l in edge){const y=l*CELL+50,p=.5+.5*Math.sin(time*9);ctx.save();ctx.fillStyle=`rgba(232,51,79,${.55+.4*p})`;ctx.beginPath();ctx.moveTo(W-30,y-16);ctx.lineTo(W-58,y);ctx.lineTo(W-30,y+16);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#fff';ctx.strokeStyle='#e8334f';ctx.lineWidth=2;ctx.beginPath();ctx.arc(W-78,y,13,0,7);ctx.fill();ctx.stroke();marker(W-78,y,7,edge[l][0].s,!S.revealed[edge[l][0].s]);ctx.restore();}
+}
 function popScale(pt){if(!pt)return 1;const t=performance.now()/1000-pt;if(t>.9||t<0)return 1;return 1+.5*Math.exp(-t*7)*Math.cos(t*15);}
 function drawBoard(time){
-  ctx.drawImage(tissueFor(S.stage),0,0,W,H);
+  ctx.drawImage(tissueFor(S.cfg.look??S.stage),0,0,W,H);
   for(let r=0;r<ROWS;r++)if(r%2){ctx.fillStyle='rgba(120,30,55,.05)';ctx.fillRect(LEFT,r*CELL,W-LEFT,CELL);}
-  drawEdge(time);drawVessel(time);
-  const placing=selected&&S.phase==='setup';
+  drawEdge(time);drawVessel(time);drawWounds(time);
+  if(isUnitSel()){
+    const pulse=.45+.3*Math.sin(time*5),hr=hover&&canRow(hover.r)?hover.r:null;
+    if(hr!=null){ctx.fillStyle='rgba(255,207,77,.16)';const r0=Math.max(0,hr-1),r1=Math.min(ROWS-1,hr+1);ctx.fillRect(LEFT,r0*CELL,W-LEFT,(r1-r0+1)*CELL);}
+    for(let r=0;r<ROWS;r++)if(canRow(r)){ctx.strokeStyle=r===hr?'#ffcf4d':`rgba(255,207,77,${pulse})`;ctx.lineWidth=r===hr?4:3;ctx.setLineDash(r===hr?[]:[10,8]);ctx.beginPath();ctx.roundRect(LEFT+4,r*CELL+6,W-LEFT-34,CELL-12,18);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=r===hr?'#ffcf4d':`rgba(255,207,77,${pulse})`;ctx.beginPath();ctx.moveTo(LEFT+12,r*CELL+36);ctx.lineTo(LEFT+30,r*CELL+50);ctx.lineTo(LEFT+12,r*CELL+64);ctx.closePath();ctx.fill();}
+    if(hr!=null){const k=selected.type==='memory'?'memory':selected.k;ctx.save();ctx.globalAlpha=.7;drawUnit(k,LEFT+70,hr*CELL+50,54,time);ctx.restore();}
+  }
+  const placing=selected&&selected.type==='barrier'&&S.phase==='setup';
   if(placing){
     const pulse=.55+.35*Math.sin(time*5);
     for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(canPlace(c,r)){ctx.strokeStyle=`rgba(255,207,77,${pulse})`;ctx.lineWidth=3;ctx.setLineDash([8,7]);ctx.beginPath();ctx.roundRect(LEFT+c*CELL+8,r*CELL+8,CELL-16,CELL-16,16);ctx.stroke();ctx.setLineDash([]);}
@@ -644,7 +739,7 @@ function drawBoard(time){
     const cx=LEFT+c*CELL+50,cy=r*CELL+50;
     if(placing&&canPlace(c,r)){const s=1.12+.05*Math.sin(time*8);ctx.save();ctx.globalAlpha=.75;ctx.translate(cx,cy);ctx.scale(s,s);ctx.translate(-cx,-cy);drawBarrier(selected.k,cx,cy,time,1);ctx.restore();
       ctx.strokeStyle='#ffcf4d';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(cx-48,cy-48,96,96,18);ctx.stroke();}
-    else if(removeMode||S.picked||placing){ctx.strokeStyle=removeMode?'#e8334f':S.picked?'#3d8fd1':'rgba(80,20,40,.35)';ctx.lineWidth=4;ctx.setLineDash([10,7]);ctx.beginPath();ctx.roundRect(LEFT+c*CELL+5,r*CELL+5,CELL-10,CELL-10,18);ctx.stroke();ctx.setLineDash([]);}
+    else if(removeMode||placing){ctx.strokeStyle=removeMode?'#e8334f':S.picked?'#3d8fd1':'rgba(80,20,40,.35)';ctx.lineWidth=4;ctx.setLineDash([10,7]);ctx.beginPath();ctx.roundRect(LEFT+c*CELL+5,r*CELL+5,CELL-10,CELL-10,18);ctx.stroke();ctx.setLineDash([]);}
   }}
 }
 // ---------- camera: zoom punch on placement, zoom-in while a cell is picked ----------
@@ -729,8 +824,15 @@ const SND=(()=>{
 let selected=null, hover=null, removeMode=false;
 function cellCenter(c,r){return [LEFT+c*CELL+CELL/2,r*CELL+CELL/2];}
 function unitNear(x,y){let best=null,bd=.6;for(const u of S.units){const d=Math.hypot(u.x-x,u.y-y);if(d<bd){bd=d;best=u;}}return best;}
+const isUnitSel=()=>selected&&(selected.type==='unit'||selected.type==='memory');
+function canRow(r){
+  if(!isUnitSel()||r<0||r>=ROWS||(S.phase!=='setup'&&S.phase!=='wave'))return false;
+  if(S.tut&&S.tut.rows&&!S.tut.rows.includes(r))return false;
+  return true;
+}
 function canPlace(c,r){
-  if(!selected||c<0||c>=COLS||r<0||r>=ROWS||S.grid[r][c]||S.phase!=='setup')return false;
+  if(!selected||selected.type!=='barrier'||c<0||c>=COLS||r<0||r>=ROWS||S.grid[r][c]||S.phase!=='setup')return false;
+  if(S.tut&&S.tut.cells&&!S.tut.cells(c,r))return false;
   return S.glu>=BARRIERS[selected.k].cost;
 }
 function place(c,r,px,py){
@@ -740,15 +842,17 @@ function place(c,r,px,py){
     const g=S.grid[r][c];if(g){if(S.phase==='setup')S.glu+=BARRIERS[g.k].cost;S.grid[r][c]=null;}return;
   }
   if(!selected){
-    if(S.picked){const p=S.picked;
-      if(p.ordered&&Math.abs(p.hx-(c+.5))<.1&&Math.abs(p.hy-r)<.1){p.ordered=false;setInfo('명령 해제. 다시 자유롭게 돌아다닌다.');}
-      else{p.hx=c+.5;p.hy=r;p.ordered=true;setInfo('그 자리로 가서 주변을 지킨다. 같은 칸을 한 번 더 고르면 명령이 풀린다.');}
-      SND.play('click');{const [cx,cy]=cellCenter(c,r);camPunch(cx,cy,.06);S.fx.push({x:cx,y:cy,t:0,kind:'place',c:'#3d8fd1'});}
-      S.picked=null;return;}
-    const u=unitNear(px,py);if(u){S.picked=u;u.pt=performance.now()/1000;setInfo(`${unitName(u)} 선택. 지킬 칸을 누른다.`);}
+    const u=unitNear(px,py);if(u)setInfo(cardInfo(u.k==='memory'?'memory':'unit',u.k==='memory'?u.s:u.k,u));
     return;
   }
-  if(!canPlace(c,r)){if(S.phase!=='setup')setInfo('1차 방어선은 웨이브 시작 전에만 깔 수 있다. 감염 전부터 있는 방어이기 때문이다.');return;}
+  if(isUnitSel()){
+    if(!canRow(r)){SND.play('nope');if(S.tut&&S.tut.rows)setInfo('안내에 표시된 줄을 누르세요.');return;}
+    const sel=selected;
+    if(spawnUnit(sel.type==='memory'?'memory':sel.k,sel.type==='memory'?sel.k:null,r)){selected=null;camPunch(LEFT+40,r*CELL+50,.05);
+      const b=$(`card-${sel.type}-${sel.k}`);if(b){b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');}}
+    refreshTray();return;
+  }
+  if(!canPlace(c,r)){if(S.phase!=='setup')setInfo('1차 방어선은 웨이브 시작 전에만 깔 수 있다. 감염 전부터 있는 방어이기 때문이다.');else if(S.tut&&S.tut.cells)setInfo('안내에 표시된 칸을 누르세요.');return;}
   S.glu-=BARRIERS[selected.k].cost;
   S.grid[r][c]={k:selected.k,hp:BARRIERS[selected.k].hp||1,maxhp:BARRIERS[selected.k].hp||1,pt:performance.now()/1000};
   {const [cx,cy]=cellCenter(c,r);camPunch(cx,cy,.09);S.fx.push({x:cx,y:cy,t:0,kind:'place'});SND.play('place');}
@@ -774,31 +878,45 @@ function chooseStrain(k){
   return best;
 }
 function laneFor(s){let best=null;for(const e of S.enemies){if(s&&e.s!==s)continue;if(!best||e.x<best.x)best=e;}return best?best.lane:Math.floor(Math.random()*ROWS);}
-function spawnUnit(k,memS){
+function spawnUnit(k,memS,row){
   const def=UNITS[k];
-  if(k==='memory'){if(S.glu<def.cost){setInfo(`포도당이 모자란다 (${def.cost} 필요)`);return;}}
-  else{const why=blockReason(k);if(why){setInfo(why);return;}}
+  if(k==='memory'){if(S.glu<def.cost){setInfo(`포도당이 모자란다 (${def.cost} 필요)`);return false;}}
+  else{const why=blockReason(k);if(why){setInfo(why);return false;}}
   S.glu-=def.cost;
   const s=k==='memory'?memS:(k==='bcell'||k==='tc')?chooseStrain(k):null;
-  const y=laneFor(s)+(Math.random()-.5)*.3;
-  const u={k,s,x:.05,y,hx:.5,hy:Math.round(y),hp:def.hp,maxhp:def.hp,cd:0,born:S.t,tick:0,face:1,moving:0,ordered:false,
+  if(row==null)row=laneFor(s);
+  const y=row+(Math.random()-.5)*.2;
+  const u={k,s,x:.05,y,band:row,hx:.5,hy:row,hp:def.hp,maxhp:def.hp,cd:0,born:S.t,tick:0,face:1,moving:0,ordered:false,
     active:!(k==='bcell'||k==='tc'),actT:0,kills:0,state:'seek'};
   u.pt=performance.now()/1000;S.units.push(u);SND.play('spawn');
   S.fx.push({x:LEFT,y:y*CELL+50,t:0,kind:'birth'});camPunch(LEFT+40,y*CELL+50,.04);
   if((k==='bcell'||k==='tc')&&!S.flags.clone){S.flags.clone=1;note('clone');}
+  S.fx.push({x:LEFT+20,y:row*CELL+50,t:0,kind:'place',c:'#ffcf4d'});
   if((k==='bcell'||k==='tc')&&!hasHelper()&&!S.flags.waiting){S.flags.waiting=1;note('waiting');}
-  setInfo(`${k==='memory'?`기억세포 ${s}형`:def.name} 출동${s?` (${STRAINS[s].name} 담당)`:''}. ${def.desc}`);
-  refreshTray();
+  setInfo(`<b>${k==='memory'?`기억세포 ${s}형`:def.name} 출동</b>${s?` (${STRAINS[s].name} 담당)`:''} · ${row+1}번째 줄과 위아래 한 줄을 지킨다.`);
+  refreshTray();return true;
 }
 let eid=0;
 function spawn(k,s,lane,x=9.6){
-  const d=ENEMIES[k];S.enemies.push({id:eid++,k,s,lane,x,hp:d.hp,maxhp:d.hp,age:0,slowT:0,opT:0,spawnCd:k==='mutant'?4:k==='infected'?8:0,pushCd:0});
+  const d=ENEMIES[k],hp=Math.round(d.hp*(S.dm?S.dm.hp:1));const e={id:eid++,k,s,lane,x,hp,maxhp:hp,age:0,slowT:0,opT:0,spawnCd:k==='mutant'?4:k==='infected'?8:0,pushCd:0};S.enemies.push(e);
   if(!S.revealed[s]&&!S.flags.mystery){S.flags.mystery=1;note('mystery');}
   if(k==='mutant'&&!S.seen.mutant){S.seen.mutant=1;note('mutant');}
+  return e;
+}
+// where a scheduled pathogen comes in: bacteria through a wall wound, everything else through the right edge
+function entryOf(sp){
+  if(isWoundK(sp.k)&&S.wounds.length){const w=S.wounds[(sp.w||0)%S.wounds.length];return {wound:w,lane:w.side?ROWS-1:0,x:w.c+.5};}
+  return {lane:sp.lane,x:9.6};
+}
+function spawnEntry(sp){
+  const en=entryOf(sp);
+  if(en.wound){let lane=en.lane;if(!S.cfg.noShift&&Math.random()<.35)lane+=en.wound.side?-1:1;
+    const e=spawn(sp.k,sp.s,lane,en.x);e.ry=en.wound.side?ROWS-.25:-.75;e.enter=1;S.fx.push({x:LEFT+en.x*CELL,y:en.wound.side?H-8:8,t:.1,kind:'hit'});return e;}
+  return spawn(sp.k,sp.s,en.lane,en.x);
 }
 function hasHelper(){return S.units.some(u=>u.k==='helper');}
 function rateMul(u){const t=S.temp||36.8;return t>=40?.75:t>=37.8?1.45:1;}
-function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;discover(s);SND.play('reveal');toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait} 도감에 기록됐다.`]);buildTray();}
+function reveal(s){if(S.revealed[s])return;S.revealed[s]=1;discover(s);SND.play('reveal');if(!S.tut)toastQ.push([`정체 공개: ${STRAINS[s].name}`,`대식세포가 먹은 조각을 표면에 올려 정체를 밝혔다(항원 제시). ${STRAINS[s].trait} 도감에 기록됐다.`]);buildTray();}
 function hurt(e,dmg,by){
   if(e.dead)return;
   e.hp-=dmg;
@@ -815,15 +933,18 @@ function blockerFor(e){
   for(let c=COLS-1;c>=0;c--){const g=S.grid[e.lane][c];if(!g||!BARRIERS[g.k].block)continue;const dx=e.x-(c+.5);if(dx>-.1&&dx<.62)return g;}
   return null;
 }
+function bandOf(u){return u.band==null?[0,ROWS-1]:[Math.max(0,u.band-1),Math.min(ROWS-1,u.band+1)];}
 function moveToward(u,tx,ty,sp,dt){
   if(S.allergy>0)sp*=.6;if((S.temp||0)>=40)sp*=.8;
-  tx=Math.max(.3,Math.min(COLS-.3,tx));ty=Math.max(0,Math.min(ROWS-1,ty));
+  const [b0,b1]=bandOf(u);
+  tx=Math.max(.3,Math.min(COLS-.3,tx));ty=Math.max(b0,Math.min(b1,ty));
   const dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);
   if(d<.04){u.moving=0;return true;}
   const step=Math.min(d,sp*dt);u.x+=dx/d*step;u.y+=dy/d*step;u.moving=1;if(Math.abs(dx)>.02)u.face=dx>0?1:-1;
   return false;
 }
 function nearest(u,pred){let b=null,bd=1e9;for(const e of S.enemies){if(e.dead||!pred(e))continue;
+  if(u.band!=null&&Math.abs(e.lane-u.band)>1.5)continue;
   if(u.ordered&&Math.hypot(e.x-u.hx,e.lane-u.hy)>2.6)continue;const d=Math.hypot(e.x-u.x,e.lane-u.y);if(d<bd){bd=d;b=e;}}if(b)u.hasT=1;return b;}
 function approach(u,e,reach,dt){
   const d=Math.hypot(e.x-u.x,e.lane-u.y);
@@ -833,7 +954,8 @@ function approach(u,e,reach,dt){
 }
 function idle(u,dt,x0=.6,x1=8.4){
   if(u.ordered){moveToward(u,u.hx,u.hy,UNITS[u.k].sp,dt);return;}
-  if(u.wx==null||Math.hypot(u.wx-u.x,u.wy-u.y)<.1){u.wx=x0+Math.random()*(x1-x0);u.wy=Math.random()*(ROWS-1);}
+  const [b0,b1]=bandOf(u);
+  if(u.wx==null||u.wy<b0-.01||u.wy>b1+.01||Math.hypot(u.wx-u.x,u.wy-u.y)<.1){u.wx=x0+Math.random()*(x1-x0);u.wy=b0+Math.random()*(b1-b0);}
   moveToward(u,u.wx,u.wy,UNITS[u.k].sp*.55,dt);
 }
 function releaseAntibodies(u,n,dmg){
@@ -853,9 +975,9 @@ function update(dt){
   if(burn&&!S.flags.highFever){S.flags.highFever=1;note('highFever');}
   if(burn){for(const u of S.units)u.hp-=2.5*dt;S.glu=Math.max(0,S.glu-1.5*dt);
     if(S.temp>=41){S.heatT=(S.heatT||0)+dt;if(S.heatT>8){S.heatT=0;S.hp-=1;S.fx.push({x:LEFT,y:H/2,t:0,kind:'hit'});}}}
-  let regen=3.2;if(burn)regen*=.4;else if(hot)regen*=.8;if(S.meal>0)regen*=2;
+  let regen=3.2*(S.dm?S.dm.regen:1);if(burn)regen*=.4;else if(hot)regen*=.8;if(S.meal>0)regen*=2;
   S.glu+=regen*dt;
-  while(S.spawns.length&&S.spawns[0].t<=S.t){const s=S.spawns.shift();spawn(s.k,s.s,s.lane);}
+  while(S.spawns.length&&S.spawns[0].t<=S.t){const s=S.spawns.shift();spawnEntry(s);if(S.tut)S.tut.spawned=(S.tut.spawned||0)+1;}
   while(S.events.length&&S.events[0].t<=S.t){const ev=S.events.shift();
     if(ev.k==='meal'){S.glu+=60;S.meal=10;}
     if(ev.k==='fever'){S.fever=16;S.antipyT=0;S.feverBanner=0;SND.play('fever');}
@@ -870,22 +992,22 @@ function update(dt){
   for(const e of S.enemies){
     e.perfT=Math.max(0,(e.perfT||0)-dt);
     const d=ENEMIES[e.k];e.age+=dt*((S.temp||0)>=37.8?.6:1);e.opT=Math.max(0,e.opT-dt);if(e.alarmT)e.alarmT=Math.max(0,e.alarmT-dt);
-    e.ry=e.ry==null?e.lane:e.ry+(e.lane-e.ry)*Math.min(1,dt*7);
+    e.ry=e.ry==null?e.lane:e.ry+(e.lane-e.ry)*Math.min(1,dt*(e.enter?1.8:7));if(e.enter&&Math.abs(e.ry-e.lane)<.08)e.enter=0;
     const T=STRAINS[e.s]||{};
     if(e.k==='virus'&&e.age>=(T.hide||6)){e.k='infected';e.hp=ENEMIES.infected.hp;e.maxhp=e.hp;e.spawnCd=8;e.age=0;e.opT=0;if(!S.seen.infected){S.seen.infected=1;discover('infected');note('infected');}continue;}
     if(e.k==='mutant'||e.k==='infected'){e.spawnCd-=dt;if(e.spawnCd<=0){e.spawnCd=e.k==='mutant'?4:9;e.rel=(e.rel||0)+1;if(e.k==='infected'&&e.rel>=2){e.dead=1;S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'hit'});}const l=e.k==='mutant'?Math.max(0,Math.min(ROWS-1,e.lane+(Math.random()<.5?-1:1))):e.lane;spawn('virus',e.s,l,e.x-.2);}}
     const c=Math.floor(e.x), g=(c>=0&&c<COLS)?S.grid[e.lane][c]:null;
     // flagellar dodge: swims sideways away from an approaching phagocyte (not once antibodies tie the flagella)
     e.dodgeCd=Math.max(0,(e.dodgeCd||0)-dt);
-    if(T.dodge&&e.k==='bact'&&!(e.opT>0)&&e.dodgeCd<=0){const th=S.units.find(u=>(u.k==='macro'||u.k==='neut')&&Math.abs(u.y-e.lane)<.5&&Math.abs(u.x-e.x)<.85);
+    if(T.dodge&&!S.cfg.noDodge&&e.k==='bact'&&!(e.opT>0)&&e.dodgeCd<=0){const th=S.units.find(u=>(u.k==='macro'||u.k==='neut')&&Math.abs(u.y-e.lane)<.5&&Math.abs(u.x-e.x)<.85);
       if(th){const opts=[e.lane-1,e.lane+1].filter(l=>l>=0&&l<ROWS);const l=opts[Math.floor(Math.random()*opts.length)];e.lane=l;e.dodgeCd=2.2;S.fx.push({x:LEFT+e.x*CELL,y:e.ry*CELL+50,t:.3,kind:'dust'});}}
     // viruses are carried around by body fluid
     if(e.k==='virus'){e.drift=(e.drift||0)+dt;if(e.drift>2.4){e.drift=0;if(Math.random()<.35){const l=e.lane+(Math.random()<.5?-1:1);if(l>=0&&l<ROWS)e.lane=l;}}}
     // binary fission
-    if(T.divide&&e.k==='bact'&&(e.gen||0)<1&&S.enemies.length<40){e.divT=(e.divT||0)+dt*((S.temp||0)>=37.8?.5:1);if(e.divT>=13){e.divT=0;e.gen=(e.gen||0)+1;
+    if(T.divide&&!S.cfg.noDivide&&e.k==='bact'&&(e.gen||0)<1&&S.enemies.length<40){e.divT=(e.divT||0)+dt*((S.temp||0)>=37.8?.5:1);if(e.divT>=13){e.divT=0;e.gen=(e.gen||0)+1;
       const ch={...e,id:eid++,x:e.x+.18,lane:Math.max(0,Math.min(ROWS-1,e.lane+(Math.random()<.5?0:(Math.random()<.5?-1:1)))),hp:ENEMIES.bact.hp,divT:0};born2.push(ch);
       S.fx.push({x:LEFT+e.x*CELL,y:e.ry*CELL+50,t:.2,kind:'place',c:'#e5484d'});if(!S.flags.divide&&S.revealed[e.s]){S.flags.divide=1;note('divide');}}}
-    let sp=d.speed*(T.spd||1);if((S.temp||0)>=37.8)sp*=.72;if(e.opT>0)sp*=.5;if(e.inPlasma)sp*=.6;e.inPlasma=0;e.slowT=0;
+    let sp=d.speed*(T.spd||1);if(e.enter)sp*=.3;if((S.temp||0)>=37.8)sp*=.72;if(e.opT>0)sp*=.5;if(e.inPlasma)sp*=.6;e.inPlasma=0;e.slowT=0;
     if(g){
       if(g.k==='mucus'){sp*=.5;e.slowT=1;}
       if(g.k==='lyso'&&(e.k==='bact'||e.k==='toxin'))hurt(e,9*dt);
@@ -903,7 +1025,7 @@ function update(dt){
           S.fx.push({x:LEFT+tg.x*CELL,y:tg.y*CELL+28,t:0,kind:'dmg',n:dmg});S.fx.push({x:LEFT+(tg.x+e.x)/2*CELL,y:((tg.y+(e.ry??e.lane))/2)*CELL+50,t:.2,kind:'bite'});
           SND.play('bite');if(!S.flags.bite){S.flags.bite=1;note('bite');}}}}
     if(e.x<-.2&&e.k==='pollen'){e.dead=1;continue;}
-    if(e.x<-.2){e.dead=1;S.hp-=e.k==='mutant'?5:1;SND.play('hurt');S.fx.push({x:LEFT,y:e.lane*CELL+50,t:0,kind:'hit'});}
+    if(e.x<-.2){e.dead=1;S.hp-=e.k==='mutant'?5:1;if(S.tut)S.hp=Math.max(1,S.hp);SND.play('hurt');S.fx.push({x:LEFT,y:e.lane*CELL+50,t:0,kind:'hit'});}
   }
   S.enemies.push(...born2);
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const g=S.grid[r][c];if(g&&g.hp<=0){S.grid[r][c]=null;S.fx.push({x:LEFT+c*CELL+50,y:r*CELL+50,t:0,kind:'hit'});}}
@@ -1030,7 +1152,7 @@ function update(dt){
       if(sick)u.worked=1;
     }
     // job done: after a while with nothing to do, the cell withdraws (contraction phase)
-    if(S.phase==='wave'&&!u.infected&&u.k!=='neut'&&u.k!=='plasma'){
+    if(S.phase==='wave'&&!S.tut&&!u.infected&&u.k!=='neut'&&u.k!=='plasma'){
       if(u.tick>0||u.hasT){if(u.tick>0)u.worked=1;u.idleT=0;}
       else u.idleT=(u.idleT||0)+dt;
       if(u.worked&&u.idleT>9){u.dead=1;S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'leave'});if(!S.flags.leave){S.flags.leave=1;note('leave');}}
@@ -1049,7 +1171,7 @@ function update(dt){
   S.units=S.units.filter(u=>!u.dead);
   for(let i=0;i<S.units.length;i++)for(let j=i+1;j<S.units.length;j++){const a=S.units[i],b=S.units[j];const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
     if(d<.45&&d>1e-4){const p=(.45-d)/2;a.x-=dx/d*p;a.y-=dy/d*p;b.x+=dx/d*p;b.y+=dy/d*p;}}
-  for(const u of S.units){u.y=Math.max(0,Math.min(ROWS-1,u.y));u.x=Math.max(.3,Math.min(COLS-.3,u.x));}
+  for(const u of S.units){const [b0,b1]=bandOf(u);u.y=Math.max(b0,Math.min(b1,u.y));u.x=Math.max(.3,Math.min(COLS-.3,u.x));}
 
   // antibodies home in on their antigen
   for(const h of S.hist){const a=1-h.t/1.4;ctx.save();ctx.globalAlpha=a;circ(LEFT+h.x*CELL,h.y*CELL+50,3.5,'#9b4dbf');ctx.restore();}
@@ -1069,7 +1191,7 @@ function update(dt){
   S.fx.forEach(f=>f.t+=dt);S.fx=S.fx.filter(f=>f.t<(f.kind==='shout'?1.2:f.kind==='say'?1.1:.8));
 
   if(S.hp<=0){S.phase='over';showOver();}
-  else if(!S.spawns.length&&!S.enemies.length&&S.t>S.lastSpawn){S.phase='clear';showClear();}
+  else if(!S.tut&&!S.spawns.length&&!S.enemies.length&&S.t>S.lastSpawn){S.phase='clear';showClear();}
 }
 
 function render(time){
@@ -1142,20 +1264,21 @@ function render(time){
   ctx.restore();
   drawHeat(time);
   if(S.allergy>0){ctx.fillStyle=`rgba(255,210,60,${.08+.04*Math.sin(time*6)})`;ctx.fillRect(0,0,W,H);}
-  if(S.phase==='setup'){ctx.fillStyle='rgba(125,34,56,.88)';ctx.beginPath();ctx.roundRect(LEFT+COLS*CELL/2-260,H-44,520,34,17);ctx.fill();ctx.fillStyle='#ffe9ec';ctx.font='18px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('준비 단계 · 1차 방어선을 깔고 시작 버튼을 누른다',LEFT+COLS*CELL/2,H-21);}
+  if(S.tut)drawTutBoard(time);
+  if(S.phase==='setup'&&!S.tut){ctx.fillStyle='rgba(125,34,56,.88)';ctx.beginPath();ctx.roundRect(LEFT+12,H/2-17,420,34,17);ctx.fill();ctx.fillStyle='#ffe9ec';ctx.font='17px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('준비 단계 · 상처를 확인하고 1차 방어선을 깐다',LEFT+222,H/2+6);}
 }
 
 // ---------- UI ----------
 const $=id=>document.getElementById(id);
 let toastQ=[],toastT=0,TAB='barrier';
-function note(k,extra){const n=NOTES[k];if(!n)return;toastQ.push([n[0]+(extra?`: ${extra}`:''),n[1]]);}
+function note(k,extra){const n=NOTES[k];if(!n||S.tut)return;toastQ.push([n[0]+(extra?`: ${extra}`:''),n[1]]);}
 function tickToast(dt){
   const el=$('toast');
   if(toastT>0){toastT-=dt;if(toastT<=0){el.style.opacity=0;el.classList.add('old');}return;}
   if(toastQ.length){SND.play('note');const [h,b]=toastQ.shift();el.innerHTML=`<b>${h}</b>${b}`;el.style.opacity=1;el.classList.remove('old','fresh');void el.offsetWidth;el.classList.add('fresh');toastT=6.5;}
 }
-const DEFAULT_INFO='면역세포 카드를 누르면 혈관에서 바로 출동한다. 판 위 세포를 누르고 칸을 누르면 그 주변을 지키게 할 수 있다.';
-function setInfo(t){$('info').textContent=t;}
+const DEFAULT_INFO='면역세포 카드를 고르고 줄을 누르면 그 줄의 혈관에서 출동한다. 출동한 세포는 고른 줄과 위아래 한 줄 안에서만 움직인다.';
+function setInfo(t){$('info').innerHTML=t;}
 function drawWith(g,fn){const keep=ctx;ctx=g;try{fn();}finally{ctx=keep;}}
 function makeIcon(type,k){
   const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
@@ -1170,18 +1293,20 @@ function setTab(t){
   TAB=t;
   [['barrierRow','barrier'],['unitRow','unit'],['autoRow','auto']].forEach(([id,key])=>{$(id).hidden=key!==t;});
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
-  if(t!=='barrier'&&selected){selected=null;}
+  if(selected&&(t==='barrier')!==(selected.type==='barrier')){selected=null;}
   setInfo(t==='barrier'?'준비 단계에 카드를 고르고 칸을 눌러 깐다. 웨이브가 시작되면 더 못 깐다.':t==='auto'?'이 세포들은 직접 부를 수 없다. 몸이 상황에 맞춰 알아서 내보낸다. 카드를 누르면 설명이 나온다.':DEFAULT_INFO);
 }
 function buildTray(){
-  const st=STAGES[S.stage];
+  const st=S.cfg;
   const br=$('barrierRow'),uh=$('unitHand'),mh=$('memHand'),ar=$('autoRow');
   br.innerHTML='';uh.innerHTML='';mh.innerHTML='';ar.innerHTML='';
   st.barriers.forEach(k=>br.appendChild(cardEl('barrier',k)));
   st.units.forEach(k=>uh.appendChild(cardEl('unit',k)));
-  uh.appendChild(cardEl('unit','bcell'));
-  [...new Set([...Object.keys(S.memory).filter(s=>S.memory[s]),...st.strains])].filter(s=>!STRAINS[s].harmless).forEach(s=>mh.appendChild(cardEl('memory',s)));
+  const showMem=!S.tut||st.mem;
+  if(showMem)[...new Set([...Object.keys(S.memory).filter(s=>S.memory[s]),...st.strains])].filter(s=>!STRAINS[s].harmless).forEach(s=>mh.appendChild(cardEl('memory',s)));
+  mh.hidden=!showMem;$('memLbl').hidden=!showMem;
   AUTO.forEach(a=>ar.appendChild(autoCard(a)));
+  $('tab-barrier').hidden=!st.barriers.length;$('tab-unit').hidden=!st.units.length;$('tab-auto').hidden=!!(S.tut&&!st.auto);
   refreshTray();
 }
 const AUTO=[
@@ -1195,8 +1320,8 @@ function autoCard(a){
   d.appendChild(makeIcon('unit',a.k));
   const t=document.createElement('div');t.className='txt';t.innerHTML=`<div class="t">${a.name}</div><div class="lk">${a.how}</div>`;d.appendChild(t);
   d._cnt=cnt;d._auto=a;
-  const desc=a.k==='serum'?'히스타민으로 넓어진 혈관에서 새어 나오는 액체. 고인 곳에선 병원체가 느려지고, 보체 단백질이 세균에 구멍을 낸다':UNITS[a.k].desc;
-  d.onclick=d.onmouseenter=d.onfocus=()=>setInfo(`${a.name}: ${desc}`);
+  const dd=a.k==='serum'?{desc:'웅덩이 안의 병원체를 느리게 하고 세균에 계속 피해를 준다.',bio:'비특이적 방어 · 염증 반응. 넓어진 혈관에서 새어 나온 혈장 속 보체 단백질이 세균에 구멍을 낸다.'}:UNITS[a.k];
+  d.onclick=d.onmouseenter=d.onfocus=()=>setInfo(infoHtml(a.name,dd,a.how+'만 나온다'));
   return d;
 }
 function cardEl(type,k){
@@ -1209,18 +1334,17 @@ function cardEl(type,k){
   b.onclick=()=>{
     if(b.dataset.off==='1'){b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');SND.play('nope');setInfo(offReason(type,k));return;}
     removeMode=false;S.picked=null;$('removeBtn').classList.remove('sel');
-    if(type==='unit'||type==='memory'){selected=null;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');
-      if(type==='memory')spawnUnit('memory',k);else spawnUnit(k);return;}
-    selected=(selected&&selected.k===k)?null:{type,k};
-    setInfo(selected?`${def.name}: ${def.desc}. 반짝이는 칸을 눌러 깐다.`:DEFAULT_INFO);refreshTray();};
+    selected=(selected&&selected.k===k&&selected.type===type)?null:{type,k};SND.play('click');
+    setInfo(selected?cardInfo(type,k)+`<span class="how">${type==='barrier'?'반짝이는 칸을 눌러 깐다.':'출동할 줄을 누른다. 고른 줄과 위아래 한 줄 안에서만 움직인다.'}</span>`:DEFAULT_INFO);refreshTray();};
   b.onmouseenter=b.onfocus=()=>setInfo(cardInfo(type,k));
   return b;
 }
-function cardInfo(type,k){
-  if(type==='barrier')return `${BARRIERS[k].name}: ${BARRIERS[k].desc}`;
-  if(type==='memory'){if(!S.memory[k])return S.revealed[k]?`${STRAINS[k].name}을 ${10-Math.min(10,S.kills[k]||0)}번 더 물리치면 기억세포가 생긴다.`:'아직 정체를 모르는 항원이다. 대식세포가 정체를 밝혀야 기억도 쌓인다.';
-    return `기억세포 ${k}형: ${STRAINS[k].name} 전용. ${UNITS.memory.desc}`;}
-  const why=blockReason(k);return `${UNITS[k].name}: ${UNITS[k].desc}${why?` · ${why}`:''}`;
+function infoHtml(name,d,extra=''){return `<b>${name}</b> ${d.desc}${extra?` <em>${extra}</em>`:''}<span class="bio">${d.bio||''}</span>`;}
+function cardInfo(type,k,u){
+  if(type==='barrier')return infoHtml(BARRIERS[k].name,BARRIERS[k]);
+  if(type==='memory'){if(!S.memory[k])return S.revealed[k]?`<b>기억세포 ${k}형</b> ${STRAINS[k].name}을 ${10-Math.min(10,S.kills[k]||0)}번 더 물리치면 열린다.<span class="bio">${UNITS.memory.bio}</span>`:'<b>기억세포 ???</b> 아직 정체를 모르는 항원이다. 대식세포가 정체를 밝혀야 기억도 쌓인다.';
+    return infoHtml(`기억세포 ${k}형`,UNITS.memory,`${STRAINS[k].name} 전용`);}
+  const why=u?'':blockReason(k);return infoHtml(UNITS[k].name,UNITS[k],why);
 }
 function offReason(type,k){
   if(type==='barrier')return S.phase!=='setup'?'1차 방어선은 웨이브 시작 전에만 깔 수 있다. 감염 전부터 있는 방어이기 때문이다.':`포도당이 모자란다 (${BARRIERS[k].cost} 필요)`;
@@ -1233,12 +1357,12 @@ function refreshTray(){
     if(b._auto){const n=b._auto.count();const t=n?`판 위 ${n}`:'0';if(b._cnt.textContent!==t)b._cnt.textContent=t;b._cnt.classList.toggle('zero',!n);return;}
     if(!b._txt)return;
     let cost,off,lock=false,name,sub='',prog='';
-    if(type==='barrier'){cost=BARRIERS[k].cost;name=BARRIERS[k].name;off=S.phase!=='setup'||S.glu<cost;if(S.phase!=='setup')sub='준비 단계 전용';}
+    if(type==='barrier'){cost=BARRIERS[k].cost;name=BARRIERS[k].name;off=S.phase!=='setup'||S.glu<cost;sub=S.phase!=='setup'?'준비 단계 전용':BARRIERS[k].tag;}
     else if(type==='memory'){cost=UNITS.memory.cost;const open=!!S.memory[k],rev=S.revealed[k],n=Math.min(10,S.kills[k]||0);lock=!open;
       name=open||rev?`기억세포 ${k}형`:'기억세포 ???';off=lock||S.glu<cost||(S.phase!=='setup'&&S.phase!=='wave');
-      if(lock){sub=rev?`잠김 · ${n}/10`:'잠김 · 정체 불명';prog=`<div class="prog"><i style="width:${rev?n*10:0}%"></i></div>`;}}
-    else{cost=UNITS[k].cost;name=UNITS[k].name;const why=blockReason(k);lock=why.includes('항원');off=!!why;
-      if(lock)sub=k==='tc'?'잠김 · 세포 안 병원체':'잠김 · 항원 필요';}
+      if(lock){sub=rev?`잠김 · ${n}/10`:'잠김 · 정체 불명';prog=`<div class="prog"><i style="width:${rev?n*10:0}%"></i></div>`;}else sub=UNITS.memory.tag;}
+    else{cost=UNITS[k].cost;name=UNITS[k].name;const why=blockReason(k);lock=((k==='helper'||k==='bcell')&&!revealedList().length)||(k==='tc'&&!revealedList(true).length);off=!!why;
+      sub=lock?(k==='tc'?'잠김 · 세포 안 병원체':'잠김 · 항원 필요'):UNITS[k].tag;}
     b.dataset.off=off?'1':'0';b.setAttribute('aria-disabled',String(off));
     b.classList.toggle('locked',lock);b.classList.toggle('poor',!lock&&S.glu<cost);b.classList.toggle('off',off&&!lock);
     b._cost.hidden=lock;
@@ -1246,12 +1370,12 @@ function refreshTray(){
     if(b._txt.innerHTML!==html)b._txt.innerHTML=html;
     b.classList.toggle('sel',!!(selected&&selected.k===k&&selected.type===type));
   });
-  if(selected&&S.phase!=='setup')selected=null;
+  if(selected&&selected.type==='barrier'&&S.phase!=='setup')selected=null;
   const setup=S.phase==='setup';
-  $('startBtn').disabled=!setup;$('startLbl').textContent=setup?'시작':S.phase==='wave'?'방어 중':'대기';
-  $('antiBtn').disabled=!STAGES[S.stage].anti||S.phase!=='wave'||S.antiUsed;
+  $('startBtn').disabled=!setup||!!(S.tut&&!S.tut.allowStart);$('startLbl').textContent=setup?'시작':S.phase==='wave'?'방어 중':'대기';
+  $('antiBtn').disabled=!S.cfg.anti||S.phase!=='wave'||S.antiUsed;
   $('pyBtn').disabled=!(S.fever>0)||S.antipyUsed||S.phase!=='wave';
-  $('antiBtn').title=!STAGES[S.stage].anti?'2스테이지부터 쓸 수 있다':S.antiUsed?'이미 썼다':'항생제 (1회)';
+  $('antiBtn').title=!S.cfg.anti?'2스테이지부터 쓸 수 있다':S.antiUsed?'이미 썼다':'항생제 (1회)';
 }
 const HEART='<svg viewBox="0 0 24 24"><path fill="#ff6b86" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>';
 let heartsBuilt=false,lastHp=null;
@@ -1264,13 +1388,13 @@ function refreshHud(){
    $('thermoFill').style.width=Math.max(4,Math.min(100,(t-36)/6*100))+'%';th.classList.toggle('hot',hot);th.classList.toggle('burn',burn);
    $('tempState').textContent=burn?'고열 · 디버프':hot?'적당한 열 · 버프':t>37.2?'오르는 중':'정상';
    $('game').classList.toggle('hot',hot);$('game').classList.toggle('burn',burn);}
-  $('stageNo').textContent=S.stage+1;$('stageName').textContent=STAGES[S.stage].name;
+  $('stageNo').textContent=S.tut?'T'+(S.tut.i+1):S.stage+1;$('stageName').textContent=S.tut?S.cfg.short:S.cfg.name;
   const chips=[];
-  for(const s of STAGES[S.stage].strains){
+  for(const s of S.cfg.strains){
     if(S.revealed[s])chips.push(`<span class="chip" style="border-color:${STRAINS[s].color};color:${STRAINS[s].color}">${STRAINS[s].harmless?STRAINS[s].name:`${S.memory[s]?'기억 ':''}${s}형${S.kills[s]&&!S.memory[s]?` ${Math.min(S.kills[s],10)}/10`:''}`}</span>`);
     else if(S.enemies.some(e=>e.s===s))chips.push('<span class="chip">? 정체 불명</span>');
   }
-  if(S.revealed&&Object.keys(S.revealed).length)chips.push(hasHelper()?'<span class="chip on">지휘 중</span>':'<span class="chip warn">지휘관 없음</span>');
+  if(S.revealed&&Object.keys(S.revealed).length&&S.cfg.units.includes('helper'))chips.push(hasHelper()?'<span class="chip on">지휘 중</span>':'<span class="chip warn">지휘관 없음</span>');
   if(S.fever>0)chips.push(`<span class="chip warn">피버 타임 ${Math.ceil(S.fever)}초</span>`);
   if(S.allergy>0)chips.push(`<span class="chip warn">알레르기 ${Math.ceil(S.allergy)}초</span>`);
   else if(S.flags.sens)chips.push('<span class="chip">꽃가루 감작</span>');
@@ -1279,15 +1403,15 @@ function refreshHud(){
 }
 function overlay(html){$('overlay').innerHTML=html;$('overlay').hidden=false;}
 function hideOverlay(){$('overlay').hidden=true;}
-function st(){return STAGES[S.stage];}
+function st(){return S.cfg;}
 function showIntro(){
-  const st=STAGES[S.stage];
+  const st=S.cfg;
   const tips=[
-    ['오른쪽 상처로 병원체가 몰려온다. 왼쪽 혈관에 닿으면 온몸으로 퍼져 체력(하트)이 깎인다.','준비 단계에서 1차 방어선 카드를 고르고 반짝이는 칸을 눌러 깐다. 웨이브가 시작되면 더 못 깐다.','대식세포(백혈구)는 멀리 있는 세균을 못 알아챈다. 돌아다니다 바로 옆에 와야 먹는다.','비만세포는 세균이 다가오면 소리치며 히스타민을 뿜는다. 그러면 혈장이 새어 나오고 호중구가 몰려온다. 호중구와 혈장은 직접 부를 수 없다.','처음 보는 병원체는 까맣다. 대식세포가 하나를 먹으면 그 유형 전체의 정체가 드러난다.','T림프구는 정체가 드러난 항원이 있어야 열린다. 세포독성 T림프구는 세포 안에 숨는 병원체(바이러스, B형 세균)의 정체가 드러나야 쓸 수 있다.','중간에 피버 타임이 온다. 적당한 열은 병원체를 약하게 하지만, 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다. 위의 체온계를 보자.'],
-    ['면역세포 탭의 B림프구는 드러난 항원 하나를 맡는다. 머리 위 표식이 담당 항원이다.','까만 병원체 중엔 해롭지 않은 꽃가루도 섞여 있다. 정체를 밝힌 상태로 보조 T림프구가 있으면 몸이 꽃가루를 적으로 기억해 버린다(감작).','보조 T림프구가 판에 있어야 B림프구가 활성화되어 형질세포를 만든다. 항체를 뿌리는 건 형질세포다.','같은 유형을 10번 물리치면 그 유형의 기억세포가 열린다.'],
-    ['바이러스는 노란 고리가 다 차면(6초) 세포 속으로 숨어 감염세포가 되고, 감염세포는 그 자리에서 바이러스를 복제해 내보내다 결국 터진다.','NK세포는 아무 감염세포나, 세포독성 T림프구는 맡은 항원의 감염세포만 공격한다.','마지막에 새 항원을 가진 변이 바이러스가 온다.','중간에 꽃가루 시즌이 온다. 림프절에서 꽃가루에 감작됐다면 알레르기 반응이 일어난다.']
+    ['세균은 위·아래 벽의 상처로 들어와 혈관(왼쪽)으로 향한다. 붉게 깜박이며 "침입!"이 뜨는 상처를 지킨다.','준비 단계에 1차 방어선을 깔고 시작 버튼을 누른다.','처음 보는 병원체는 까맣다. 대식세포가 먹어 정체를 밝혀야 림프구 카드가 열린다.','중간에 피버 타임이 온다. 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다.'],
+    ['독소 세균은 가까이 간 면역세포를 다치게 한다. B림프구가 만든 항체로 멀리서 중화한다.','B림프구와 세포독성 T림프구는 보조 T림프구가 판에 있어야 움직인다.','오른쪽 림프관으로 꽃가루도 들어온다. 해롭지 않지만 몸이 꽃가루를 적으로 기억하면 알레르기가 생긴다.','같은 유형을 10번 물리치면 그 유형의 기억세포가 열린다.'],
+    ['바이러스는 오른쪽 기도로 들어와 몇 초 뒤 세포 속에 숨는다. 감염세포는 세포독성 T림프구나 NK세포로 없앤다.','E형 바이러스는 세포독성 T림프구를 피한다. NK세포를 쓴다.','마지막에 새 항원을 가진 변이 바이러스가 온다. 기억세포가 통하지 않는다.']
   ][S.stage];
-  overlay(`<div class="card"><div class="eyebrow">스테이지 ${S.stage+1} / ${STAGES.length}</div><h2>${st.name}</h2><p>${st.goal}</p>
+  overlay(`<div class="card"><div class="eyebrow">스테이지 ${S.stage+1} / ${STAGES.length} · 난이도 ${S.dm.name}</div><h2>${st.name}</h2><p>${st.goal}</p>
   <ul>${tips.map(t=>`<li>${t}</li>`).join('')}</ul><button class="btn" id="goBtn">준비하기</button></div>`);
   $('goBtn').onclick=()=>{hideOverlay();setTab('barrier');};
   $('goBtn').focus();
@@ -1297,16 +1421,16 @@ function showClear(){
   const last=S.stage===STAGES.length-1;
   overlay(`<div class="card"><div class="eyebrow">방어 성공</div><h2>${last?'모든 감염을 막아냈다':st().name+' 방어 완료'}</h2>
   <p>${last?'정체불명의 병원체를 식세포가 먹고, 항원 제시로 정체를 밝히고, 항체와 세포독성 T림프구로 처리하고, 기억세포까지 남겼다. 실제 몸의 면역도 이 순서로 이어진다.':'남은 체력 '+S.hp+'. 다음 부위로 이동한다. 드러난 항원과 기억세포는 그대로 남는다.'}</p>
-  <button class="btn" id="nextBtn">${last?'처음부터 다시':'다음 스테이지'}</button></div>`);
-  $('nextBtn').onclick=()=>{if(last)DISC={};S=last?newState(0):newState(S.stage+1,S);lastHp=null;buildTray();showIntro();};
+  <button class="btn" id="nextBtn">${last?'모드 선택으로':'다음 스테이지'}</button></div>`);
+  $('nextBtn').onclick=()=>{if(last){hideOverlay();openModes();return;}S=newState(S.stage+1,S);lastHp=null;buildTray();setTab('barrier');showIntro();};
   refreshTray();
 }
 function showOver(){
   SND.play('over');
   overlay(`<div class="card"><div class="eyebrow">감염 확산</div><h2>방어선이 무너졌다</h2>
   <p>정체를 빨리 밝힐수록 특이적 면역을 일찍 쓸 수 있다. 세균은 식세포와 항체, 바이러스는 숨기 전엔 항체로, 숨은 뒤엔 NK세포와 세포독성 T림프구로 막아야 한다.</p>
-  <button class="btn" id="retryBtn">이 스테이지 다시</button></div>`);
-  $('retryBtn').onclick=()=>{const keep=S.stage>0?S.carry:null;S=newState(S.stage,keep);lastHp=null;buildTray();showIntro();};
+  <button class="btn" id="retryBtn">${S.tut?'튜토리얼 다시':'이 스테이지 다시'}</button></div>`);
+  $('retryBtn').onclick=()=>{if(S.tut){startTut(S.tut.i);return;}const keep=S.stage>0?S.carry:null;S=newState(S.stage,keep,{diff:S.diffK});lastHp=null;buildTray();showIntro();};
   refreshTray();
 }
 const BOOK_AG=[
@@ -1441,7 +1565,7 @@ cv.addEventListener('pointermove',ev=>{hover=cellFromEvent(ev);});
 cv.addEventListener('pointerleave',()=>hover=null);
 cv.addEventListener('pointerdown',ev=>{if(S.phase!=='setup'&&S.phase!=='wave')return;const {c,r,px,py}=cellFromEvent(ev);if(c<0||c>=COLS||r<0||r>=ROWS)return;place(c,r,px,py);hover={c,r};refreshTray();});
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{setTab(b.dataset.tab);refreshTray();});
-$('startBtn').onclick=()=>{if(S.phase!=='setup')return;SND.play('start');S.phase='wave';S.t=0;selected=null;setTab('unit');camPunch(W/2,H/2,.05);setInfo('웨이브 시작. 면역세포 카드를 눌러 계속 출동시킨다.');refreshTray();};
+$('startBtn').onclick=()=>{if(S.phase!=='setup')return;SND.play('start');S.phase='wave';S.t=0;selected=null;if(S.cfg.units.length)setTab('unit');camPunch(W/2,H/2,.05);setInfo('웨이브 시작. 면역세포 카드를 눌러 계속 출동시킨다.');refreshTray();};
 $('antiBtn').onclick=()=>{if(S.antiUsed||S.phase!=='wave')return;S.antiUsed=true;
   S.enemies.forEach(e=>{if(e.k==='bact'||e.k==='toxin'){e.dead=1;S.fx.push({x:LEFT+e.x*CELL,y:e.lane*CELL+50,t:0,kind:'pop'});}});
   S.enemies=S.enemies.filter(e=>!e.dead);note('antibiotic');refreshTray();};
@@ -1453,6 +1577,233 @@ function syncSnd(){const m=SND.isMuted();$('sndBtn').classList.toggle('off',m);$
 $('sndBtn').onclick=()=>{SND.init();SND.setMuted(!SND.isMuted());syncSnd();};syncSnd();
 $('pyBtn').onclick=()=>{if(!(S.fever>0)||S.antipyUsed)return;S.antipyUsed=true;S.antipyT=S.fever;note('antipy');refreshTray();};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;removeMode=false;S.picked=null;$('removeBtn').classList.remove('sel');refreshTray();}});
+
+// ---------- tutorials: one cell at a time, game rule <-> biology concept ----------
+function tSched(list){for(const [d,k,s,o] of list){const op=o||{};S.spawns.push({t:S.t+d,k,s,lane:op.lane??2,w:op.w??0});}S.spawns.sort((a,b)=>a.t-b.t);}
+function tWave(){if(S.phase==='setup'){S.phase='wave';S.t=0;}}
+const tHas=(k,rows)=>S.units.some(u=>u.k===k&&(!rows||rows.includes(u.band)));
+const tClear=()=>!S.spawns.length&&!S.enemies.length;
+function tGrid(k,f){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const g=S.grid[r][c];if(g&&g.k===k&&(!f||f(c,r)))return [c,r];}return null;}
+function tPre(k,row,s){const d=UNITS[k];S.units.push({k,s,x:.6,y:row,band:row,hx:.6,hy:row,hp:d.hp,maxhp:d.hp,cd:0,born:S.t,tick:0,face:1,moving:0,ordered:false,active:!(k==='bcell'||k==='tc'),actT:0,kills:0,state:'seek',pt:performance.now()/1000});}
+const tSel=(type,k)=>()=>!!(selected&&selected.type===type&&selected.k===k);
+const ALL_ROWS=[0,1,2,3,4];
+const TUTS=[
+ {short:'1차 방어선',name:'튜토리얼 1 · 1차 방어선',sub:'피부 · 분비물 · 점막',
+  cfg:{look:0,barriers:['skin','mucus','lyso'],units:[],strains:['A'],start:120,wounds:[{side:1,c:7}],noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {next:1,point:{vessel:1},t:'이곳은 피부 바로 아래 조직입니다. 왼쪽의 붉은 띠는 <b>혈관</b>입니다. 병원체가 혈관에 닿으면 혈액을 타고 온몸으로 퍼지고, 위쪽의 하트(몸의 체력)가 하나 줄어듭니다.'},
+   {next:1,point:{wound:0},t:'아래쪽 벽에 <b>상처</b>가 났습니다. 피부가 찢어지면 그 틈으로 세균이 들어옵니다. 세균은 상처에서 나와 혈관 쪽(왼쪽)으로 이동합니다. 상처의 위치는 판마다 바뀌므로, 시작하기 전에 상처가 어디에 났는지 먼저 확인하세요.'},
+   {next:1,point:{el:'glubar'},t:'카드를 쓰려면 <b>포도당</b>이 필요합니다. 우리 몸의 세포는 포도당을 분해해 활동에 필요한 에너지를 얻습니다. 포도당은 시간이 지나면 조금씩 차오르고, 병원체를 물리칠 때도 조금 얻습니다. 카드 왼쪽 위의 숫자가 그 카드에 필요한 포도당입니다.'},
+   {next:1,tab:'barrier',point:{el:'barrierRow'},t:'우리 몸에는 병원체가 들어오기 전부터 이를 막는 장벽이 있습니다. 이것을 <b>1차 방어</b>라고 합니다. 피부, 점막, 눈물과 침 같은 분비물이 여기에 속합니다. 1차 방어는 병원체의 종류를 가리지 않고 막으므로 <b>비특이적 방어</b>에 속합니다.'},
+   {tab:'barrier',point:{card:'barrier:skin'},wait:tSel('barrier','skin'),t:'먼저 <b>피부</b> 카드를 누르세요.'},
+   {cells:(c,r)=>r===4&&c>=2&&c<=6,point:{cells:1},wait:()=>!!tGrid('skin',(c,r)=>r===4),t:'세균이 지나갈 아래쪽 줄에서 반짝이는 칸 하나를 누르세요. 피부는 병원체가 지나가지 못하게 막는 벽입니다. 피부의 <b>각질층</b>이 이런 물리적 장벽 역할을 합니다.'},
+   {tab:'barrier',point:{card:'barrier:lyso'},wait:tSel('barrier','lyso'),t:'다음은 <b>분비물</b>입니다. 눈물과 침 속의 <b>라이소자임</b>은 세균의 세포벽을 분해합니다. 분비물 카드를 누르세요.'},
+   {cells:(c,r)=>{const sk=tGrid('skin',(cc,rr)=>rr===4);return sk&&r===4&&c===sk[0]+1;},point:{cells:1},wait:()=>{const sk=tGrid('skin',(c,r)=>r===4);return !!(sk&&tGrid('lyso',(c,r)=>r===4&&c===sk[0]+1));},
+    t:'피부 바로 오른쪽 칸을 누르세요. 피부에 막혀 멈춘 세균이 이 칸에서 라이소자임에 녹습니다.'},
+   {next:1,tab:'barrier',point:{card:'barrier:mucus'},t:'<b>점막</b>은 끈적한 점액으로 병원체를 붙잡아 느리게 만듭니다. 호흡기와 소화관의 안쪽이 점막으로 덮여 있습니다. 이번에는 쓰지 않아도 되지만, 병원체가 지나가는 길에 깔면 시간을 벌 수 있습니다.'},
+   {start:1,point:{el:'startBtn'},wait:()=>S.phase==='wave',t:'준비가 끝났습니다. <b>시작</b> 버튼을 누르세요. 1차 방어선은 감염이 일어나기 전부터 있는 방어라서, 시작하기 전 준비 단계에만 깔 수 있습니다.'},
+   {enter:()=>{S.tut.spawned=0;tSched([[1,'bact','A'],[3.5,'bact','A'],[6,'bact','A'],[8.5,'bact','A']]);},point:{wound:0},wait:()=>S.tut.spawned>=4&&tClear(),
+    t:'세균이 상처로 들어옵니다. 피부가 세균을 막고, 분비물이 막힌 세균을 녹이는 모습을 지켜보세요.'},
+   {next:1,t:'1차 방어선이 세균을 모두 막았습니다. 하지만 1차 방어선은 계속 공격받으면 닳고, 병원체가 많아지면 뚫립니다. 그래서 몸 안으로 들어온 병원체를 직접 처리하는 <b>면역세포</b>가 필요합니다.'}
+  ],
+  sum:'1차 방어(피부·점막·분비물)는 병원체가 들어오기 전부터 있는 비특이적 방어입니다. 게임에서는 준비 단계에만 깔 수 있고, 상처 위치를 보고 길목에 까는 것이 중요합니다.'},
+
+ {short:'대식세포',name:'튜토리얼 2 · 대식세포와 항원 제시',sub:'식세포 작용 · 항원 제시',
+  cfg:{look:0,barriers:[],units:['macro'],strains:['A'],start:160,wounds:[{side:0,c:7}],noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {next:1,tab:'unit',point:{card:'unit:macro'},t:'이제 면역세포가 직접 싸웁니다. <b>대식세포</b>는 백혈구의 한 종류로, 병원체를 삼켜 분해합니다. 이것을 <b>식세포 작용</b>이라고 합니다. 대식세포는 병원체의 종류를 가리지 않고 먹으므로 비특이적 방어에 속합니다.'},
+   {next:1,point:{wound:0},t:'이번 상처는 위쪽 벽에 있습니다. 세균은 맨 위 줄을 따라 혈관 쪽으로 이동합니다.'},
+   {next:1,point:{rows:ALL_ROWS},t:'면역세포는 혈관에서 나와 조직으로 들어갑니다. 카드를 고른 뒤 줄을 누르면 그 줄의 혈관에서 세포가 나옵니다. 출동한 세포는 <b>고른 줄과 그 위아래 한 줄</b> 안에서만 돌아다니므로, 병원체가 지나갈 줄을 골라야 합니다.'},
+   {tab:'unit',point:{card:'unit:macro'},wait:tSel('unit','macro'),t:'대식세포 카드를 누르세요.'},
+   {rows:[0],point:{rows:[0]},wait:()=>tHas('macro'),t:'세균이 지나갈 맨 위 줄을 누르세요. 대식세포는 이 줄과 바로 아래 줄을 돌아다닙니다.'},
+   {enter:()=>{tWave();tSched([[1,'bact','A'],[4,'bact','A'],[7,'bact','A'],[10,'bact','A']]);},rows:[0,1],point:{wound:0},wait:()=>!!S.revealed.A,
+    tick:()=>{if(tClear()&&!S.revealed.A)tSched([[1,'bact','A'],[4,'bact','A']]);},
+    t:'들어오는 세균이 까맣게 보입니다. 우리 몸이 아직 이 병원체가 무엇인지 모르기 때문입니다. 대식세포는 멀리 있는 병원체는 알아채지 못하고, 돌아다니다 바로 옆에 오면 먹습니다.'},
+   {next:1,point:{enemy:'any'},t:'대식세포가 세균을 삼킨 뒤, 분해한 조각을 세포 표면에 올려 내보였습니다. 이것을 <b>항원 제시</b>라고 합니다. 이제 이 유형의 세균은 모두 정체가 드러나 색이 보이고, 머리 위에 A 표식이 붙습니다.'},
+   {next:1,t:'<b>항원</b>은 몸에 면역 반응을 일으키는 물질로, 병원체마다 모양이 다릅니다. 항원이 드러나야 특정 항원만 골라 공격하는 <b>특이적 방어</b>(B림프구, T림프구)가 시작됩니다. 대식세포는 비특이적 방어를 하면서, 특이적 방어를 시작하게 하는 다리 역할도 합니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),tick:()=>{},t:'남은 세균을 대식세포가 처리하는 모습을 지켜보세요. 포도당이 넉넉하면 대식세포를 한 마리 더 보내도 됩니다.'}
+  ],
+  sum:'대식세포는 가까이 온 병원체를 먹습니다(식세포 작용, 비특이적 방어). 처음 보는 병원체를 먹으면 항원 제시로 정체를 밝힙니다. 본게임에서는 정체가 드러나야 림프구 카드가 열립니다.'},
+
+ {short:'비만세포',name:'튜토리얼 3 · 비만세포와 염증 반응',sub:'히스타민 · 호중구 · 혈장',
+  cfg:{look:0,auto:1,barriers:[],units:['macro','mast'],strains:['A'],start:220,wounds:[{side:1,c:6},{side:1,c:8}],revealed:{A:1},noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {next:1,point:{wounds:1},t:'이번에는 아래쪽 상처 두 곳으로 세균이 한꺼번에 몰려옵니다. 대식세포는 느려서 혼자서는 다 막지 못합니다.'},
+   {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 조직에 머물러 있다가 세균을 발견하면 <b>히스타민</b>을 분비합니다. 히스타민은 모세 혈관을 넓히고 혈관 벽의 틈을 벌려, 혈관 속의 백혈구와 혈장이 감염 부위로 빠져나오게 합니다. 이것을 <b>염증 반응</b>이라고 합니다. 다친 곳이 붉어지고, 붓고, 열이 나는 까닭입니다.'},
+   {tab:'unit',point:{card:'unit:mast'},wait:tSel('unit','mast'),t:'비만세포 카드를 누르세요.'},
+   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('mast'),t:'세균이 지나갈 아래쪽 두 줄 중 하나를 누르세요.'},
+   {enter:()=>{tWave();tSched([0,1,2,3,4,5,6].map(i=>[1+i*1.3,'bact','A',{w:i%2}]));},rows:[3,4],point:{unit:'mast'},wait:()=>!!S.flags.alarm,
+    tick:()=>{if(tClear()&&!S.flags.alarm)tSched([[1,'bact','A',{w:0}],[2,'bact','A',{w:1}]]);},
+    t:'세균이 몰려옵니다. 비만세포 가까이로 세균이 오면 어떤 일이 일어나는지 지켜보세요.'},
+   {next:1,point:{unit:'mast'},t:'비만세포가 "세균이다!" 하고 히스타민(보라색 알갱이)을 뿜었습니다. 넓어진 혈관에서 <b>호중구</b>가 달려 나오고, 노란 <b>혈장</b> 웅덩이가 생겼습니다. 혈장 속의 <b>보체</b> 단백질은 세균에 구멍을 내고, 웅덩이 안의 병원체는 느려집니다.'},
+   {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 카드로 직접 부를 수 없습니다. 비만세포가 신호를 보낼 때만 나옵니다. <b>자동 출동</b> 탭에서 지금 판에 얼마나 나와 있는지 볼 수 있습니다. 호중구는 비만세포가 알린 세균만 먹고, 일이 끝나면 사라집니다.'},
+   {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요. 대식세포를 함께 보내면 더 빨리 끝납니다.'}
+  ],
+  sum:'비만세포는 직접 싸우지 않고, 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 부릅니다. 모두 병원체의 종류를 가리지 않는 비특이적 방어입니다.'},
+
+ {short:'B림프구',name:'튜토리얼 4 · 보조 T림프구와 B림프구',sub:'형질세포 · 항체 · 체액성 면역',
+  cfg:{look:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['C'],start:300,wounds:[{side:0,c:7}],revealed:{C:1},noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {next:1,point:{wound:0},t:'이번 적은 <b>독소를 뿜는 세균</b>입니다. 독소는 가까이 온 면역세포를 다치게 해서, 식세포가 다가가 먹기 어렵습니다. 이럴 때는 멀리서 <b>항체</b>로 공격합니다. 이 세균의 정체는 이미 드러나 있다고 하겠습니다.'},
+   {next:1,tab:'unit',point:{card:'unit:bcell'},t:'<b>B림프구</b>는 항원 한 종류에만 반응하는 림프구입니다. 몸속에는 저마다 다른 항원에 맞는 B림프구가 아주 많고, 드러난 항원에 꼭 맞는 B림프구가 골라져 출동합니다. 세포 머리 위의 표식이 이 B림프구가 맡은 항원입니다.'},
+   {tab:'unit',point:{card:'unit:bcell'},wait:tSel('unit','bcell'),t:'B림프구 카드를 누르세요.'},
+   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('bcell'),t:'세균이 지나갈 위쪽 줄 근처를 누르세요.'},
+   {enter:()=>{tWave();},next:1,point:{unit:'bcell'},t:'B림프구 위에 "신호 대기"가 떠 있습니다. B림프구는 항원을 만났다고 바로 일하지 않습니다. <b>보조 T림프구</b>가 같은 항원을 인식하고 신호 물질(<b>사이토카인</b>)을 보내야 활성화됩니다.'},
+   {tab:'unit',point:{card:'unit:helper'},wait:tSel('unit','helper'),t:'보조 T림프구 카드를 누르세요.'},
+   {rows:[0,1,2],point:{rows:[0,1,2]},wait:()=>tHas('helper'),t:'B림프구가 있는 줄 근처를 누르세요.'},
+   {point:{unit:'helper'},wait:()=>tHas('plasma'),t:'보조 T림프구가 B림프구에게 신호(파란 점)를 보냅니다. 신호를 받은 B림프구가 어떻게 바뀌는지 지켜보세요.'},
+   {next:1,point:{unit:'plasma'},t:'B림프구가 분열하면서 <b>형질세포</b>를 만들었습니다. 형질세포는 항체를 만들어 내보내는 세포입니다. 활성화된 B림프구 중 일부는 나중을 위해 <b>기억세포</b>로도 남습니다.'},
+   {enter:()=>{tSched([0,1,2,3,4].map(i=>[.5+i*2.4,'toxin','C']));},point:{wound:0},wait:()=>S.enemies.some(e=>e.opT>0),
+    t:'독소 세균이 들어옵니다. 형질세포가 무엇을 하는지 지켜보세요.'},
+   {next:1,point:{enemy:'op'},t:'형질세포가 뿌린 <b>항체</b>(Y자 모양)가 세균에 붙었습니다. 항체는 꼭 맞는 항원에만 결합합니다. 이것을 <b>항원 항체 반응의 특이성</b>이라고 합니다. 항체가 붙으면 독소가 중화되고, 세균이 느려지며, 식세포에게 두 배로 잘 먹힙니다.'},
+   {next:1,t:'이처럼 형질세포가 만든 항체로 항원을 없애는 방어를 <b>체액성 면역</b>이라고 합니다. 항체가 혈액 같은 체액에 녹아 몸을 돌아다니기 때문에 붙은 이름입니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 독소 세균을 처리하세요. 항체가 붙은 세균은 대식세포가 쉽게 먹습니다.'}
+  ],
+  sum:'보조 T림프구는 사이토카인으로 B림프구와 세포독성 T림프구를 활성화합니다. 활성화된 B림프구는 형질세포로 분화하고, 형질세포가 만든 항체가 항원과 결합합니다(체액성 면역). 본게임에서는 보조 T림프구가 판에 없으면 B·T림프구가 "신호 대기"만 합니다.'},
+
+ {short:'세포독성 T',name:'튜토리얼 5 · 세포독성 T림프구',sub:'감염세포 · 세포성 면역',
+  cfg:{look:2,edge:1,auto:1,barriers:[],units:['helper','tc'],strains:['D'],start:300,wounds:[],revealed:{D:1},noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {enter:()=>{tPre('helper',2);},next:1,point:{edge:1},t:'이곳은 기도입니다. 이번에는 숨을 쉴 때 <b>오른쪽 기도 입구</b>로 <b>바이러스</b>가 들어옵니다. 바이러스는 세포 구조가 없어 스스로 증식하지 못하고, 우리 몸의 세포 안에 들어가 그 세포를 이용해 증식합니다.'},
+   {enter:()=>{tWave();tSched([[.5,'virus','D',{lane:2}],[1.6,'virus','D',{lane:2}]]);},point:{edge:1},wait:()=>S.enemies.some(e=>e.k==='infected'),
+    t:'바이러스 둘레의 노란 고리를 보세요. 고리가 다 차면 바이러스가 세포 안으로 숨습니다.'},
+   {next:1,point:{enemy:'infected'},t:'바이러스가 세포 안으로 들어가 <b>감염세포</b>가 되었습니다. 세포 안에는 항체가 닿지 않습니다. 그대로 두면 감염세포는 바이러스를 계속 만들어 내보내다가 터집니다.'},
+   {next:1,tab:'unit',point:{card:'unit:tc'},t:'<b>세포독성 T림프구</b>는 감염된 세포를 찾아가 세포째 없앱니다. 감염세포는 표면에 바이러스 조각(항원)을 내보이는데, 세포독성 T림프구는 이 항원을 알아봅니다. 신호를 줄 보조 T림프구는 이미 와 있습니다.'},
+   {tab:'unit',point:{card:'unit:tc'},wait:tSel('unit','tc'),t:'세포독성 T림프구 카드를 누르세요.'},
+   {enter:()=>{const e=S.enemies.find(e=>e.k==='infected');const l=e?e.lane:2;S.tut.rowsNow=[l-1,l,l+1].filter(r=>r>=0&&r<ROWS);},rowsFn:()=>S.tut.rowsNow,point:{rowsNow:1},wait:()=>tHas('tc'),
+    t:'감염세포가 있는 줄이나 그 위아래 줄을 누르세요.'},
+   {point:{unit:'tc'},wait:()=>!!S.flags.tcKill,t:'세포독성 T림프구가 감염세포에 달라붙는 모습을 지켜보세요.'},
+   {next:1,t:'세포독성 T림프구가 <b>퍼포린</b>으로 감염세포의 세포막에 구멍을 뚫고, 그 틈으로 효소를 넣었습니다. 감염세포는 안의 바이러스와 함께 스스로 죽었습니다. 이것을 <b>세포자살</b>이라고 합니다.'},
+   {next:1,t:'이처럼 세포독성 T림프구가 감염된 세포를 직접 파괴하는 방어를 <b>세포성 면역</b>이라고 합니다. 세포독성 T림프구도 B림프구처럼 <b>보조 T림프구의 신호</b>가 있어야 활성화되고, 정체가 드러난 항원 한 종류만 맡습니다.'},
+   {enter:()=>{tSched([[1,'virus','D',{lane:1}],[2.2,'virus','D',{lane:3}],[4,'virus','D',{lane:2}],[5.5,'virus','D',{lane:1}]]);},rows:ALL_ROWS,wait:()=>tClear(),
+    t:'바이러스가 더 들어옵니다. 세포독성 T림프구를 더 보내 감염세포를 정리하세요.'}
+  ],
+  sum:'바이러스는 세포 안에 숨어 증식합니다. 항체가 닿지 않는 감염세포는 세포독성 T림프구가 세포째 파괴합니다(세포성 면역). 본게임 3스테이지에서는 NK세포도 감염세포를 공격합니다.'},
+
+ {short:'기억세포',name:'튜토리얼 6 · 기억세포와 2차 면역 반응',sub:'1차·2차 면역 반응 · 백신',
+  cfg:{look:0,mem:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['A'],start:240,wounds:[{side:1,c:7}],revealed:{A:1},kills:{A:8},noShift:1,noDivide:1,noDodge:1},
+  steps:[
+   {next:1,tab:'unit',point:{card:'memory:A'},t:'어떤 항원을 처음 만났을 때 일어나는 면역 반응을 <b>1차 면역 반응</b>이라고 합니다. 이때 활성화된 B림프구의 일부는 <b>기억세포</b>로 남아 그 항원을 기억합니다.'},
+   {next:1,tab:'unit',point:{card:'memory:A'},t:'게임에서는 같은 유형의 병원체를 10번 물리치면 그 유형의 기억세포 카드가 열립니다. 지금은 A형 세균을 8번 물리친 상태입니다. 카드 아래의 막대가 진행도입니다.'},
+   {tab:'unit',point:{card:'unit:macro'},wait:tSel('unit','macro'),t:'대식세포 카드를 누르세요.'},
+   {rows:[3,4],point:{rows:[3,4]},wait:()=>tHas('macro'),t:'세균이 지나갈 아래쪽 두 줄 중 하나를 누르세요.'},
+   {enter:()=>{tWave();tSched([[1,'bact','A'],[4,'bact','A'],[7,'bact','A']]);},rows:ALL_ROWS,point:{wound:0},wait:()=>!!S.memory.A,
+    tick:()=>{if(tClear()&&!S.memory.A)tSched([[1,'bact','A'],[3,'bact','A']]);},t:'A형 세균을 두 번 더 물리치세요.'},
+   {next:1,tab:'unit',point:{card:'memory:A'},t:'A형 기억세포 카드가 열렸습니다.'},
+   {next:1,t:'곧 A형 세균이 한꺼번에 많이 들어옵니다. <b>기억세포</b>는 보조 T림프구의 신호를 기다리지 않고 곧바로 형질세포로 분화해, 항체를 더 빠르고 많이 만듭니다. 이것을 <b>2차 면역 반응</b>이라고 합니다.'},
+   {tab:'unit',point:{card:'memory:A'},wait:tSel('memory','A'),t:'A형 기억세포 카드를 누르세요.'},
+   {rows:[2,3,4],point:{rows:[2,3,4]},wait:()=>tHas('memory'),t:'아래쪽 줄 근처를 누르세요.'},
+   {enter:()=>{tSched([0,1,2,3,4,5,6,7,8,9].map(i=>[1+i*.8,'bact','A']));},rows:ALL_ROWS,point:{wound:0},wait:()=>tClear(),
+    t:'세균이 몰려옵니다. 기억세포가 형질세포를 얼마나 빨리 만들어 내는지 지켜보세요.'},
+   {next:1,t:'2차 면역 반응은 1차보다 빠르고 강합니다. 기억세포가 남아 있기 때문입니다. <b>백신</b>은 약하게 만든 항원을 미리 넣어 1차 면역 반응을 일으키고, 기억세포를 만들어 두는 방법입니다.'}
+  ],
+  sum:'처음 만난 항원에는 1차 면역 반응이, 같은 항원을 다시 만나면 기억세포 덕분에 더 빠르고 강한 2차 면역 반응이 일어납니다. 이제 본게임에서 모든 세포를 함께 써 보세요.'}
+];
+let TUTDONE={};
+function startTut(i){
+  const T=TUTS[i];
+  S=newState(0,null,{cfg:{...T.cfg,name:T.name,short:T.short,goal:''},tut:{i,step:-1}});
+  selected=null;removeMode=false;lastHp=null;$('removeBtn').classList.remove('sel');
+  hideOverlay();showPanel(null);gameStarted=true;$('game').classList.add('tutmode');
+  buildTray();refreshHud();setTab(T.cfg.barriers.length?'barrier':'unit');tutGo(0);
+}
+function tutStep(){return S.tut&&TUTS[S.tut.i].steps[S.tut.step];}
+function tutGo(n){
+  const T=TUTS[S.tut.i];
+  if(n>=T.steps.length){tutFinish();return;}
+  S.tut.step=n;const st=T.steps[n];
+  if(st.tab)setTab(st.tab);
+  st.enter&&st.enter();
+  S.tut.rows=st.rowsFn?st.rowsFn():st.rows||[];S.tut.cells=st.cells||(()=>false);S.tut.allowStart=!!st.start;
+  S.paused=!!st.next;selected=st.next?null:selected;
+  renderCoach();refreshTray();
+  const el=tutEl(st.point);if(el&&el.scrollIntoView)try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}
+}
+function renderCoach(){
+  const T=TUTS[S.tut.i],st=T.steps[S.tut.step];
+  $('coach').hidden=false;
+  $('cStep').innerHTML=`${T.name}<span>${S.tut.step+1} / ${T.steps.length}</span>`;
+  $('cText').innerHTML=st.t;
+  $('cNext').hidden=!st.next;$('cNext').textContent=S.tut.step===T.steps.length-1?'완료':'다음';
+  $('cWait').hidden=!!st.next;$('cWait').textContent=st.wait&&!st.next?'직접 해 보세요':'';
+  const bp=boardRects(st.point),top=bp.length&&bp.reduce((a,r)=>a+r[1]+r[3]/2,0)/bp.length<H*.5;
+  $('coach').classList.toggle('low',!!top);
+  $('coach').classList.remove('pop');void $('coach').offsetWidth;$('coach').classList.add('pop');
+  if(st.next)setTimeout(()=>{try{$('cNext').focus({preventScroll:true});}catch(e){}},50);
+}
+function tutFinish(){
+  const i=S.tut.i,T=TUTS[i];TUTDONE[i]=1;S.paused=true;$('coach').hidden=true;clearTutPt();
+  SND.play('clear');
+  const nx=i<TUTS.length-1;
+  overlay(`<div class="card"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>
+   <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 시작하기</button>`}<button class="btn ghost" id="tList">모드 선택</button></div></div>`);
+  if(nx)$('tNext').onclick=()=>startTut(i+1);else $('tMain').onclick=()=>{hideOverlay();openModes();};
+  $('tList').onclick=()=>{hideOverlay();openModes();};
+}
+function exitTut(){if(!S.tut)return;$('coach').hidden=true;clearTutPt();$('game').classList.remove('tutmode');gameStarted=false;openModes();}
+function resumeGame(){showPanel(null);if(S.tut){$('game').classList.add('tutmode');if(tutStep())$('coach').hidden=false;}}
+let tutPtEl=null;
+function clearTutPt(){if(tutPtEl)tutPtEl.classList.remove('tutpt');tutPtEl=null;$('tutArrow').hidden=true;}
+function tutEl(pt){if(!pt)return null;if(pt.el)return $(pt.el);if(pt.card){const [t,k]=pt.card.split(':');return $(`card-${t}-${k}`);}return null;}
+function boardRects(pt){
+  if(!pt||!S)return [];
+  const wr=w=>[LEFT+w.c*CELL-20,w.side?H-96:0,140,96];
+  if(pt.vessel)return [[0,0,LEFT+4,H]];
+  if(pt.wound!=null&&S.wounds[pt.wound])return [wr(S.wounds[pt.wound])];
+  if(pt.wounds)return S.wounds.map(wr);
+  if(pt.edge)return [[W-64,0,64,H]];
+  const rows=pt.rows||(pt.rowsNow&&S.tut.rowsNow);if(rows)return rows.map(r=>[LEFT,r*CELL,W-LEFT-28,CELL]);
+  if(pt.cells&&S.tut.cells){const out=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(S.tut.cells(c,r)&&!S.grid[r][c])out.push([LEFT+c*CELL,r*CELL,CELL,CELL]);return out;}
+  if(pt.enemy){const e=S.enemies.find(e=>pt.enemy==='any'?true:pt.enemy==='op'?e.opT>0:e.k===pt.enemy);if(e){const y=(e.ry??e.lane)*CELL+50;return [[LEFT+e.x*CELL-48,y-48,96,96]];}}
+  if(pt.unit){const u=S.units.find(u=>u.k===pt.unit);if(u)return [[LEFT+u.x*CELL-46,u.y*CELL+4,92,92]];}
+  return [];
+}
+function drawTutBoard(time){
+  const st=tutStep();if(!st)return;
+  const R=boardRects(st.point);
+  if(S.paused){ctx.save();ctx.fillStyle='rgba(30,4,12,.42)';ctx.beginPath();ctx.rect(0,0,W,H);for(const [x,y,w,h] of R){ctx.moveTo(x+w,y);ctx.roundRect(x,y,w,h,18);}ctx.fill('evenodd');ctx.restore();}
+  if(!R.length)return;
+  const p=.6+.4*Math.sin(time*6);
+  ctx.save();ctx.strokeStyle=`rgba(255,207,77,${p})`;ctx.lineWidth=4;ctx.setLineDash([10,7]);ctx.lineDashOffset=-time*24;
+  for(const [x,y,w,h] of R){ctx.beginPath();ctx.roundRect(x+2,y+2,w-4,h-4,16);ctx.stroke();}
+  ctx.setLineDash([]);
+  const [x,y,w,h]=R[0],b=Math.sin(time*7)*6,cx=x+w/2,up=y>60;
+  const ay=up?y-14+b:y+h+14-b,d=up?1:-1;
+  ctx.fillStyle='#ffcf4d';ctx.strokeStyle='#7d2238';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx-15,ay-16*d);ctx.lineTo(cx+15,ay-16*d);ctx.lineTo(cx,ay);ctx.closePath();ctx.stroke();ctx.fill();
+  ctx.restore();
+}
+function tutTick(){
+  if(!S.tut||S.tut.step<0)return;
+  const st=tutStep();if(!st){clearTutPt();return;}
+  if($('overlay').hidden&&!panelsOpen()&&!S.paused){
+    if(st.tick)st.tick();
+    if(st.wait&&st.wait()){SND.play('note');tutGo(S.tut.step+1);return;}
+  }
+  // DOM pointer
+  const el=tutEl(st.point),vis=el&&el.offsetParent!==null&&$('overlay').hidden&&!panelsOpen();
+  if(el!==tutPtEl){if(tutPtEl)tutPtEl.classList.remove('tutpt');tutPtEl=el;if(el)el.classList.add('tutpt');}
+  const ar=$('tutArrow');
+  if(vis){const g=$('game'),gr=g.getBoundingClientRect(),sc=gr.width/g.offsetWidth||1,r=el.getBoundingClientRect();
+    ar.hidden=false;ar.style.left=((r.left+r.width/2-gr.left)/sc-14)+'px';ar.style.top=((r.top-gr.top)/sc-34)+'px';}
+  else ar.hidden=true;
+}
+const MODES_DIFF=[['easy','쉬움','병원체가 느리게 들어오고 약합니다. 포도당이 넉넉합니다.'],['normal','보통','기본 난이도입니다.'],['hard','어려움','병원체가 더 자주, 더 튼튼하게 들어옵니다.']];
+function openModes(){
+  if(S&&S.tut){$('coach').hidden=true;clearTutPt();$('game').classList.remove('tutmode');}
+  const tl=$('tutList');tl.innerHTML='';
+  TUTS.forEach((T,i)=>{const b=document.createElement('button');b.type='button';b.className='tbtn'+(TUTDONE[i]?' done':'');
+    b.innerHTML=`<span class="tn">${i+1}</span><span class="tt"><b>${T.short}</b><small>${T.sub}</small></span><span class="ck">${TUTDONE[i]?'완료':''}</span>`;
+    b.onclick=()=>{SND.init();SND.play('start');startTut(i);};tl.appendChild(b);});
+  const dl=$('diffList');dl.innerHTML='';
+  MODES_DIFF.forEach(([k,n,d])=>{const b=document.createElement('button');b.type='button';b.className='dbtn'+(k==='normal'?' main':'');
+    b.innerHTML=`<b>${n}</b><small>${d}</small>`;b.onclick=()=>{SND.init();SND.play('start');startMain(k);};dl.appendChild(b);});
+  showPanel('modes');
+}
+function startMain(k){
+  DIFFK=k;DISC={};$('game').classList.remove('tutmode');$('coach').hidden=true;clearTutPt();
+  S=newState(0,null,{diff:k});selected=null;removeMode=false;lastHp=null;$('removeBtn').classList.remove('sel');
+  buildTray();setTab('barrier');refreshHud();gameStarted=true;showPanel(null);showIntro();
+}
 
 // ---------- home, study, quiz ----------
 const LESSONS=[
@@ -1494,8 +1845,8 @@ const QUIZ=[
  {q:'꽃가루처럼 해롭지 않은 물질에 면역계가 지나치게 반응하는 것은?',o:['자가 면역','알레르기','2차 면역 반응','항원 제시'],a:1,e:'알레르기(과민 반응)에서는 비만세포가 히스타민을 과하게 분비해 콧물, 가려움, 부기가 나타난다.'}
 ];
 let lessonI=0,quizI=0,quizScore=0,fromHome=false,gameStarted=false;
-function panelsOpen(){return !$('home').hidden||!$('study').hidden||!$('quiz').hidden;}
-function showPanel(id){['home','study','quiz'].forEach(k=>$(k).hidden=k!==id);}
+function panelsOpen(){return !$('home').hidden||!$('study').hidden||!$('quiz').hidden||!$('modes').hidden;}
+function showPanel(id){['home','study','quiz','modes'].forEach(k=>$(k).hidden=k!==id);}
 function goHome(){showPanel('home');$('hStartLbl').textContent=gameStarted?'이어서 하기':'게임 시작';$('hRestart').hidden=!gameStarted;$('hStart').focus();}
 function figNode(kind,key,label){const d=document.createElement('div');d.className='fnode';
   if(kind==='b')d.appendChild(makeIcon('barrier',key));else if(kind==='u')d.appendChild(makeIcon('unit',key));else{const [k,s]=key.split(':');d.appendChild(makeEnemyIcon(k,s,false));}
@@ -1531,15 +1882,16 @@ function renderQuiz(){
     $('qNext').onclick=()=>{quizI++;renderQuiz();};$('qNext').focus();});
 }
 function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
-function startGame(){SND.init();showPanel(null);if(!gameStarted){gameStarted=true;showIntro();}}
+function startGame(){SND.init();if(gameStarted)resumeGame();else openModes();}
 $('hStart').onclick=()=>{SND.play('start');startGame();};
-$('hRestart').onclick=()=>{DISC={};S=newState(0);lastHp=null;buildTray();setTab('barrier');gameStarted=true;showPanel(null);showIntro();};
+$('hRestart').onclick=()=>{SND.init();openModes();};
+$('modesBack').onclick=goHome;$('cSkip').onclick=exitTut;$('cNext').onclick=()=>{if(S.tut){SND.play('click');tutGo(S.tut.step+1);}};
 $('hStudy').onclick=()=>openStudy(0);$('hQuiz').onclick=openQuiz;
 $('hBook').onclick=()=>{showPanel(null);fromHome=true;showBook();$('bookClose').onclick=()=>{hideOverlay();if(fromHome){fromHome=false;goHome();}};};
 $('studyBack').onclick=goHome;$('quizBack').onclick=goHome;
 $('studyPrev').onclick=()=>{if(lessonI>0){lessonI--;renderLesson();}};
 $('studyNext').onclick=()=>{if(lessonI<LESSONS.length-1){lessonI++;renderLesson();}else openQuiz();};
-$('homeBtn').onclick=()=>{selected=null;removeMode=false;S.picked=null;goHome();};
+$('homeBtn').onclick=()=>{selected=null;removeMode=false;S.picked=null;$('coach').hidden=true;clearTutPt();goHome();};
 // floating cells behind the title
 const HOMEFLOAT=['macro','neut','mast','helper','bcell','plasma','tc','nk','memory'].map((k,i)=>({k,x:Math.random()*1000,y:Math.random()*900,v:12+Math.random()*18,s:46+Math.random()*30,ph:i}));
 function drawHome(time,dt){
@@ -1554,7 +1906,8 @@ let last=performance.now(),trayTimer=0;
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   const time=now/1000;
-  if(S.phase==='wave'&&$('overlay').hidden&&!panelsOpen())update(dt);
+  if(S.phase==='wave'&&$('overlay').hidden&&!panelsOpen()&&!S.paused)update(dt);
+  tutTick();
   drawHome(time,dt);
   updateCam(dt);render(time);tickToast(dt);
   trayTimer+=dt;if(trayTimer>.2){trayTimer=0;refreshHud();refreshTray();}
@@ -1564,11 +1917,12 @@ S=newState(0);
 document.fonts.ready.then(()=>{buildTray();refreshHud();});
 buildTray();setTab('barrier');refreshHud();goHome();
 (function fitScreen(){
-  const g=$('game');let busy=false;
+  const g=$('game');let busy=false,maxH=0,lastVW=0,lastVH=0;
   function fit(){if(busy)return;busy=true;
     const vw=document.documentElement.clientWidth,vh=window.innerHeight;
+    if(vw!==lastVW||vh!==lastVH){maxH=0;lastVW=vw;lastVH=vh;}
     if(vw<=680){g.style.width='';g.style.transform='';g.style.marginBottom='';g.style.marginLeft='';document.body.style.overflow='';busy=false;return;}
-    g.style.width='1000px';const h=g.offsetHeight;
+    g.style.width='1000px';maxH=Math.max(maxH,g.offsetHeight);const h=maxH;
     const sc=Math.max(.3,Math.min((vw-32)/1000,(vh-28)/h,1.6));
     g.style.transformOrigin='top left';g.style.transform=`scale(${sc})`;g.style.marginBottom=`${h*(sc-1)}px`;g.style.marginLeft=`${((vw-32)-1000*sc)/2}px`;
     document.body.style.overflow='hidden';busy=false;}
