@@ -411,8 +411,8 @@ const STRAINS={
     trait:'독소를 뿜어 주변 면역세포를 해친다. 항체가 독소에 붙어 중화한다.'},
   D:{name:'바이러스 D형',color:'#e39a0c',shape:'star',virus:1,spd:1.35,hide:5,
     trait:'전파가 빠른 바이러스. 빠르게 움직이고 5초 만에 세포 속으로 숨는다.'},
-  E:{name:'바이러스 E형',color:'#0f9f9f',shape:'diamond',virus:1,hide:6,mhc:1,
-    trait:'감염시킨 세포 표면의 MHC를 숨겨서 세포독성 T림프구가 알아보지 못한다. 대신 MHC가 사라진 세포를 알아보는 NK세포가 2배로 강하다.'},
+  E:{name:'바이러스 E형',color:'#0f9f9f',shape:'diamond',virus:1,hide:3,
+    trait:'3초 만에 세포 속으로 숨는다. 항체로 막을 틈이 거의 없어 세포독성 T림프구를 미리 준비해야 한다.'},
   F:{name:'변이 바이러스 F형',color:'#c03fa8',shape:'cross',virus:1,hide:6,
     trait:'항원이 바뀐 새 바이러스다. 예전 기억이 통하지 않아 처음부터 다시 정체를 밝혀야 한다.'},
   P:{name:'꽃가루',color:'#d9a400',shape:'flower',harmless:1,
@@ -491,8 +491,8 @@ const STAGES=[
   {name:'림프절',goal:'정체가 드러난 항원에 맞는 B림프구가 보조 T 신호를 받아 형질세포가 되고, 항체로 독소 세균을 중화한다(체액성 면역).',
    units:['macro','mast','helper','bcell','tc'],barriers:['skin','mucus','lyso'],start:210,anti:true,strains:['A','B','C','P'],
    tint:['#efe6ff','#e6dbfc'],spawns:[[4,95,4.4,'bact','A'],[12,95,5,'bact','B'],[18,95,5.2,'toxin','C'],[6,60,6.5,'pollen','P']],events:[[40,'fever'],[68,'meal']]},
-  {name:'기도·폐',goal:'바이러스가 세포 안으로 숨는다. NK세포와 세포독성 T림프구가 감염세포를 파괴하고(세포성 면역), 반복된 승리는 기억세포를 남긴다.',
-   units:['macro','mast','helper','bcell','nk','tc'],barriers:['skin','mucus','lyso','cilia'],start:260,anti:true,strains:['A','D','E','F','P'],
+  {name:'기도·폐',goal:'바이러스가 세포 안으로 숨는다. 세포독성 T림프구가 감염세포를 파괴하고(세포성 면역), 반복된 승리는 기억세포를 남긴다.',
+   units:['macro','mast','helper','bcell','tc'],barriers:['skin','mucus','lyso','cilia'],start:260,anti:true,strains:['A','D','E','F','P'],
    tint:['#e4f4f6','#d7eef1'],spawns:[[4,95,2.2,'virus','D'],[24,95,3,'virus','E'],[8,60,7,'bact','A'],[60,95,1.8,'virus','D'],[100,100,1,'mutant','F']],events:[[22,'vaccine'],[40,'pollen'],[58,'fever'],[75,'meal']]}
 ];
 
@@ -1347,7 +1347,7 @@ function buildTray(){
   $('tab-barrier').hidden=!st.barriers.length;$('tab-unit').hidden=!st.units.length;$('tab-auto').hidden=!!(S.tut&&!st.auto);
   refreshTray();
 }
-const UNIT_GROUPS=[['비특이적 방어',['macro','mast','nk']],['지휘관',['helper']],['특이적 방어 · 지휘관 필요',['bcell','tc']]];
+const UNIT_GROUPS=[['비특이적 방어',['macro','mast']],['지휘관',['helper']],['특이적 방어 · 지휘관 필요',['bcell','tc']]];
 const AUTO=[
   {k:'neut',name:'호중구(백혈구)',how:'비만세포가 부를 때',count:()=>S.units.filter(u=>u.k==='neut').length},
   {k:'serum',name:'혈장',how:'비만세포가 부를 때',count:()=>S.plasmaPools.length},
@@ -1448,7 +1448,7 @@ function showIntro(){
   const tips=[
     ['세균은 위·아래 벽의 상처로 들어와 혈관(왼쪽)으로 향한다. 붉게 깜박이며 "침입!"이 뜨는 상처를 지킨다.','준비 단계에 1차 방어선을 깔고 시작 버튼을 누른다.','처음 보는 병원체는 까맣다. 대식세포가 삼켜 정체를 밝혀야 림프구 카드가 열린다.','중간에 피버 타임이 온다. 세포를 너무 많이 풀면 40℃를 넘어 우리 편도 지친다.'],
     ['독소 세균은 가까이 간 면역세포를 다치게 한다. B림프구가 만든 항체로 멀리서 중화한다.','B림프구와 세포독성 T림프구는 보조 T림프구가 판에 있어야 움직인다.','오른쪽 림프관으로 꽃가루도 들어온다. 해롭지 않지만 몸이 꽃가루를 적으로 기억하면 알레르기가 생긴다.','같은 유형을 10번 물리치면 그 유형의 기억세포가 열린다.'],
-    ['바이러스는 오른쪽 기도로 들어와 몇 초 뒤 세포 속에 숨는다. 감염세포는 세포독성 T림프구나 NK세포로 없앤다.','E형 바이러스는 세포독성 T림프구를 피한다. NK세포를 쓴다.','마지막에 새 항원을 가진 변이 바이러스가 온다. 기억세포가 통하지 않는다.']
+    ['바이러스는 오른쪽 기도로 들어와 몇 초 뒤 세포 속에 숨는다. 감염세포는 세포독성 T림프구로 없앤다.','E형 바이러스는 3초 만에 숨는다. 세포독성 T림프구를 미리 보내 둔다.','마지막에 새 항원을 가진 변이 바이러스가 온다. 기억세포가 통하지 않는다.']
   ][S.stage];
   overlay(`<div class="card"><div class="eyebrow">스테이지 ${S.stage+1} / ${STAGES.length} · 난이도 ${S.dm.name}</div><h2>${st.name}</h2><p>${st.goal}</p>
   <ul>${tips.map(t=>`<li>${t}</li>`).join('')}</ul><button class="btn" id="goBtn">준비하기</button></div>`);
@@ -1467,7 +1467,7 @@ function showClear(){
 function showOver(){
   SND.play('over');
   overlay(`<div class="card"><div class="eyebrow">감염 확산</div><h2>방어선이 무너졌다</h2>
-  <p>정체를 빨리 밝힐수록 특이적 면역을 일찍 쓸 수 있다. 세균은 식세포와 항체, 바이러스는 숨기 전엔 항체로, 숨은 뒤엔 NK세포와 세포독성 T림프구로 막아야 한다.</p>
+  <p>정체를 빨리 밝힐수록 특이적 면역을 일찍 쓸 수 있다. 세균은 식세포와 항체, 바이러스는 숨기 전엔 항체로, 숨은 뒤엔 세포독성 T림프구로 막아야 한다.</p>
   <button class="btn" id="retryBtn">${S.tut?'튜토리얼 다시':'이 스테이지 다시'}</button></div>`);
   $('retryBtn').onclick=()=>{if(S.tut){startTut(S.tut.i);return;}const keep=S.stage>0?S.carry:null;S=newState(S.stage,keep,{diff:S.diffK});lastHp=null;buildTray();showIntro();};
   refreshTray();
@@ -1478,10 +1478,10 @@ const BOOK_AG=[
     {k:'bact',s:'B',tags:['협막','세포 내 기생','이분법'],where:'1·2스테이지',weak:'항체를 붙여(옵소닌화) 식세포가 삼키게 한다. 감염된 대식세포는 보조 T림프구로 활성화한다.'},
     {k:'toxin',s:'C',tags:['독소'],where:'2스테이지',weak:'형질세포의 항체가 독소를 중화한다.'}]},
   {row:'바이러스',sub:'세포 구조가 없어 숙주 세포 안에서만 증식한다. 항생제가 듣지 않는다',items:[
-    {k:'virus',s:'D',tags:['빠른 전파'],where:'3스테이지',weak:'숨기 전엔 항체, 숨은 뒤엔 세포독성 T림프구와 NK세포.'},
-    {k:'virus',s:'E',tags:['MHC 숨김'],where:'3스테이지',weak:'세포독성 T림프구가 못 알아본다. NK세포가 2배로 강하다.'},
+    {k:'virus',s:'D',tags:['빠른 전파'],where:'3스테이지',weak:'숨기 전엔 항체, 숨은 뒤엔 세포독성 T림프구.'},
+    {k:'virus',s:'E',tags:['빠른 은신'],where:'3스테이지',weak:'세포독성 T림프구를 미리 보내 감염세포를 바로 없앤다.'},
     {k:'mutant',s:'F',tags:['항원 변이','보스'],where:'3스테이지 마지막',weak:'대식세포로 정체를 다시 밝힌 뒤 형질세포와 T림프구로 처리한다.'},
-    {k:'infected',s:'D',name:'감염세포',tags:['바이러스 공장'],where:'바이러스가 숨으면 생긴다',weak:'NK세포, 세포독성 T림프구. 그대로 두면 바이러스를 내보내다 터진다.',
+    {k:'infected',s:'D',name:'감염세포',tags:['바이러스 공장'],where:'바이러스가 숨으면 생긴다',weak:'세포독성 T림프구. 그대로 두면 바이러스를 내보내다 터진다.',
      trait:'바이러스가 숨어든 우리 몸 세포. 항체도 식세포도 안쪽까지 닿지 못한다.'}]},
   {row:'무해한 물질',sub:'병원체가 아니지만, 면역계가 착각하면 알레르기를 일으킨다',items:[
     {k:'pollen',s:'P',tags:['무해','알레르기 유발'],where:'2·3스테이지',weak:'싸울 필요가 없다. 감작되면 비만세포가 과민 반응한다.'}]}
@@ -1495,7 +1495,6 @@ const BIO={
   neut:['비특이적 방어 · 식세포 작용','백혈구 중 수가 가장 많고 감염 부위에 가장 먼저 모인다. 병원체를 삼키고 죽은 호중구가 쌓인 것이 고름이다.'],
   mast:['비특이적 방어 · 염증 반응','손상이나 감염이 생기면 히스타민을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 백혈구가 감염 부위로 쉽게 모이게 한다.'],
   serum:['비특이적 방어 · 염증 반응','혈액의 액체 성분이다. 염증 반응 때 혈관 밖으로 빠져나와 부위가 붓고(부종), 함께 나온 단백질이 병원체 제거를 돕는다.'],
-  nk:['비특이적 방어 · 심화 내용','자연 살해 세포라고도 한다. 항원을 미리 몰라도 바이러스에 감염된 세포나 암세포를 알아보고 파괴한다. 생명과학Ⅰ 범위를 넘는 심화 내용이다.'],
   helper:['특이적 방어 · 체액성·세포성 면역의 시작','가슴샘(흉선)에서 성숙하는 T림프구의 한 종류다. 대식세포가 제시한 항원을 인식해 활성화되고, B림프구와 세포독성 T림프구가 활성화되도록 돕는다.'],
   bcell:['특이적 방어 · 체액성 면역','골수에서 만들어지고 성숙한다. 자신에게 맞는 항원을 인식하고 보조 T림프구의 도움을 받으면 형질세포와 기억세포로 분화한다.'],
   plasma:['특이적 방어 · 체액성 면역','B림프구가 분화한 세포로 항체를 만들어 분비한다. 항체는 특정 항원에만 결합하며(항원-항체 반응의 특이성), 병원체를 무력화하거나 식세포가 잘 삼키도록 돕는다.'],
@@ -1503,7 +1502,7 @@ const BIO={
   memory:['특이적 방어 · 2차 면역 반응','1차 면역 반응 때 B림프구가 분화해 만들어지고 오래 살아남는다. 같은 항원이 다시 들어오면 빠르게 형질세포로 분화해 2차 면역 반응을 일으킨다.']
 };
 const AG_IMMUNE={A:'식세포 작용, 체액성 면역(항체)',B:'식세포 작용, 체액성 면역(옵소닌화). 감염된 대식세포는 세포성 면역',C:'체액성 면역(항체의 독소 중화)',
-  D:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',E:'세포 밖에서는 체액성 면역, 세포 안에서는 NK세포',F:'1차 면역 반응을 처음부터 다시 거쳐야 한다',P:'방어가 필요 없지만, 과민 반응(알레르기)이 일어날 수 있다',infected:'세포성 면역(세포독성 T림프구, NK세포)'};
+  D:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',E:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',F:'1차 면역 반응을 처음부터 다시 거쳐야 한다',P:'방어가 필요 없지만, 과민 반응(알레르기)이 일어날 수 있다',infected:'세포성 면역(세포독성 T림프구, NK세포)'};
 const CONCEPTS=[
   {t:'비특이적 방어와 특이적 방어',b:'<b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나는 방어다. 피부·점막 같은 장벽, 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식해 그 항원만 공격하는 방어로, 림프구가 담당하며 처음에는 시간이 걸린다.',
    g:'1차 방어선·대식세포·비만세포·호중구가 비특이적 방어, 보조 T·B·세포독성 T림프구와 기억세포가 특이적 방어다. 특이적 방어 카드는 항원 정체가 드러나야 열린다.'},
@@ -1535,7 +1534,7 @@ const BOOK_BODY=[
   {row:'1차 방어선',sub:'비특이적 방어. 감염 전부터 있는 물리적·화학적 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
   {row:'선천 면역',sub:'비특이적 방어. 병원체를 가리지 않고 바로 반응한다',items:[
     {u:'macro',how:'카드로 출동'},{u:'neut',how:'비만세포 경보 때 자동 출동'},{u:'mast',how:'카드로 출동'},
-    {u:'serum',how:'비만세포 경보 때 새어 나옴'},{u:'nk',how:'3스테이지부터 카드로 출동'}]},
+    {u:'serum',how:'비만세포 경보 때 새어 나옴'}]},
   {row:'지휘',sub:'특이적 방어를 시작하게 하는 림프구',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
   {row:'체액성 면역',sub:'특이적 방어. 항체로 체액 속 항원을 처리한다',items:[
     {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'},{u:'memory',how:'같은 유형 10번 처치로 열림'}]},
@@ -1960,7 +1959,7 @@ $('studyPrev').onclick=()=>{if(lessonI>0){lessonI--;renderLesson();}};
 $('studyNext').onclick=()=>{if(lessonI<LESSONS.length-1){lessonI++;renderLesson();}else openQuiz();};
 $('homeBtn').onclick=()=>{selected=null;removeMode=false;S.picked=null;$('coach').hidden=true;clearTutPt();goHome();};
 // floating cells behind the title
-const HOMEFLOAT=['macro','neut','mast','helper','bcell','plasma','tc','nk','memory'].map((k,i)=>({k,x:Math.random()*1000,y:Math.random()*900,v:12+Math.random()*18,s:46+Math.random()*30,ph:i}));
+const HOMEFLOAT=['macro','neut','mast','helper','bcell','plasma','tc','memory'].map((k,i)=>({k,x:Math.random()*1000,y:Math.random()*900,v:12+Math.random()*18,s:46+Math.random()*30,ph:i}));
 function drawHome(time,dt){
   const c=$('homeBg');if(!c||$('home').hidden)return;const g=c.getContext('2d');if(!g||!g.clearRect)return;
   drawWith(g,()=>{g.clearRect(0,0,1000,900);
