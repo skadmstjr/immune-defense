@@ -294,6 +294,17 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .mbox p{font-size:15px}.tbtn b{font-size:17px}.tbtn small{font-size:13.5px}.dbtn b{font-size:20px}.dbtn small{font-size:14px}
 .lesson p{font-size:16.5px}.ingame2{font-size:15px}
 @media (max-width:680px){.ctext{font-size:16.5px}.chead{font-size:14px}.toast{font-size:15px}.toast b{font-size:17px}.info{font-size:14.5px}}
+
+.ctext .sl,.sumlines .sl{display:block;text-wrap:balance}
+.ctext .sl+.sl{margin-top:2px}
+.cfast{margin-left:auto;flex:none;font-family:var(--display);font-size:14px;border:2px solid var(--goldbg);background:#fff;color:var(--golddk);border-radius:999px;padding:2px 12px;cursor:pointer}
+.cfast.on{background:var(--goldbg);color:#6b3d05;border-color:var(--golddk)}
+.cfast:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.cfast+.cskip{margin-left:6px}
+
+.ctext,.card,.chead,.cardbtns{word-break:keep-all;overflow-wrap:break-word}
+.nw{white-space:nowrap}
+@media (max-width:680px){.chead{flex-wrap:wrap;row-gap:4px}#cStep{flex:1 1 100%}.cfast{margin-left:0}}
 </style></head><body>
 
 <div class="game" id="game">
@@ -310,7 +321,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
   <div class="arena">
     <canvas id="cv" width="960" height="500" aria-label="게임 판"></canvas>
     <div class="toast old" id="toast" style="opacity:0" aria-live="polite"><b>알림</b>새 소식이 생기면 여기에 뜬다.</div>
-    <div class="coach" id="coach" hidden aria-live="polite"><div class="chead"><span id="cStep"></span><button type="button" class="cskip" id="cSkip">튜토리얼 건너뛰기</button></div><div class="ctext" id="cText"></div><div class="cfoot"><span class="cwait" id="cWait"></span><button type="button" class="cnext" id="cNext">다음</button></div></div>
+    <div class="coach" id="coach" hidden aria-live="polite"><div class="chead"><span id="cStep"></span><button type="button" class="cfast" id="cFast" aria-pressed="false">2배속</button><button type="button" class="cskip" id="cSkip">튜토리얼 건너뛰기</button></div><div class="ctext" id="cText"></div><div class="cfoot"><span class="cwait" id="cWait"></span><button type="button" class="cnext" id="cNext">다음</button></div></div>
   </div>
 
   <div class="dock">
@@ -1767,11 +1778,15 @@ function tutGo(n){
   renderCoach();refreshTray();
   const el=tutEl(st.point);if(el&&el.scrollIntoView)try{el.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}
 }
+function sentLines(t){t=t.replace(/(\([^()]*\)[가-힣]{0,3})/g,'<span class="nw">$1</span>');return t.split(/(?<=[.!?]['"”]?)\s+(?=\S)/).map(x=>`<span class="sl">${x}</span>`).join('');}
+let TUTFAST=false;
+function syncFast(){const b=$('cFast');b.classList.toggle('on',TUTFAST);b.setAttribute('aria-pressed',String(TUTFAST));b.textContent=TUTFAST?'2배속 켜짐':'2배속';}
 function renderCoach(){
   const T=TUTS[S.tut.i],st=T.steps[S.tut.step];
   $('coach').hidden=false;
-  $('cStep').innerHTML=`${T.name}<span>${S.tut.step+1} / ${T.steps.length}</span>`;
-  $('cText').innerHTML=st.t;
+  $('cStep').innerHTML=`튜토리얼 ${S.tut.i+1} · ${T.short}<span>${S.tut.step+1} / ${T.steps.length}</span>`;
+  $('cText').innerHTML=sentLines(st.t);
+  $('cFast').hidden=!TUTS[S.tut.i].steps.some(x=>x.wait&&!x.next);
   $('cNext').hidden=!st.next;$('cNext').textContent=S.tut.step===T.steps.length-1?'완료':'다음';
   $('cWait').hidden=!!st.next;$('cWait').textContent=st.wait&&!st.next?'직접 해 보세요':'';
   const bp=boardRects(st.point),top=bp.length&&bp.reduce((a,r)=>a+r[1]+r[3]/2,0)/bp.length<H*.5;
@@ -1784,7 +1799,7 @@ function tutFinish(){
   SND.play('clear');
   const nx=i<TUTS.length-1;
   const brief=nx?'':`<h3 class="bh">본게임에서 만나는 특별한 상황</h3><ul class="brief">${BRIEF.map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join('')}</ul><p class="bend">"침입!" 예고를 보고 알맞은 세포를 보내세요.</p>`;
-  overlay(`<div class="card${nx?'':' wide'}"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>${brief}
+  overlay(`<div class="card${nx?'':' wide'}"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p class="sumlines">${sentLines(T.sum)}</p>${brief}
    <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 난이도 고르기</button>`}${nx?'<button class="btn ghost" id="tList">튜토리얼 건너뛰기</button>':''}</div></div>`);
   if(nx)$('tNext').onclick=()=>startTut(i+1);else $('tMain').onclick=()=>{hideOverlay();openModes();};
   if(nx)$('tList').onclick=()=>{TUTS.forEach((T,i)=>TUTDONE[i]=1);hideOverlay();openModes();};
@@ -1937,7 +1952,7 @@ function openQuiz(){quizI=0;quizScore=0;showPanel('quiz');renderQuiz();}
 function startGame(){SND.init();if(gameStarted){resumeGame();return;}const n=TUTS.findIndex((T,i)=>!TUTDONE[i]);if(n>=0)startTut(n);else openModes();}
 $('hStart').onclick=()=>{SND.play('start');startGame();};
 $('hRestart').onclick=()=>{SND.init();openModes();};
-$('modesBack').onclick=goHome;$('cSkip').onclick=exitTut;$('cNext').onclick=()=>{if(S.tut){SND.play('click');tutGo(S.tut.step+1);}};
+$('modesBack').onclick=goHome;$('cFast').onclick=()=>{TUTFAST=!TUTFAST;SND.play('click');syncFast();};syncFast();$('cSkip').onclick=exitTut;$('cNext').onclick=()=>{if(S.tut){SND.play('click');tutGo(S.tut.step+1);}};
 $('hStudy').onclick=()=>openStudy(0);$('hQuiz').onclick=openQuiz;
 $('hBook').onclick=()=>{showPanel(null);fromHome=true;showBook();$('bookClose').onclick=()=>{hideOverlay();if(fromHome){fromHome=false;goHome();}};};
 $('studyBack').onclick=goHome;$('quizBack').onclick=goHome;
@@ -1958,7 +1973,7 @@ let last=performance.now(),trayTimer=0;
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   const time=now/1000;
-  if(S.phase==='wave'&&$('overlay').hidden&&!panelsOpen()&&!S.paused)update(dt);
+  if(S.phase==='wave'&&$('overlay').hidden&&!panelsOpen()&&!S.paused){update(dt);if(S.tut&&TUTFAST&&S.phase==='wave')update(dt);}
   tutTick();
   drawHome(time,dt);
   updateCam(dt);render(time);tickToast(dt);
