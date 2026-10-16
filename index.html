@@ -141,6 +141,9 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .fnode{display:flex;flex-direction:column;align-items:center;gap:4px;width:92px;text-align:center;font-family:var(--display);font-size:12.5px;color:var(--ink);line-height:1.2;word-break:keep-all}
 .fnode canvas{width:64px;height:64px;background:var(--light);border-radius:50%}
 .farr{font-family:var(--display);font-size:22px;color:var(--membrane)}
+.fbr{display:flex;flex-direction:column;gap:8px;border-left:3px solid var(--flesh2);padding-left:10px}
+.frow{display:flex;align-items:center;gap:4px 6px}
+.ftag{font-family:var(--display);font-size:12.5px;color:#fff;background:var(--membrane);border-radius:999px;padding:2px 9px;margin-left:4px}
 .lesson p{margin:0;font-size:15px;line-height:1.8;max-width:68ch}
 .lesson p b{color:var(--membrane);}
 .keys{display:flex;flex-wrap:wrap;gap:6px}
@@ -290,7 +293,7 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .info{font-size:16.5px}.info b{font-size:18px}.info .bio{font-size:15px}.info .how{font-size:15.5px}
 .unit .t{font-size:14.5px}.unit .lk{font-size:12.5px}.glbl,.rowlbl{font-size:13.5px}.tab{font-size:15.5px}
 .toast{font-size:16px}.toast b{font-size:19px}
-.card p{font-size:18px}.card ul{font-size:16.5px}.card ul.brief{font-size:16px}.card .bh{font-size:21px}
+.card p{font-size:18px}.card.bookcard p{font-size:14.5px}.card ul{font-size:16.5px}.card ul.brief{font-size:16px}.card .bh{font-size:21px}
 .mbox p{font-size:15px}.tbtn b{font-size:17px}.tbtn small{font-size:13.5px}.dbtn b{font-size:20px}.dbtn small{font-size:14px}
 .lesson p{font-size:16.5px}.ingame2{font-size:15px}
 @media (max-width:680px){.ctext{font-size:16.5px}.chead{font-size:14px}.toast{font-size:15px}.toast b{font-size:17px}.info{font-size:14.5px}}
@@ -1502,7 +1505,7 @@ const BIO={
   memory:['특이적 방어 · 2차 면역 반응','1차 면역 반응 때 B림프구가 분화해 만들어지고 오래 살아남는다. 같은 항원이 다시 들어오면 빠르게 형질세포로 분화해 2차 면역 반응을 일으킨다.']
 };
 const AG_IMMUNE={A:'식세포 작용, 체액성 면역(항체)',B:'식세포 작용, 체액성 면역(옵소닌화). 감염된 대식세포는 세포성 면역',C:'체액성 면역(항체의 독소 중화)',
-  D:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',E:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',F:'1차 면역 반응을 처음부터 다시 거쳐야 한다',P:'방어가 필요 없지만, 과민 반응(알레르기)이 일어날 수 있다',infected:'세포성 면역(세포독성 T림프구, NK세포)'};
+  D:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',E:'세포 밖에서는 체액성 면역, 세포 안에 숨으면 세포성 면역',F:'1차 면역 반응을 처음부터 다시 거쳐야 한다',P:'방어가 필요 없지만, 과민 반응(알레르기)이 일어날 수 있다',infected:'세포성 면역(세포독성 T림프구)'};
 const CONCEPTS=[
   {t:'비특이적 방어와 특이적 방어',b:'<b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나는 방어다. 피부·점막 같은 장벽, 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식해 그 항원만 공격하는 방어로, 림프구가 담당하며 처음에는 시간이 걸린다.',
    g:'1차 방어선·대식세포·비만세포·호중구가 비특이적 방어, 보조 T·B·세포독성 T림프구와 기억세포가 특이적 방어다. 특이적 방어 카드는 항원 정체가 드러나야 열린다.'},
@@ -1514,8 +1517,10 @@ const CONCEPTS=[
    g:'같은 유형을 10번 물리치면 기억세포 카드가 열린다. 기억세포는 보조 T림프구를 기다리지 않고 형질세포를 빠르게 많이 만든다.',chart:1},
   {t:'백신의 원리',b:'<b>백신</b>은 독성을 약하게 하거나 없앤 항원을 미리 넣어 1차 면역 반응을 일으키는 것이다. 이때 생긴 기억세포 덕분에 실제 병원체가 들어오면 바로 2차 면역 반응이 일어난다.',
    g:'3스테이지의 백신 접종 이벤트로 D형의 정체가 미리 드러나고 D형 기억세포가 열린다.'},
-  {t:'염증 반응',b:'상처나 감염 부위에서 비만세포가 <b>히스타민</b>을 분비하면 모세 혈관이 확장되고 혈관 벽의 투과성이 커진다. 그 결과 부위가 붉어지고 열이 나며 붓고, 식세포가 모여 병원체를 제거한다.',
-   g:'비만세포가 세균을 발견하면 경보를 울리고, 혈장이 새어 나오며 호중구가 혈관에서 달려온다.'},
+  {t:'식세포 작용',b:'백혈구 중 <b>대식세포</b>와 <b>호중구</b>는 병원체를 세포 안으로 삼켜 분해한다. 병원체의 종류를 가리지 않으므로 <b>비특이적 방어</b>다. 대식세포는 분해한 조각을 세포 표면에 내보이는 <b>항원 제시</b>로 특이적 방어를 시작하게 한다.',
+   g:'대식세포는 바로 옆에 온 병원체만 삼킨다. 처음 보는 병원체를 분해하면 그 유형의 정체가 드러난다.'},
+  {t:'염증 반응',b:'상처나 감염 부위에서 비만세포가 <b>히스타민</b>을 분비하면 모세 혈관이 확장되고 혈관 벽의 투과성이 커진다. 그 결과 부위가 붉어지고 열이 나며 붓고, 백혈구가 감염 부위로 모인다. 모인 식세포가 병원체를 삼키는 것은 식세포 작용으로, 염증 반응과는 다른 방어다.',
+   g:'비만세포가 세균을 발견하면 히스타민을 뿜고, 혈장이 새어 나오며 호중구가 혈관에서 달려온다.'},
   {t:'세균과 바이러스',b:'<b>세균</b>은 핵막이 없는 원핵생물로 스스로 분열해 증식하며 항생제로 치료할 수 있다. <b>바이러스</b>는 세포 구조가 없어 살아 있는 숙주 세포 안에서만 증식하며 항생제가 듣지 않는다.',
    g:'세균은 이분법으로 수를 늘리고, 바이러스는 세포 안으로 숨어 감염세포가 된다. 항생제 버튼은 세균만 없애고 바이러스는 그대로 남긴다.'},
   {t:'알레르기',b:'꽃가루처럼 해롭지 않은 물질에 면역계가 지나치게 반응하는 것을 <b>알레르기</b>(과민 반응)라 한다. 비만세포가 히스타민을 과하게 분비해 콧물, 가려움, 부기 같은 증상이 나타난다.',
@@ -1531,14 +1536,14 @@ const ABCHART=`<svg viewBox="0 0 320 150" role="img" aria-label="1차와 2차 �
 <text x="306" y="138" text-anchor="end" font-size="10" fill="#8c4a5c" font-family="Jua, sans-serif">시간</text></svg>`;
 
 const BOOK_BODY=[
-  {row:'1차 방어선',sub:'비특이적 방어. 감염 전부터 있는 물리적·화학적 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
-  {row:'선천 면역',sub:'비특이적 방어. 병원체를 가리지 않고 바로 반응한다',items:[
-    {u:'macro',how:'카드로 출동'},{u:'neut',how:'비만세포 경보 때 자동 출동'},{u:'mast',how:'카드로 출동'},
-    {u:'serum',how:'비만세포 경보 때 새어 나옴'}]},
-  {row:'지휘',sub:'특이적 방어를 시작하게 하는 림프구',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
-  {row:'체액성 면역',sub:'특이적 방어. 항체로 체액 속 항원을 처리한다',items:[
-    {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'},{u:'memory',how:'같은 유형 10번 처치로 열림'}]},
-  {row:'세포성 면역',sub:'특이적 방어. 감염된 세포를 직접 파괴한다',items:[{u:'tc',how:'바이러스나 B형 세균 정체가 드러나면 열림'}]}
+  {row:'1차 방어',sub:'비특이적 방어. 감염 전부터 있는 물리적·화학적 장벽',items:['skin','mucus','lyso','cilia'].map(k=>({b:k,how:'준비 단계에 깐다'}))},
+  {row:'식세포 작용',sub:'비특이적 방어. 병원체를 삼켜 분해한다',items:[{u:'macro',how:'카드로 출동'},{u:'neut',how:'염증 반응 때 자동 출동'}]},
+  {row:'염증 반응',sub:'비특이적 방어. 백혈구와 혈장을 감염 부위로 불러 모은다',items:[{u:'mast',how:'카드로 출동'},{u:'serum',how:'비만세포가 히스타민을 분비하면 새어 나옴'}]},
+  {row:'지휘',sub:'특이적 방어. B림프구와 세포독성 T림프구를 활성화한다',items:[{u:'helper',how:'항원 정체가 드러나면 열림'}]},
+  {row:'체액성 면역',sub:'특이적 방어. 형질세포가 만든 항체로 항원을 처리한다',items:[
+    {u:'bcell',how:'항원 정체가 드러나면 열림'},{u:'plasma',how:'B림프구가 분화해 자동 생성'}]},
+  {row:'세포성 면역',sub:'특이적 방어. 감염된 세포를 직접 파괴한다',items:[{u:'tc',how:'바이러스나 B형 세균 정체가 드러나면 열림'}]},
+  {row:'2차 면역 반응',sub:'1차 면역 반응 때 남은 기억세포가 같은 항원에 빠르게 반응한다',items:[{u:'memory',how:'같은 유형 10번 처치로 열림'}]}
 ];
 function makeEnemyIcon(k,s,mys){
   const c=document.createElement('canvas');c.width=80;c.height=80;const g=c.getContext('2d');
@@ -1870,7 +1875,7 @@ function startMain(k){
 
 // ---------- home, study, quiz ----------
 const LESSONS=[
- {t:'우리 몸의 방어 체계',fig:[['b','skin','피부·점막'],['u','macro','식세포'],['u','helper','보조 T림프구'],['u','plasma','형질세포·항체'],['u','tc','세포독성 T림프구']],
+ {t:'우리 몸의 방어 체계',fig:[['b','skin','피부·점막'],['u','macro','식세포'],['u','helper','보조 T림프구'],['br',[[['u','plasma','형질세포·항체'],'체액성'],[['u','tc','세포독성 T림프구'],'세포성']]]],
   p:'병원체가 몸에 들어오면 우리 몸은 두 겹으로 방어한다. <b>비특이적 방어</b>는 병원체의 종류를 가리지 않고 즉시 일어나며, 피부·점막 같은 장벽과 식세포 작용, 염증 반응이 여기에 속한다. <b>특이적 방어</b>는 특정 항원을 인식한 림프구가 담당하며, 처음에는 시간이 걸리지만 정확하다.',
   k:['비특이적 방어','특이적 방어','항원','림프구'],g:'1차 방어선과 대식세포·비만세포로 버티는 동안 대식세포가 병원체의 정체를 밝히면, 보조 T·B·세포독성 T림프구 카드가 열린다.'},
  {t:'1차 방어 · 피부와 점막',sep:'·',fig:[['b','skin','피부'],['b','mucus','점막'],['b','lyso','라이소자임'],['b','cilia','섬모']],
@@ -1882,10 +1887,10 @@ const LESSONS=[
  {t:'염증 반응',fig:[['u','mast','비만세포'],['u','serum','히스타민 → 혈관 확장'],['u','neut','백혈구가 모임']],
   p:'피부가 뚫려 병원체가 들어오면 <b>비만세포</b>가 <b>히스타민</b>을 분비한다. 히스타민은 모세 혈관을 확장시키고 혈관 벽의 투과성을 높여, 혈장이 빠져나오고 백혈구가 감염 부위로 모이게 한다. 그래서 부위가 붉어지고 열이 나며 붓는다. 이것이 <b>염증 반응</b>이다. 염증 반응은 백혈구를 <b>불러 모으는</b> 반응이고, 모여든 백혈구가 병원체를 삼키는 것은 앞 장의 식세포 작용이다.',
   k:['비만세포','히스타민','염증 반응','혈관 확장'],g:'비만세포는 직접 싸우지 않는다. 세균을 보면 히스타민을 뿜고, 그러면 혈장 웅덩이가 생기고 호중구가 혈관에서 달려온다.'},
- {t:'항원 제시와 보조 T림프구',fig:[['u','macro','대식세포'],['u','helper','보조 T림프구'],['u','bcell','B림프구'],['u','tc','세포독성 T림프구']],
+ {t:'항원 제시와 보조 T림프구',fig:[['u','macro','대식세포'],['u','helper','보조 T림프구'],['br',[[['u','bcell','B림프구']],[['u','tc','세포독성 T림프구']]]]],
   p:'대식세포는 삼킨 병원체를 분해해 그 조각(<b>항원</b>)을 세포 표면에 내보인다(<b>항원 제시</b>). <b>보조 T림프구</b>는 제시된 항원을 인식해 활성화되고, 같은 항원을 인식하는 B림프구와 세포독성 T림프구가 활성화되도록 돕는다. 림프구는 골수에서 만들어지며, B림프구는 <b>골수</b>에서, T림프구는 <b>가슴샘(흉선)</b>에서 성숙한다.',
   k:['항원 제시','보조 T림프구','골수','가슴샘'],g:'처음 보는 병원체는 까맣다. 대식세포가 하나를 삼키면 그 유형 전체의 정체가 드러난다. 보조 T림프구가 판에 없으면 B·세포독성 T림프구는 "신호 대기"만 한다.'},
- {t:'체액성 면역',fig:[['u','bcell','B림프구'],['u','plasma','형질세포'],['e','bact:C','항원-항체 반응'],['u','memory','기억세포']],
+ {t:'체액성 면역',fig:[['u','helper','보조 T림프구'],['u','bcell','B림프구'],['br',[[['u','plasma','형질세포'],['e','bact:C','항체 → 항원']],[['u','memory','기억세포']]]]],
   p:'활성화된 B림프구는 <b>형질세포</b>와 <b>기억세포</b>로 분화한다. 형질세포는 <b>항체</b>를 만들어 분비하고, 항체는 특정 항원과만 결합한다(<b>항원-항체 반응의 특이성</b>). 항체가 결합한 병원체는 무력화되거나 식세포에게 쉽게 삼켜지며, 독소는 중화된다. 이처럼 항체로 항원을 제거하는 방어를 <b>체액성 면역</b>이라 한다.',
   k:['형질세포','항체','특이성','체액성 면역'],g:'B림프구는 머리 위 표식의 항원 하나만 맡는다. 보조 T림프구의 신호를 받으면 형질세포를 만들고, 형질세포가 항체를 뿌린다.'},
  {t:'세포성 면역',fig:[['u','helper','보조 T림프구'],['u','tc','세포독성 T림프구'],['e','infected:D','감염세포']],
@@ -1921,7 +1926,14 @@ function renderLesson(){
   const L=LESSONS[lessonI],el=$('lesson');el.innerHTML='';
   el.insertAdjacentHTML('beforeend',`<div class="lno">${lessonI+1}장 / ${LESSONS.length}장</div><h2>${L.t}</h2>`);
   const fig=document.createElement('div');fig.className='fig';
-  L.fig.forEach((f,i)=>{if(i){const a=document.createElement('span');a.className='farr';a.textContent=L.sep||'→';fig.appendChild(a);}fig.appendChild(figNode(...f));});
+  const arr=t=>{const a=document.createElement('span');a.className='farr';a.textContent=t;return a;};
+  L.fig.forEach((f,i)=>{if(i)fig.appendChild(arr(L.sep||'→'));
+    if(f[0]!=='br'){fig.appendChild(figNode(...f));return;}
+    const br=document.createElement('div');br.className='fbr';
+    f[1].forEach(row=>{const r=document.createElement('div');r.className='frow';
+      row.forEach((n,j)=>{if(typeof n==='string'){const t=document.createElement('span');t.className='ftag';t.textContent=n;r.appendChild(t);return;}if(j)r.appendChild(arr('→'));r.appendChild(figNode(...n));});
+      br.appendChild(r);});
+    fig.appendChild(br);});
   el.appendChild(fig);
   if(L.chart)el.insertAdjacentHTML('beforeend',`<div class="fig">${ABCHART}</div>`);
   el.insertAdjacentHTML('beforeend',`<p>${L.p}</p><div class="keys">${L.k.map(k=>`<span>#${k}</span>`).join('')}</div><div class="ingame2"><span>게임에서는</span>${L.g}</div>`);
