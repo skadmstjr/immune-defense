@@ -268,6 +268,11 @@ canvas#cv{display:block;width:100%;height:auto;touch-action:manipulation;cursor:
 .dbtn b{font-family:var(--display);font-weight:400;font-size:19px}
 .dbtn small{font-size:12.5px;color:var(--muted)}
 .dbtn.main{background:var(--goldbg);border-color:var(--golddk);box-shadow:0 3px 0 var(--golddk)}
+.card.wide{max-width:660px}
+.card .bh{margin:4px 0 0;font-family:var(--display);font-weight:400;font-size:19px;color:var(--membrane-d)}
+.card ul.brief{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.6}
+.card ul.brief b{font-family:var(--display);font-weight:400;color:var(--membrane);margin-right:6px}
+.card .bend{font-family:var(--display);color:var(--gold);margin:0}
 .cardbtns{display:flex;gap:10px;flex-wrap:wrap}
 .btn.ghost{background:var(--skin);border:3px solid var(--membrane);color:var(--ink);box-shadow:0 4px 0 var(--membrane-d)}
 @media (max-width:680px){
@@ -1137,7 +1142,7 @@ function update(dt){
       if(t&&u.cd<=0){
         const allergic=t.k==='pollen';u.cd=allergic?4:8;u.alarm=1.6;u.tick=.4;
         if(allergic){S.allergy=Math.max(S.allergy||0,9);if(!S.flags.allergy){S.flags.allergy=1;note('allergy');}}
-        S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'shout'});
+        S.fx.push({x:LEFT+u.x*CELL,y:u.y*CELL+50,t:0,kind:'shout',txt:allergic?'꽃가루다!':'세균이다!'});
         for(let i=0;i<14;i++){const a=Math.random()*6.28,v=.6+Math.random()*1.2;S.hist.push({x:u.x,y:u.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0});}
         S.plasmaPools.push({x:u.x+.2,y:u.y,t:0,life:9});
         const lane=Math.round(u.y);
@@ -1251,7 +1256,7 @@ function render(time){
       for(let i=0;i<8;i++){const an=i*.785+.2,d1=34+f.t*70;ctx.beginPath();ctx.arc(f.x,f.y,d1,an-.25,an+.25);ctx.stroke();
         if(i%2===0){ctx.fillStyle='#e0577f';ctx.font='20px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('!',f.x+Math.cos(an)*(d1+16),f.y+Math.sin(an)*(d1+16)+7);}}
       ctx.fillStyle='#fff';ctx.strokeStyle='#e0577f';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(f.x-34,f.y-78,68,26,13);ctx.fill();ctx.stroke();
-      ctx.fillStyle='#e0577f';ctx.font='16px Jua, sans-serif';ctx.textAlign='center';ctx.fillText('세균이다!',f.x,f.y-60);}
+      ctx.fillStyle='#e0577f';ctx.font='16px Jua, sans-serif';ctx.textAlign='center';ctx.fillText(f.txt||'세균이다!',f.x,f.y-60);}
     else if(f.kind==='birth'){ctx.strokeStyle='#ffcf4d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(f.x+10,f.y,8+f.t*50,0,7);ctx.stroke();for(let i=0;i<5;i++){const an=i*1.256;heart(f.x+10+Math.cos(an)*(10+f.t*40),f.y+Math.sin(an)*(10+f.t*40),5,'#ff8fb0');}}
     else if(f.kind==='place'){ctx.strokeStyle=f.c||'#ffcf4d';ctx.lineWidth=5*(1-f.t/.8)+1;ctx.beginPath();ctx.arc(f.x,f.y,20+f.t*90,0,7);ctx.stroke();for(let i=0;i<8;i++){const an=i*.785,d=30+f.t*70;circ(f.x+Math.cos(an)*d,f.y+Math.sin(an)*d,4*(1-f.t/.8)+1,f.c||'#ffcf4d');}}
     else if(f.kind==='dmg'){ctx.fillStyle='#e8334f';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.font='17px Jua, sans-serif';ctx.textAlign='center';ctx.strokeText('-'+f.n,f.x,f.y-f.t*40);ctx.fillText('-'+f.n,f.x,f.y-f.t*40);}
@@ -1635,8 +1640,8 @@ const TUTS=[
   ],
   sum:'대식세포는 가까이 온 병원체를 삼켜 분해합니다(식세포 작용, 비특이적 방어). 처음 보는 병원체를 분해하면 항원 제시로 정체를 밝힙니다. 본게임에서는 정체가 드러나야 림프구 카드가 열립니다.'},
 
- {short:'비만세포',name:'튜토리얼 3 · 비만세포와 염증 반응',sub:'히스타민 · 호중구 · 혈장',
-  cfg:{look:0,auto:1,barriers:[],units:['macro','mast'],strains:['A'],start:220,wounds:[{side:1,c:6},{side:1,c:8}],revealed:{A:1},noShift:1,noDivide:1,noDodge:1},
+ {short:'비만세포',name:'튜토리얼 3 · 비만세포와 염증 반응',sub:'히스타민 · 호중구 · 꽃가루 알레르기',
+  cfg:{look:0,auto:1,edge:1,barriers:[],units:['macro','mast'],strains:['A','P'],start:220,wounds:[{side:1,c:6},{side:1,c:8}],revealed:{A:1,P:1},noShift:1,noDivide:1,noDodge:1},
   steps:[
    {next:1,point:{wounds:1},t:'이번에는 아래쪽 상처 두 곳으로 세균이 한꺼번에 몰려옵니다. 대식세포는 느려서 혼자서는 다 막지 못합니다.'},
    {next:1,tab:'unit',point:{card:'unit:mast'},t:'<b>비만세포</b>는 조직에 머물러 있다가 세균을 발견하면 <b>히스타민</b>을 분비합니다. 히스타민은 모세 혈관을 넓히고 혈관 벽의 틈을 벌려, 혈관 속의 백혈구와 혈장이 감염 부위로 빠져나오게 합니다. 이것을 <b>염증 반응</b>이라고 합니다. 다친 곳이 붉어지고, 붓고, 열이 나는 까닭입니다. 비만세포는 세균을 직접 공격하지 않습니다.'},
@@ -1648,9 +1653,18 @@ const TUTS=[
    {next:1,point:{unit:'mast'},t:'비만세포가 "세균이다!" 하고 히스타민(보라색 알갱이)을 뿜었습니다. 넓어진 혈관에서 <b>호중구</b>가 달려 나오고, 노란 <b>혈장</b> 웅덩이가 생겼습니다. 혈장 속의 <b>보체</b> 단백질은 세균에 구멍을 내고, 웅덩이 안의 병원체는 느려집니다.'},
    {next:1,tab:'auto',point:{el:'tab-auto'},t:'호중구와 혈장은 카드로 직접 부를 수 없습니다. 비만세포가 신호를 보낼 때만 나옵니다. <b>자동 출동</b> 탭에서 지금 판에 얼마나 나와 있는지 볼 수 있습니다. 호중구는 비만세포가 알린 세균만 처리하고, 일이 끝나면 사라집니다.'},
    {next:1,point:{unit:'neut'},t:'여기서 두 방어를 구분해야 합니다. <b>염증 반응</b>은 혈관을 넓혀 백혈구와 혈장을 감염 부위로 <b>불러 모으는</b> 반응입니다. 모여든 호중구가 세균을 삼켜 분해하는 것은 앞에서 대식세포로 본 <b>식세포 작용</b>입니다. 비만세포는 부르기만 하고, 세균을 처리하는 것은 식세포입니다.'},
-   {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요. 대식세포를 함께 보내면 더 빨리 끝납니다.'}
+   {tab:'unit',rows:ALL_ROWS,wait:()=>tClear(),t:'남은 세균을 막으세요. 대식세포를 함께 보내면 더 빨리 끝납니다.'},
+   {enter:()=>{tSched([[.5,'pollen','P',{lane:4}],[1.5,'pollen','P',{lane:3}],[2.5,'pollen','P',{lane:4}]]);},rows:ALL_ROWS,point:{edge:1},wait:()=>S.enemies.some(e=>e.k==='pollen'&&e.x<8.2),
+    t:'세균을 모두 막았습니다. 이번에는 오른쪽 입구로 무언가가 날아 들어옵니다.'},
+   {next:1,point:{enemy:'pollen'},t:'노란 <b>꽃가루</b>입니다. 꽃가루는 병원체가 아니지만, 몸에 면역 반응을 일으킬 수 있는 물질이므로 <b>항원</b>입니다. 지금 비만세포는 꽃가루를 보고도 가만히 있습니다. 이 몸이 꽃가루를 해로운 것으로 기억하고 있지 않기 때문입니다.'},
+   {next:1,point:{unit:'mast'},t:'그런데 어떤 사람의 몸은 꽃가루를 적으로 잘못 기억합니다. 이것을 <b>감작</b>이라고 합니다. 감작되면 꽃가루에 맞는 항체가 비만세포 표면에 붙어 있다가, 다음에 꽃가루를 만나면 비만세포가 곧바로 히스타민을 쏟아냅니다. 지금부터 이 몸이 꽃가루에 감작되었다고 하겠습니다.'},
+   {enter:()=>{S.flags.sens=1;tSched([[.5,'pollen','P',{lane:4}],[1.3,'pollen','P',{lane:3}],[2.1,'pollen','P',{lane:4}],[2.9,'pollen','P',{lane:3}]]);},rows:ALL_ROWS,point:{unit:'mast'},wait:()=>!!S.flags.allergy,
+    tick:()=>{if(!S.enemies.some(e=>e.k==='pollen')&&!S.spawns.length&&!S.flags.allergy)tSched([[.5,'pollen','P',{lane:4}],[1.5,'pollen','P',{lane:3}]]);},
+    t:'꽃가루가 다시 들어옵니다. 감작된 비만세포가 어떻게 반응하는지 지켜보세요.'},
+   {next:1,t:'<b>알레르기</b> 반응입니다. 해롭지 않은 꽃가루에 비만세포가 히스타민을 쏟아내 쓸데없는 염증이 생겼습니다. 화면이 노랗게 변한 동안 면역세포가 느려지고 포도당이 빠져나갑니다. 실제로 콧물, 재채기, 가려움이 생기는 까닭이며, 항히스타민제는 이 히스타민의 작용을 막는 약입니다.'},
+   {rows:ALL_ROWS,wait:()=>tClear(),t:'남은 꽃가루가 지나가기를 기다리세요. 꽃가루는 혈관에 닿아도 체력을 깎지 않습니다.'}
   ],
-  sum:'비만세포는 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 감염 부위로 불러 모읍니다. 모여든 호중구가 세균을 삼키는 것은 식세포 작용입니다. 염증 반응과 식세포 작용은 서로 다른 방어이지만, 둘 다 병원체의 종류를 가리지 않는 비특이적 방어입니다.'},
+  sum:'비만세포는 히스타민으로 염증 반응을 일으켜 호중구와 혈장을 감염 부위로 불러 모읍니다. 모여든 호중구가 세균을 삼키는 것은 식세포 작용입니다. 염증 반응과 식세포 작용은 서로 다른 방어이지만, 둘 다 병원체의 종류를 가리지 않는 비특이적 방어입니다. 몸이 꽃가루 같은 해롭지 않은 항원에 감작되면, 비만세포가 지나치게 반응하는 알레르기가 일어납니다.'},
 
  {short:'B림프구',name:'튜토리얼 4 · 보조 T림프구와 B림프구',sub:'형질세포 · 항체 · 체액성 면역',
   cfg:{look:1,auto:1,barriers:[],units:['macro','helper','bcell'],strains:['C'],start:300,wounds:[{side:0,c:7}],revealed:{C:1},noShift:1,noDivide:1,noDodge:1},
@@ -1710,6 +1724,16 @@ const TUTS=[
   ],
   sum:'처음 만난 항원에는 1차 면역 반응이, 같은 항원을 다시 만나면 기억세포 덕분에 더 빠르고 강한 2차 면역 반응이 일어납니다. 이제 본게임에서 모든 세포를 함께 써 보세요.'}
 ];
+const BRIEF=[
+ ['피버 타임','중간에 열이 오릅니다. 38~39.9℃의 적당한 열은 병원체를 약하게 하고 면역세포를 빠르게 하지만, 세포를 너무 많이 내보내면 40℃를 넘어 우리 편도 지칩니다. 위쪽 체온계를 보고, 너무 오르면 해열제 버튼을 쓰세요.'],
+ ['식사 시간','소장에서 흡수된 포도당이 혈액으로 들어옵니다. 포도당이 한꺼번에 늘고, 잠시 동안 두 배로 찹니다.'],
+ ['세포 안에 숨는 세균','B형 세균은 대식세포에게 삼켜져도 일부가 살아남아 대식세포를 감염시킵니다. 보조 T림프구가 다가가면 되살아나고, 늦으면 세포독성 T림프구가 정리합니다.'],
+ ['꽃가루 시즌','2·3스테이지에서는 꽃가루가 섞여 들어옵니다. 보조 T림프구가 있는 상태에서 꽃가루의 정체가 드러나면 몸이 감작되어, 그 뒤로는 꽃가루마다 알레르기 반응이 일어납니다.'],
+ ['백신 접종','3스테이지 초반에 D형 바이러스의 백신을 맞습니다. D형의 정체가 드러나고 기억세포가 미리 준비됩니다.'],
+ ['변이 바이러스','3스테이지 마지막에 항원이 바뀐 바이러스가 옵니다. 기억세포가 알아보지 못하므로 다시 정체를 밝혀야 합니다.'],
+ ['항생제','2스테이지부터 한 번 쓸 수 있습니다. 판 위의 세균을 한꺼번에 없애지만 바이러스에는 듣지 않습니다.'],
+ ['임무 완료','일을 마친 면역세포는 잠시 뒤 물러납니다. 실제로도 감염이 끝나면 대부분 사라지고 기억세포만 남습니다. 필요하면 다시 보내세요.']
+];
 let TUTDONE={};
 function startTut(i){
   const T=TUTS[i];
@@ -1746,10 +1770,11 @@ function tutFinish(){
   const i=S.tut.i,T=TUTS[i];TUTDONE[i]=1;S.paused=true;$('coach').hidden=true;clearTutPt();
   SND.play('clear');
   const nx=i<TUTS.length-1;
-  overlay(`<div class="card"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>
-   <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 난이도 고르기</button>`}<button class="btn ghost" id="tList">튜토리얼 건너뛰기</button></div></div>`);
+  const brief=nx?'':`<h3 class="bh">본게임에서 만나는 특별한 상황</h3><ul class="brief">${BRIEF.map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join('')}</ul><p class="bend">상처 위치와 "침입!" 예고를 보고, 병원체에 맞는 세포를 보내 몸을 지켜 내세요.</p>`;
+  overlay(`<div class="card${nx?'':' wide'}"><div class="eyebrow">튜토리얼 ${i+1} / ${TUTS.length} 완료</div><h2>${T.short}</h2><p>${T.sum}</p>${brief}
+   <div class="cardbtns">${nx?`<button class="btn" id="tNext">다음 튜토리얼: ${TUTS[i+1].short}</button>`:`<button class="btn" id="tMain">본게임 난이도 고르기</button>`}${nx?'<button class="btn ghost" id="tList">튜토리얼 건너뛰기</button>':''}</div></div>`);
   if(nx)$('tNext').onclick=()=>startTut(i+1);else $('tMain').onclick=()=>{hideOverlay();openModes();};
-  $('tList').onclick=()=>{TUTS.forEach((T,i)=>TUTDONE[i]=1);hideOverlay();openModes();};
+  if(nx)$('tList').onclick=()=>{TUTS.forEach((T,i)=>TUTDONE[i]=1);hideOverlay();openModes();};
 }
 function exitTut(){if(!S.tut)return;TUTS.forEach((T,i)=>TUTDONE[i]=1);$('coach').hidden=true;clearTutPt();$('game').classList.remove('tutmode');gameStarted=false;openModes();}
 function resumeGame(){showPanel(null);if(S.tut){$('game').classList.add('tutmode');if(tutStep())$('coach').hidden=false;}}
